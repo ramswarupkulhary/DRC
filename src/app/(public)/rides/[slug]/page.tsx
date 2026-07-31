@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { MapPin, Calendar, Clock, Users, Mountain, ChevronLeft, CheckCircle2 } from "lucide-react";

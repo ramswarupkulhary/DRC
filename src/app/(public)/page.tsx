@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { RideCard } from "@/components/rides/RideCard";
 import { TrainingCard } from "@/components/training/TrainingCard";
 import { prisma } from "@/lib/prisma";

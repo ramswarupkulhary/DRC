@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { TrainingCard } from "@/components/training/TrainingCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";

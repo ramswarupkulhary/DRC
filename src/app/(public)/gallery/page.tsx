@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { prisma } from "@/lib/prisma";
 import { Image as ImageIcon } from "lucide-react";
