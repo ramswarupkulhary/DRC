@@ -117,8 +117,8 @@ function CountUpInner({ target, duration, suffix }: { target: number; duration: 
   return (
     <motion.span ref={ref}>
       <motion.span
-        animate={{ count: target }}
-        initial={{ count: 0 }}
+        animate={{ count: target } as Record<string, number>}
+        initial={{ count: 0 } as Record<string, number>}
         transition={{ duration, ease: "easeOut" }}
         onUpdate={(latest) => {
           if (ref.current) {

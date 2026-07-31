@@ -34,7 +34,7 @@ export default async function LeaderboardPage() {
         />
       </AnimatedPageHeader>
 
-      <AnimatedGrid className="mt-12 space-y-3" staggerDelay={0.05}>
+      <AnimatedGrid className="mt-12 space-y-3">
         {riders.map((rider, i) => {
           const RankIcon = rankIcons[i] ?? null;
           return (

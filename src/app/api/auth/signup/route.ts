@@ -1,10 +1,6 @@
-import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { prisma } from "@/lib/prisma";
 import { hashSync } from "bcryptjs";
 import { NextResponse } from "next/server";
-
-const adapter = new PrismaBetterSqlite3({ url: "file:./dev.db" });
-const prisma = new PrismaClient({ adapter });
 
 export async function POST(req: Request) {
   try {

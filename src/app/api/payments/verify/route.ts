@@ -40,15 +40,15 @@ export async function POST(req: Request) {
       if (plan) {
         const startDate = new Date();
         const endDate = new Date();
-        endDate.setMonth(endDate.getMonth() + plan.durationMonths);
+        endDate.setMonth(endDate.getMonth() + plan.duration);
 
         await prisma.membership.create({
           data: {
-            userId,
             planId: itemId,
             startDate,
             endDate,
             status: "active",
+            users: { connect: { id: userId } },
           },
         });
       }

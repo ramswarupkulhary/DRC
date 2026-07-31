@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LayoutDashboard, Bike, GraduationCap, Users, ClipboardList, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText } from "lucide-react";
