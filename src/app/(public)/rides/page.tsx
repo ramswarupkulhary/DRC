@@ -1,0 +1,102 @@
+import { prisma } from "@/lib/prisma";
+import { RideCard } from "@/components/rides/RideCard";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection } from "@/components/ui/AnimatedPage";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Rides & Events",
+  description: "Explore upcoming off-road rides, overnighters, and multi-day expeditions with DRC.",
+};
+
+export default async function RidesPage() {
+  const rides = await prisma.ride.findMany({
+    where: { status: "published" },
+    orderBy: { startDate: "asc" },
+    include: { registrations: { where: { status: { not: "cancelled" } } } },
+  });
+
+  const upcoming = rides.filter((r) => r.startDate >= new Date());
+  const past = rides.filter((r) => r.startDate < new Date());
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <AnimatedPageHeader>
+        <SectionHeader
+          accent="Adventure awaits"
+          title="Rides & Events"
+          subtitle="Limited slots on every ride. Grab yours before they're gone."
+        />
+      </AnimatedPageHeader>
+
+      {upcoming.length > 0 && (
+        <div className="mt-12">
+          <AnimatedSection>
+            <h3 className="font-heading text-xl font-semibold text-tan mb-6 uppercase tracking-wider">
+              Upcoming
+            </h3>
+          </AnimatedSection>
+          <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {upcoming.map((ride) => (
+              <AnimatedGridItem key={ride.id}>
+                <RideCard
+                  slug={ride.slug}
+                  title={ride.title}
+                  location={ride.location}
+                  startDate={ride.startDate.toISOString()}
+                  endDate={ride.endDate.toISOString()}
+                  price={ride.price}
+                  totalSlots={ride.totalSlots}
+                  bookedSlots={ride.registrations.length}
+                  difficulty={ride.difficulty}
+                  type={ride.type}
+                  coverImage={ride.coverImage ?? undefined}
+                  featured={ride.featured}
+                />
+              </AnimatedGridItem>
+            ))}
+          </AnimatedGrid>
+        </div>
+      )}
+
+      {upcoming.length === 0 && (
+        <AnimatedSection className="mt-16">
+          <div className="text-center py-16 bg-surface border border-border rounded-sm">
+            <p className="text-muted text-lg">No upcoming rides at the moment.</p>
+            <p className="text-muted text-sm mt-2">Follow us on Instagram for announcements!</p>
+          </div>
+        </AnimatedSection>
+      )}
+
+      {past.length > 0 && (
+        <div className="mt-16">
+          <AnimatedSection>
+            <h3 className="font-heading text-xl font-semibold text-tan mb-6 uppercase tracking-wider">
+              Past Rides
+            </h3>
+          </AnimatedSection>
+          <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 opacity-60">
+            {past.map((ride) => (
+              <AnimatedGridItem key={ride.id}>
+                <RideCard
+                  slug={ride.slug}
+                  title={ride.title}
+                  location={ride.location}
+                  startDate={ride.startDate.toISOString()}
+                  endDate={ride.endDate.toISOString()}
+                  price={ride.price}
+                  totalSlots={ride.totalSlots}
+                  bookedSlots={ride.registrations.length}
+                  difficulty={ride.difficulty}
+                  type={ride.type}
+                  coverImage={ride.coverImage ?? undefined}
+                  featured={ride.featured}
+                />
+              </AnimatedGridItem>
+            ))}
+          </AnimatedGrid>
+        </div>
+      )}
+    </div>
+  );
+}

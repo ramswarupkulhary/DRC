@@ -1,0 +1,632 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── AUTH ───────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  phone         String?   @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  image         String?
+  role          String    @default("rider")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  bikeName         String?
+  bikeCC           String?
+  ridingExperience String?
+  emergencyName    String?
+  emergencyPhone   String?
+  bloodGroup       String?
+  licenseNumber    String?
+  city             String?
+
+  // Skill progression
+  skillLevel    String  @default("bronze")
+  skillPoints   Int     @default(0)
+  totalRides    Int     @default(0)
+  totalKm       Int     @default(0)
+  totalHours    Int     @default(0)
+
+  // Referral
+  referralCode   String?  @unique
+  referredById   String?
+  referralCredits Int     @default(0)
+
+  // Membership
+  membershipId   String?
+
+  accounts       Account[]
+  sessions       Session[]
+  registrations  Registration[]
+  reviews        Review[]
+  certificates   Certificate[]
+  badges         UserBadge[]
+  rideLogs       RideLog[]
+  journals       RideJournal[]
+  referrals      Referral[]     @relation("referrer")
+  referred       Referral[]     @relation("referred")
+  waivers        Waiver[]
+  surveyResponses SurveyResponse[]
+  waitlists      Waitlist[]
+  notifications  Notification[]
+  orders         Order[]
+  membership     Membership?    @relation(fields: [membershipId], references: [id])
+  passwordResets PasswordReset[]
+  blogPosts      BlogPost[]
+  giftVouchersPurchased GiftVoucher[] @relation("purchaser")
+  giftVouchersRedeemed  GiftVoucher[] @relation("redeemer")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expires   DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── RIDES & TRAININGS ──────────────────────────────
+
+model Ride {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  shortDesc   String?
+  location    String
+  state       String?
+  startDate   DateTime
+  endDate     DateTime
+  startPoint  String?
+  startTime   String?
+  price       Int
+  totalSlots  Int
+  coverImage  String?
+  images      String?
+  inclusions  String?
+  itinerary   String?
+  difficulty  String   @default("moderate")
+  type        String   @default("ride")
+  status      String   @default("draft")
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Trail map data
+  routeData     String?
+  elevationData String?
+  terrainTypes  String?
+  distance      Int?
+  elevationGain Int?
+
+  // Instructor
+  instructorId  String?
+
+  registrations Registration[]
+  reviews       Review[]
+  gallery       GalleryImage[]
+  rideLogs      RideLog[]
+  journals      RideJournal[]
+  waitlists     Waitlist[]
+  surveys       Survey[]
+  instructor    Instructor? @relation(fields: [instructorId], references: [id])
+}
+
+model Training {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  shortDesc   String?
+  level       String   @default("beginner")
+  duration    String?
+  price       Int
+  totalSlots  Int
+  location    String?
+  coverImage  String?
+  images      String?
+  curriculum  String?
+  schedule    String?
+  status      String   @default("draft")
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Skill assessment
+  requiredLevel    String?
+  skillPointsAward Int    @default(0)
+
+  instructorId     String?
+
+  registrations Registration[]
+  reviews       Review[]
+  waitlists     Waitlist[]
+  certificates  Certificate[]
+  surveys       Survey[]
+  instructor    Instructor? @relation(fields: [instructorId], references: [id])
+}
+
+model Registration {
+  id            String   @id @default(cuid())
+  userId        String
+  rideId        String?
+  trainingId    String?
+  status        String   @default("pending")
+  paymentStatus String   @default("unpaid")
+  paymentId     String?
+  orderId       String?
+  amount        Int
+  waiverSigned  Boolean  @default(false)
+  notes         String?
+  couponId      String?
+  discount      Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride     Ride?     @relation(fields: [rideId], references: [id])
+  training Training? @relation(fields: [trainingId], references: [id])
+  coupon   Coupon?   @relation(fields: [couponId], references: [id])
+}
+
+// ─── ENGAGEMENT ─────────────────────────────────────
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String
+  icon        String
+  category    String
+  criteria    String
+  threshold   Int      @default(1)
+  createdAt   DateTime @default(now())
+
+  users UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  earnedAt  DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+}
+
+model RideLog {
+  id         String   @id @default(cuid())
+  userId     String
+  rideId     String?
+  date       DateTime @default(now())
+  distance   Int      @default(0)
+  duration   Int      @default(0)
+  terrain    String?
+  notes      String?
+  rating     Int?
+  createdAt  DateTime @default(now())
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride Ride? @relation(fields: [rideId], references: [id])
+}
+
+model RideJournal {
+  id        String   @id @default(cuid())
+  userId    String
+  rideId    String?
+  title     String
+  content   String
+  photos    String?
+  terrain   String?
+  published Boolean  @default(false)
+  approved  Boolean  @default(false)
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride Ride? @relation(fields: [rideId], references: [id])
+}
+
+model Referral {
+  id          String   @id @default(cuid())
+  referrerId  String
+  referredId  String
+  code        String
+  status      String   @default("pending")
+  reward      Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  referrer User @relation("referrer", fields: [referrerId], references: [id], onDelete: Cascade)
+  referred User @relation("referred", fields: [referredId], references: [id], onDelete: Cascade)
+}
+
+// ─── REVENUE ────────────────────────────────────────
+
+model MembershipPlan {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  tier        String
+  price       Int
+  duration    Int
+  description String
+  benefits    String
+  maxGuests   Int      @default(0)
+  discount    Int      @default(0)
+  priority    Boolean  @default(false)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  memberships Membership[]
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  planId    String
+  startDate DateTime @default(now())
+  endDate   DateTime
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+
+  plan  MembershipPlan @relation(fields: [planId], references: [id])
+  users User[]
+}
+
+model GiftVoucher {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  amount       Int
+  balance      Int
+  purchaserId  String
+  recipientEmail String?
+  recipientName  String?
+  message      String?
+  redeemerId   String?
+  status       String   @default("active")
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  purchaser User  @relation("purchaser", fields: [purchaserId], references: [id])
+  redeemer  User? @relation("redeemer", fields: [redeemerId], references: [id])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  price       Int
+  salePrice   Int?
+  category    String
+  images      String?
+  sizes       String?
+  stock       Int      @default(0)
+  featured    Boolean  @default(false)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems OrderItem[]
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  userId        String
+  total         Int
+  status        String   @default("pending")
+  paymentStatus String   @default("unpaid")
+  paymentId     String?
+  shippingName  String?
+  shippingPhone String?
+  shippingAddress String?
+  shippingCity  String?
+  shippingState String?
+  shippingPin   String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Int
+  size      String?
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model CorporateInquiry {
+  id          String   @id @default(cuid())
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  groupSize   Int
+  eventType   String
+  preferredDate String?
+  budget      String?
+  requirements String?
+  status      String   @default("new")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  type        String   @default("percentage")
+  value       Int
+  minAmount   Int      @default(0)
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  validFrom   DateTime @default(now())
+  validUntil  DateTime
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  registrations Registration[]
+}
+
+// ─── SAFETY ─────────────────────────────────────────
+
+model Waiver {
+  id             String   @id @default(cuid())
+  userId         String
+  type           String   @default("standard")
+  fullName       String
+  dateOfBirth    String?
+  emergencyName  String
+  emergencyPhone String
+  medicalConditions String?
+  allergies      String?
+  medications    String?
+  agreedTerms    Boolean  @default(false)
+  signedAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SkillAssessment {
+  id          String   @id @default(cuid())
+  userId      String
+  score       Int
+  level       String
+  answers     String
+  completedAt DateTime @default(now())
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  userId      String
+  trainingId  String?
+  title       String
+  type        String
+  certNumber  String   @unique
+  issuedAt    DateTime @default(now())
+  imageUrl    String?
+  validUntil  DateTime?
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  training Training? @relation(fields: [trainingId], references: [id])
+}
+
+// ─── OPERATIONS ─────────────────────────────────────
+
+model Instructor {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  bio            String
+  photo          String?
+  certifications String?
+  specialties    String?
+  experience     String?
+  rating         Float    @default(5.0)
+  totalReviews   Int      @default(0)
+  active         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  rides     Ride[]
+  trainings Training[]
+}
+
+model Waitlist {
+  id         String   @id @default(cuid())
+  userId     String
+  rideId     String?
+  trainingId String?
+  status     String   @default("waiting")
+  notified   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride     Ride?     @relation(fields: [rideId], references: [id])
+  training Training? @relation(fields: [trainingId], references: [id])
+
+  @@unique([userId, rideId])
+  @@unique([userId, trainingId])
+}
+
+model Survey {
+  id         String   @id @default(cuid())
+  rideId     String?
+  trainingId String?
+  title      String
+  questions  String
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  ride      Ride?     @relation(fields: [rideId], references: [id])
+  training  Training? @relation(fields: [trainingId], references: [id])
+  responses SurveyResponse[]
+}
+
+model SurveyResponse {
+  id        String   @id @default(cuid())
+  surveyId  String
+  userId    String
+  answers   String
+  npsScore  Int?
+  createdAt DateTime @default(now())
+
+  survey Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── MARKETING ──────────────────────────────────────
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  type        String
+  date        DateTime
+  endDate     DateTime?
+  location    String
+  coverImage  String?
+  price       Int      @default(0)
+  totalSlots  Int      @default(0)
+  status      String   @default("upcoming")
+  featured    Boolean  @default(false)
+  rules       String?
+  prizes      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── EXISTING ───────────────────────────────────────
+
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  rideId     String?
+  trainingId String?
+  rating     Int
+  comment    String?
+  approved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ride     Ride?     @relation(fields: [rideId], references: [id])
+  training Training? @relation(fields: [trainingId], references: [id])
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  url       String
+  caption   String?
+  rideId    String?
+  category  String?
+  featured  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  ride Ride? @relation(fields: [rideId], references: [id])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SiteSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?
+  content     String
+  coverImage  String?
+  category    String   @default("adventure")
+  tags        String?
+  published   Boolean  @default(false)
+  featured    Boolean  @default(false)
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id])
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
