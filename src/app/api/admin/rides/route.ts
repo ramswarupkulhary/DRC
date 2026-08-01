@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       status: body.status,
       featured: body.featured || false,
       inclusions,
+      coverImage: body.coverImage || null,
     },
   });
 

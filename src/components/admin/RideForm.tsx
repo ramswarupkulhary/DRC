@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 const difficultyOptions = [
   { value: "easy", label: "Easy" },
@@ -47,6 +48,7 @@ interface RideFormProps {
     status: string;
     featured: boolean;
     inclusions: string | null;
+    coverImage: string | null;
   };
 }
 
@@ -54,6 +56,7 @@ export default function RideForm({ ride }: RideFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [coverImage, setCoverImage] = useState<string | null>(ride?.coverImage || null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -78,6 +81,7 @@ export default function RideForm({ ride }: RideFormProps) {
       status: form.get("status"),
       featured: form.get("featured") === "on",
       inclusions: form.get("inclusions") || null,
+      coverImage,
     };
 
     const url = ride ? `/api/admin/rides/${ride.id}` : "/api/admin/rides";
@@ -113,6 +117,11 @@ export default function RideForm({ ride }: RideFormProps) {
         <Input name="title" id="title" label="Title" defaultValue={ride?.title} required />
         <Input name="shortDesc" id="shortDesc" label="Short Description" defaultValue={ride?.shortDesc || ""} />
         <Textarea name="description" id="description" label="Full Description" defaultValue={ride?.description} required />
+      </div>
+
+      <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
+        <h3 className="font-heading text-lg font-semibold text-tan">Cover Image</h3>
+        <ImageUpload value={coverImage} onChange={setCoverImage} />
       </div>
 
       <div className="bg-surface border border-border rounded-sm p-6 space-y-5">

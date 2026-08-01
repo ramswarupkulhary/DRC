@@ -23,7 +23,17 @@ export function AnimatedHero() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background z-10" />
-      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/hero-bg.jpg')", filter: "brightness(0.4)" }} />
+      {/* Place hero.mp4 in /public/videos/ to activate the background video */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ filter: "brightness(0.4)" }}
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
       <div className="absolute inset-0 bg-gradient-to-br from-surface via-background to-surface-light" />
 
       <div className="relative z-20 text-center px-4 max-w-5xl mx-auto space-y-8">

@@ -32,6 +32,7 @@ export async function PUT(req: Request, { params }: Props) {
       status: body.status,
       featured: body.featured || false,
       inclusions,
+      coverImage: body.coverImage || null,
     },
   });
 
