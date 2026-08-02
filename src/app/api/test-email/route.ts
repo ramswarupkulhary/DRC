@@ -6,16 +6,15 @@ export async function GET() {
   console.log("[TEST] SMTP_PASSWORD:", process.env.SMTP_PASSWORD ? "SET" : "MISSING");
 
   const transporter = nodemailer.createTransport({
-    host: "smtpout.secureserver.net",
-    port: 587,
-    secure: false,
-    requireTLS: true,
+    host: "relay.secureserver.net",
+    port: 465,
+    secure: true,
     auth: {
       user: "info@dirtridecamp.com",
       pass: process.env.SMTP_PASSWORD,
     },
-    connectionTimeout: 5000,
-    socketTimeout: 5000,
+    connectionTimeout: 10000,
+    socketTimeout: 10000,
   } as any);
 
   try {
