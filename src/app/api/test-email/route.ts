@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 export async function GET() {
-  console.log("[TEST] Starting email test");
+  console.log("[TEST] === EMAIL TEST START ===");
+  console.log("[TEST] SMTP_PASSWORD:", process.env.SMTP_PASSWORD ? "SET" : "MISSING");
 
   const transporter = nodemailer.createTransport({
     host: "smtpout.secureserver.net",
@@ -12,39 +13,45 @@ export async function GET() {
       user: "info@dirtridecamp.com",
       pass: process.env.SMTP_PASSWORD,
     },
-    connectionTimeout: 3000,
-    socketTimeout: 3000,
+    connectionTimeout: 5000,
+    socketTimeout: 5000,
   } as any);
 
   try {
-    console.log("[TEST] Sending test email...");
-    const sendPromise = transporter.sendMail({
-      from: "info@dirtridecamp.com",
-      to: "kulhary.1999@gmail.com",
-      subject: "DRC Test Email",
-      html: `<h1>Test Email</h1><p>Test at ${new Date().toISOString()}</p>`,
-    });
+    console.log("[TEST] Step 1: Verifying SMTP connection...");
+    await Promise.race([
+      transporter.verify(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Verify timeout")), 6000))
+    ]);
+    console.log("[TEST] ✅ SMTP verified");
 
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("SMTP timeout after 5 seconds")), 5000)
-    );
+    console.log("[TEST] Step 2: Sending test email...");
+    const info = await Promise.race([
+      transporter.sendMail({
+        from: "info@dirtridecamp.com",
+        to: "kulhary.1999@gmail.com",
+        subject: "DRC Test Email",
+        html: `<h1>Test Email</h1><p>Test at ${new Date().toISOString()}</p>`,
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Send timeout")), 6000))
+    ]);
 
-    const info = await Promise.race([sendPromise, timeoutPromise]);
-
-    console.log("[TEST] ✅ Email sent!");
+    console.log("[TEST] ✅ Email sent! MessageID:", info?.messageId);
     return NextResponse.json({
       success: true,
-      message: "Email sent",
-      result: info,
+      message: "Email sent successfully",
+      messageId: info?.messageId,
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.error("[TEST] ❌ Error:", msg);
+    console.error("[TEST] ❌ FAILED:", msg);
+    console.error("[TEST] Error object:", error);
     return NextResponse.json(
       {
         success: false,
         error: msg,
-        hint: "SMTP connection issue - check GoDaddy settings",
+        host: "smtpout.secureserver.net",
+        port: 465,
       },
       { status: 500 }
     );
