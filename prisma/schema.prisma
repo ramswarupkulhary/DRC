@@ -320,6 +320,7 @@ model Membership {
   status       String   @default("pending")
   tshirtSize   String?
   paymentProof String?
+  rejectionNote String?
   createdAt    DateTime @default(now())
 
   plan  MembershipPlan @relation(fields: [planId], references: [id])

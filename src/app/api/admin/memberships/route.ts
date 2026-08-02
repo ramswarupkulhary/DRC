@@ -1,5 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: parseInt(process.env.SMTP_PORT || "587"),
+  secure: process.env.SMTP_SECURE === "true",
+  auth: {
+    user: process.env.SMTP_USER || process.env.SMTP_FROM,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export async function GET() {
   const memberships = await prisma.membership.findMany({
@@ -13,9 +24,10 @@ export async function GET() {
 }
 
 export async function PATCH(req: Request) {
-  const { id, status } = await req.json();
+  const { id, status, rejectionNote } = await req.json();
 
   const data: Record<string, unknown> = { status };
+  if (rejectionNote) data.rejectionNote = rejectionNote;
 
   if (status === "active") {
     const membership = await prisma.membership.findUnique({ where: { id }, include: { plan: true } });
@@ -27,6 +39,55 @@ export async function PATCH(req: Request) {
     }
   }
 
-  const membership = await prisma.membership.update({ where: { id }, data });
+  const membership = await prisma.membership.update({
+    where: { id },
+    data,
+    include: { users: { select: { name: true, email: true } } },
+  });
+
+  if (status === "rejected" && membership.users[0]?.email) {
+    const userEmail = membership.users[0].email;
+    const userName = membership.users[0].name;
+    try {
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || "info@dirtridecamp.com",
+        to: userEmail,
+        subject: "DRC Membership Application - Status Update",
+        html: `
+          <h2>Membership Application Status</h2>
+          <p>Hi ${userName},</p>
+          <p>Unfortunately, your DRC Membership application has been rejected.</p>
+          ${rejectionNote ? `<p><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
+          <p>If you have any questions, please contact us at info@dirtridecamp.com</p>
+          <p>Best regards,<br>DRC Team</p>
+        `,
+      });
+    } catch (error) {
+      console.error("Email send error:", error);
+    }
+  }
+
+  if (status === "active" && membership.users[0]?.email) {
+    const userEmail = membership.users[0].email;
+    const userName = membership.users[0].name;
+    try {
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || "info@dirtridecamp.com",
+        to: userEmail,
+        subject: "Welcome to DRC Membership!",
+        html: `
+          <h2>Welcome to DRC Membership</h2>
+          <p>Hi ${userName},</p>
+          <p>Your DRC Membership application has been approved! Welcome to the tribe.</p>
+          <p>Your welcome kit will be dispatched within 7 working days.</p>
+          <p>Best regards,<br>DRC Team</p>
+        `,
+      });
+    } catch (error) {
+      console.error("Email send error:", error);
+    }
+  }
+
   return NextResponse.json({ membership });
 }
+
