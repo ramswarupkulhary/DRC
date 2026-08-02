@@ -7,8 +7,8 @@ export async function GET() {
 
   const transporter = nodemailer.createTransport({
     host: "relay.secureserver.net",
-    port: 465,
-    secure: true,
+    port: 25,
+    secure: false,
     auth: {
       user: "info@dirtridecamp.com",
       pass: process.env.SMTP_PASSWORD,

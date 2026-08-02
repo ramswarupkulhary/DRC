@@ -2,11 +2,11 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-// Create transporter with GoDaddy relay
+// Create transporter with GoDaddy port 25
 const transporter = nodemailer.createTransport({
   host: "relay.secureserver.net",
-  port: 465,
-  secure: true,
+  port: 25,
+  secure: false,
   auth: {
     user: "info@dirtridecamp.com",
     pass: process.env.SMTP_PASSWORD,
