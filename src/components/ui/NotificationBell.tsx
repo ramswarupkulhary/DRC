@@ -28,6 +28,10 @@ export function NotificationBell() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
   async function fetchNotifications() {
     setLoading(true);
     try {
