@@ -57,9 +57,13 @@ export async function PATCH(req: Request) {
 
   const userId = membership.users[0]?.id;
 
+  console.log(`[MEMBERSHIP] Status update: id=${id}, status=${status}, email=${membership.users[0]?.email}`);
+
   if (status === "rejected" && membership.users[0]?.email) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name || "User";
+
+    console.log(`[EMAIL] Attempting rejection email to: ${userEmail}`);
 
     // Create in-app notification
     if (userId) {
@@ -73,33 +77,37 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email with timeout
+    // Send email - verify connection works first
     try {
-      await Promise.race([
-        transporter.sendMail({
-          from: "info@dirtridecamp.com",
-          to: userEmail,
-          subject: "DRC Membership Application - Status Update",
-          html: `
-            <h2>Membership Application Status</h2>
-            <p>Hi ${userName},</p>
-            <p>Unfortunately, your DRC Membership application has been rejected.</p>
-            ${rejectionNote ? `<p><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
-            <p>If you have any questions, please contact us at info@dirtridecamp.com</p>
-            <p>Best regards,<br>DRC Team</p>
-          `,
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Email timeout")), 8000)),
-      ]);
-      console.log(`✅ Rejection email sent to ${userEmail}`);
+      console.log(`[EMAIL] Verifying SMTP connection...`);
+      await transporter.verify();
+      console.log(`[EMAIL] ✅ SMTP connection verified`);
+
+      console.log(`[EMAIL] Sending rejection email...`);
+      const info = await transporter.sendMail({
+        from: "info@dirtridecamp.com",
+        to: userEmail,
+        subject: "DRC Membership Application - Status Update",
+        html: `
+          <h2>Membership Application Status</h2>
+          <p>Hi ${userName},</p>
+          <p>Unfortunately, your DRC Membership application has been rejected.</p>
+          ${rejectionNote ? `<p><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
+          <p>If you have any questions, please contact us at info@dirtridecamp.com</p>
+          <p>Best regards,<br>DRC Team</p>
+        `,
+      });
+      console.log(`[EMAIL] ✅ Rejection email sent. MessageID: ${info.messageId}`);
     } catch (error) {
-      console.error(`❌ Email error for ${userEmail}:`, error instanceof Error ? error.message : String(error));
+      console.error(`[EMAIL] ❌ REJECTION EMAIL FAILED:`, error instanceof Error ? error.message : String(error));
     }
   }
 
   if (status === "active" && membership.users[0]?.email) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name || "User";
+
+    console.log(`[EMAIL] Attempting approval email to: ${userEmail}`);
 
     // Create in-app notification
     if (userId) {
@@ -113,26 +121,28 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email with timeout
+    // Send email - verify connection works first
     try {
-      await Promise.race([
-        transporter.sendMail({
-          from: "info@dirtridecamp.com",
-          to: userEmail,
-          subject: "Welcome to DRC Membership!",
-          html: `
-            <h2>Welcome to DRC Membership</h2>
-            <p>Hi ${userName},</p>
-            <p>Your DRC Membership application has been approved! Welcome to the tribe.</p>
-            <p>Your welcome kit will be dispatched within 7 working days.</p>
-            <p>Best regards,<br>DRC Team</p>
-          `,
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Email timeout")), 8000)),
-      ]);
-      console.log(`✅ Approval email sent to ${userEmail}`);
+      console.log(`[EMAIL] Verifying SMTP connection...`);
+      await transporter.verify();
+      console.log(`[EMAIL] ✅ SMTP connection verified`);
+
+      console.log(`[EMAIL] Sending approval email...`);
+      const info = await transporter.sendMail({
+        from: "info@dirtridecamp.com",
+        to: userEmail,
+        subject: "Welcome to DRC Membership!",
+        html: `
+          <h2>Welcome to DRC Membership</h2>
+          <p>Hi ${userName},</p>
+          <p>Your DRC Membership application has been approved! Welcome to the tribe.</p>
+          <p>Your welcome kit will be dispatched within 7 working days.</p>
+          <p>Best regards,<br>DRC Team</p>
+        `,
+      });
+      console.log(`[EMAIL] ✅ Approval email sent. MessageID: ${info.messageId}`);
     } catch (error) {
-      console.error(`❌ Email error for ${userEmail}:`, error instanceof Error ? error.message : String(error));
+      console.error(`[EMAIL] ❌ APPROVAL EMAIL FAILED:`, error instanceof Error ? error.message : String(error));
     }
   }
 
