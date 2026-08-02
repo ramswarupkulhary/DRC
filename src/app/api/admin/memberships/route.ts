@@ -1,8 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+const transporter = nodemailer.createTransport({
+  host: "smtpout.secureserver.net",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "info@dirtridecamp.com",
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export async function GET() {
   const memberships = await prisma.membership.findMany({
@@ -55,12 +63,12 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email via SendGrid
+    // Send email
     try {
-      console.log(`Sending rejection email to ${userEmail} via SendGrid`);
-      await sgMail.send({
+      console.log(`📧 Sending rejection email to ${userEmail}...`);
+      await transporter.sendMail({
+        from: "info@dirtridecamp.com",
         to: userEmail,
-        from: process.env.SENDGRID_FROM_EMAIL || "info@dirtridecamp.com",
         subject: "DRC Membership Application - Status Update",
         html: `
           <h2>Membership Application Status</h2>
@@ -71,9 +79,9 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
-      console.log(`✅ Rejection email sent successfully to ${userEmail}`);
+      console.log(`✅ Rejection email sent to ${userEmail}`);
     } catch (error) {
-      console.error("❌ SendGrid error (rejection):", error);
+      console.error("❌ Email error:", error);
     }
   }
 
@@ -93,12 +101,12 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email via SendGrid
+    // Send email
     try {
-      console.log(`Sending approval email to ${userEmail} via SendGrid`);
-      await sgMail.send({
+      console.log(`📧 Sending approval email to ${userEmail}...`);
+      await transporter.sendMail({
+        from: "info@dirtridecamp.com",
         to: userEmail,
-        from: process.env.SENDGRID_FROM_EMAIL || "info@dirtridecamp.com",
         subject: "Welcome to DRC Membership!",
         html: `
           <h2>Welcome to DRC Membership</h2>
@@ -108,9 +116,9 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
-      console.log(`✅ Approval email sent successfully to ${userEmail}`);
+      console.log(`✅ Approval email sent to ${userEmail}`);
     } catch (error) {
-      console.error("❌ SendGrid error (approval):", error);
+      console.error("❌ Email error:", error);
     }
   }
 
