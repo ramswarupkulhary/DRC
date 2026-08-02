@@ -49,6 +49,7 @@ export async function PATCH(req: Request) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name;
     try {
+      console.log(`Sending rejection email to ${userEmail} with SMTP host: ${process.env.SMTP_HOST}`);
       await transporter.sendMail({
         from: process.env.SMTP_FROM || "info@dirtridecamp.com",
         to: userEmail,
@@ -62,8 +63,9 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
+      console.log(`Rejection email sent successfully to ${userEmail}`);
     } catch (error) {
-      console.error("Email send error:", error);
+      console.error("Email send error (rejection):", error);
     }
   }
 
@@ -71,6 +73,7 @@ export async function PATCH(req: Request) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name;
     try {
+      console.log(`Sending approval email to ${userEmail} with SMTP host: ${process.env.SMTP_HOST}`);
       await transporter.sendMail({
         from: process.env.SMTP_FROM || "info@dirtridecamp.com",
         to: userEmail,
@@ -83,8 +86,9 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
+      console.log(`Approval email sent successfully to ${userEmail}`);
     } catch (error) {
-      console.error("Email send error:", error);
+      console.error("Email send error (approval):", error);
     }
   }
 
