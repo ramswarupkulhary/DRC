@@ -42,7 +42,7 @@ export async function PATCH(req: Request) {
   const membership = await prisma.membership.update({
     where: { id },
     data,
-    include: { users: { select: { name: true, email: true } } },
+    include: { users: { select: { id: true, name: true, email: true } } },
   });
 
   const userId = membership.users[0]?.id;
