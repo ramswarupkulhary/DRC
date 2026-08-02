@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, User, LogOut, LayoutDashboard, FileText, BookOpen, Trophy, ChevronDown } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, FileText, BookOpen, Trophy, ChevronDown, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -59,6 +59,7 @@ export function Navbar() {
   const userName = session?.user?.name || "Rider";
   const userEmail = session?.user?.email || "";
   const userRole = (session?.user as { role?: string } | undefined)?.role || "rider";
+  const isMember = (session?.user as { isMember?: boolean } | undefined)?.isMember || false;
   const userInitials = userName
     .split(" ")
     .map((n) => n[0])
@@ -110,16 +111,27 @@ export function Navbar() {
             {session ? (
               <>
                 <NotificationBell />
+                <Link href="/membership">
+                  <Button variant={isMember ? "ghost" : "outline"} size="sm" className={isMember ? "text-orange border-orange/30 bg-orange/10 hover:bg-orange/20" : ""}>
+                    <Crown className="w-4 h-4 mr-1.5" />
+                    {isMember ? "Member" : "Membership"}
+                  </Button>
+                </Link>
                 <div ref={userMenuRef} className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-surface-light transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-orange flex items-center justify-center text-white text-xs font-bold">
+                    <div className="w-8 h-8 rounded-full bg-orange flex items-center justify-center text-white text-xs font-bold relative">
                       {session.user?.image ? (
                         <img src={session.user.image} alt={userName} className="w-full h-full rounded-full object-cover" />
                       ) : (
                         userInitials
+                      )}
+                      {isMember && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange rounded-full flex items-center justify-center border-2 border-background">
+                          <Crown className="w-2.5 h-2.5 text-white" />
+                        </div>
                       )}
                     </div>
                     <div className="text-left hidden xl:block">
@@ -139,11 +151,16 @@ export function Navbar() {
                       >
                         <div className="px-4 py-3 border-b border-border">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-white text-sm font-bold shrink-0">
+                            <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-white text-sm font-bold shrink-0 relative">
                               {session.user?.image ? (
                                 <img src={session.user.image} alt={userName} className="w-full h-full rounded-full object-cover" />
                               ) : (
                                 userInitials
+                              )}
+                              {isMember && (
+                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange rounded-full flex items-center justify-center border-2 border-surface">
+                                  <Crown className="w-2.5 h-2.5 text-white" />
+                                </div>
                               )}
                             </div>
                             <div className="min-w-0">
@@ -253,11 +270,16 @@ export function Navbar() {
                 {session ? (
                   <div className="space-y-1">
                     <div className="flex items-center gap-3 px-3 py-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-white text-sm font-bold shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-orange flex items-center justify-center text-white text-sm font-bold shrink-0 relative">
                         {session.user?.image ? (
                           <img src={session.user.image} alt={userName} className="w-full h-full rounded-full object-cover" />
                         ) : (
                           userInitials
+                        )}
+                        {isMember && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-orange rounded-full flex items-center justify-center border-2 border-surface">
+                            <Crown className="w-2.5 h-2.5 text-white" />
+                          </div>
                         )}
                       </div>
                       <div className="min-w-0">
@@ -280,6 +302,15 @@ export function Navbar() {
                         {link.label}
                       </Link>
                     ))}
+
+                    <Link
+                      href="/membership"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-orange hover:bg-orange/10 rounded-sm transition-colors"
+                    >
+                      <Crown className="w-4 h-4" />
+                      {isMember ? "My Membership" : "Join Membership"}
+                    </Link>
 
                     <button
                       onClick={() => {

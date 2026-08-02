@@ -302,6 +302,7 @@ model MembershipPlan {
   duration    Int
   description String
   benefits    String
+  upiId       String   @default("ramswarup.kulhary@ybl")
   maxGuests   Int      @default(0)
   discount    Int      @default(0)
   priority    Boolean  @default(false)
@@ -312,12 +313,14 @@ model MembershipPlan {
 }
 
 model Membership {
-  id        String   @id @default(cuid())
-  planId    String
-  startDate DateTime @default(now())
-  endDate   DateTime
-  status    String   @default("active")
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  planId       String
+  startDate    DateTime @default(now())
+  endDate      DateTime
+  status       String   @default("pending")
+  tshirtSize   String?
+  paymentProof String?
+  createdAt    DateTime @default(now())
 
   plan  MembershipPlan @relation(fields: [planId], references: [id])
   users User[]

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Camera } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -20,6 +21,7 @@ interface Profile {
   bloodGroup: string;
   licenseNumber: string;
   city: string;
+  image: string | null;
 }
 
 const experienceOptions = [
@@ -47,6 +49,9 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [image, setImage] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -58,7 +63,10 @@ export default function ProfilePage() {
     if (status === "authenticated") {
       fetch("/api/profile")
         .then((r) => r.json())
-        .then(setProfile);
+        .then((data) => {
+          setProfile(data);
+          setImage(data.image || null);
+        });
     }
   }, [status]);
 
@@ -81,7 +89,7 @@ export default function ProfilePage() {
     await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile),
+      body: JSON.stringify({ ...profile, image }),
     });
     setSaving(false);
     setSaved(true);
@@ -92,6 +100,64 @@ export default function ProfilePage() {
       <SectionHeader accent="Your account" title="Rider Profile" align="left" />
 
       <form onSubmit={handleSave} className="mt-8 space-y-8">
+        {/* Avatar Section */}
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border">
+              {image ? (
+                <img src={image} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-orange flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">
+                    {profile.name
+                      ? profile.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)
+                      : "?"}
+                  </span>
+                </div>
+              )}
+            </div>
+            <button
+              type="button"
+              disabled={uploadingPhoto}
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 p-1.5 bg-orange rounded-full text-white hover:bg-orange/80 transition-colors disabled:opacity-50"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setUploadingPhoto(true);
+                try {
+                  const formData = new FormData();
+                  formData.append("file", file);
+                  const res = await fetch("/api/upload", { method: "POST", body: formData });
+                  if (!res.ok) throw new Error("Upload failed");
+                  const { url } = await res.json();
+                  setImage(url);
+                  setSaved(false);
+                } catch {
+                  alert("Image upload failed. Please try again.");
+                } finally {
+                  setUploadingPhoto(false);
+                  e.target.value = "";
+                }
+              }}
+            />
+          </div>
+          {uploadingPhoto && <span className="text-sm text-muted">Uploading...</span>}
+        </div>
+
         <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
           <h3 className="font-heading text-lg font-semibold text-tan">Personal Info</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">

@@ -2,12 +2,17 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
+import Link from "next/link";
+import { Crown } from "lucide-react";
 
 export default async function AdminRidersPage() {
   const riders = await prisma.user.findMany({
     where: { role: "rider" },
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: { select: { registrations: true } },
+      membership: true,
+    },
   });
 
   return (
@@ -22,7 +27,7 @@ export default async function AdminRidersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-surface-light text-left text-muted text-xs uppercase tracking-wider">
-                <th className="px-5 py-3">Name</th>
+                <th className="px-5 py-3">Rider</th>
                 <th className="px-5 py-3">Email</th>
                 <th className="px-5 py-3">Phone</th>
                 <th className="px-5 py-3">Bike</th>
@@ -34,7 +39,27 @@ export default async function AdminRidersPage() {
             <tbody className="divide-y divide-border">
               {riders.map((rider) => (
                 <tr key={rider.id} className="hover:bg-surface-light/50">
-                  <td className="px-5 py-3 font-medium">{rider.name || "—"}</td>
+                  <td className="px-5 py-3">
+                    <Link href={`/admin/riders/${rider.id}`} className="flex items-center gap-3 group">
+                      <div className="w-8 h-8 rounded-full bg-orange/20 flex items-center justify-center overflow-hidden shrink-0 relative">
+                        {rider.image ? (
+                          <img src={rider.image} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-xs font-bold text-orange">
+                            {(rider.name || "R").charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                        {rider.membership?.status === "active" && (
+                          <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-orange rounded-full flex items-center justify-center">
+                            <Crown className="w-2 h-2 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-medium text-foreground group-hover:text-orange transition-colors">
+                        {rider.name || "—"}
+                      </span>
+                    </Link>
+                  </td>
                   <td className="px-5 py-3 text-muted">{rider.email}</td>
                   <td className="px-5 py-3 text-muted">{rider.phone || "—"}</td>
                   <td className="px-5 py-3">{rider.bikeName || "—"}</td>

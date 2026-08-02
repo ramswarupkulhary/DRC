@@ -10,6 +10,7 @@ interface PaymentButtonProps {
   amount: number;
   itemName: string;
   couponCode?: string;
+  metadata?: Record<string, string>;
   onSuccess?: (paymentId: string) => void;
   className?: string;
   disabled?: boolean;
@@ -21,7 +22,7 @@ declare global {
   }
 }
 
-export function PaymentButton({ type, itemId, amount, itemName, couponCode, onSuccess, className, disabled }: PaymentButtonProps) {
+export function PaymentButton({ type, itemId, amount, itemName, couponCode, metadata, onSuccess, className, disabled }: PaymentButtonProps) {
   const [loading, setLoading] = useState(false);
   const [paid, setPaid] = useState(false);
 
@@ -71,6 +72,7 @@ export function PaymentButton({ type, itemId, amount, itemName, couponCode, onSu
               type,
               itemId,
               couponCode,
+              metadata,
             }),
           });
 

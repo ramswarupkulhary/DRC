@@ -16,6 +16,7 @@ export const authOptions: AuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
+          include: { membership: true },
         });
 
         if (!user || !user.passwordHash) return null;
@@ -23,12 +24,15 @@ export const authOptions: AuthOptions = {
         const valid = compareSync(credentials.password, user.passwordHash);
         if (!valid) return null;
 
+        const isMember = !!(user.membership && user.membership.status === "active" && new Date(user.membership.endDate) > new Date());
+
         return {
           id: user.id,
           name: user.name,
           email: user.email,
           role: user.role,
           image: user.image,
+          isMember,
         };
       },
     }),
@@ -43,6 +47,8 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role || "rider";
+        token.image = user.image || null;
+        token.isMember = (user as { isMember?: boolean }).isMember || false;
       }
       return token;
     },
@@ -50,6 +56,8 @@ export const authOptions: AuthOptions = {
       if (session.user) {
         (session.user as { id?: string }).id = token.id as string;
         (session.user as { role?: string }).role = token.role as string;
+        (session.user as { image?: string | null }).image = token.image as string | null;
+        (session.user as { isMember?: boolean }).isMember = token.isMember as boolean;
       }
       return session;
     },

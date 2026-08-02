@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import Link from "next/link";
-import { Trophy, Mountain, MapPin, Clock, Award } from "lucide-react";
+import { Trophy, Mountain, MapPin, Clock, Award, Crown, ArrowRight } from "lucide-react";
 
 interface DashboardData {
   user: {
@@ -17,6 +17,12 @@ interface DashboardData {
     totalHours: number;
     referralCode: string;
     referralCredits: number;
+    membership: {
+      status: string;
+      endDate: string;
+      tshirtSize: string | null;
+      plan: { name: string };
+    } | null;
   };
   badges: { id: string; name: string; icon: string; description: string; earnedAt: string }[];
   recentLogs: { id: string; date: string; distance: number; duration: number; ride: { title: string } | null }[];
@@ -115,6 +121,41 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Membership */}
+      {data.user.membership && data.user.membership.status === "active" && new Date(data.user.membership.endDate) > new Date() ? (
+        <div className="mt-8 bg-surface border border-orange/30 rounded-sm p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-orange/15 flex items-center justify-center">
+                <Crown className="w-5 h-5 text-orange" />
+              </div>
+              <div>
+                <h3 className="font-heading text-lg font-semibold text-tan">DRC Member</h3>
+                <p className="text-xs text-muted">Valid until {new Date(data.user.membership.endDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
+              </div>
+            </div>
+            <Badge variant="success">Active</Badge>
+          </div>
+        </div>
+      ) : (
+        <Link href="/membership" className="block mt-8">
+          <div className="bg-gradient-to-r from-orange/20 via-orange/10 to-transparent border border-orange/30 rounded-sm p-6 hover:border-orange/50 transition-colors group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange/15 flex items-center justify-center">
+                  <Crown className="w-5 h-5 text-orange" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-lg font-semibold text-foreground">Join DRC Membership</h3>
+                  <p className="text-sm text-muted">Welcome kit, priority booking & more — ₹999/year</p>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-orange group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+        </Link>
+      )}
 
       {/* Badges */}
       <div className="mt-8 bg-surface border border-border rounded-sm p-6">

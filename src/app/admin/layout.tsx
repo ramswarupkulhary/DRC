@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Bike, GraduationCap, Users, ClipboardList, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText } from "lucide-react";
+import { LayoutDashboard, Bike, GraduationCap, Users, ClipboardList, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown } from "lucide-react";
 
 const sidebarLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -12,6 +12,7 @@ const sidebarLinks = [
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/registrations", label: "Registrations", icon: ClipboardList },
   { href: "/admin/riders", label: "Riders", icon: Users },
+  { href: "/admin/memberships", label: "Memberships", icon: Crown },
   { href: "/admin/instructors", label: "Instructors", icon: UserCheck },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },

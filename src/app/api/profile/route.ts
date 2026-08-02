@@ -24,6 +24,7 @@ export async function GET() {
     bloodGroup: user.bloodGroup || "",
     licenseNumber: user.licenseNumber || "",
     city: user.city || "",
+    image: user.image || null,
   });
 }
 
@@ -48,6 +49,7 @@ export async function PUT(req: Request) {
       bloodGroup: body.bloodGroup || null,
       licenseNumber: body.licenseNumber || null,
       city: body.city || null,
+      image: body.image || null,
     },
   });
 

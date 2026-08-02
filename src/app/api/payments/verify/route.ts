@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, itemId, couponCode } = await req.json();
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, itemId, couponCode, metadata } = await req.json();
 
   const expectedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || "placeholder_secret")
@@ -48,6 +48,7 @@ export async function POST(req: Request) {
             startDate,
             endDate,
             status: "active",
+            tshirtSize: metadata?.tshirtSize || null,
             users: { connect: { id: userId } },
           },
         });

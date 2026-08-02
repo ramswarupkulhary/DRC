@@ -13,6 +13,10 @@ export async function GET() {
     select: {
       skillLevel: true, skillPoints: true, totalRides: true,
       totalKm: true, totalHours: true, referralCode: true, referralCredits: true,
+      name: true, image: true,
+      membership: {
+        select: { status: true, endDate: true, tshirtSize: true, plan: { select: { name: true } } },
+      },
     },
   });
 
