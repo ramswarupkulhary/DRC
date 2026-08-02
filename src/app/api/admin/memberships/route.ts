@@ -73,24 +73,28 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email asynchronously (fire-and-forget)
-    transporter.sendMail({
-      from: "info@dirtridecamp.com",
-      to: userEmail,
-      subject: "DRC Membership Application - Status Update",
-      html: `
-        <h2>Membership Application Status</h2>
-        <p>Hi ${userName},</p>
-        <p>Unfortunately, your DRC Membership application has been rejected.</p>
-        ${rejectionNote ? `<p><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
-        <p>If you have any questions, please contact us at info@dirtridecamp.com</p>
-        <p>Best regards,<br>DRC Team</p>
-      `,
-    }).then(() => {
+    // Send email with timeout
+    try {
+      await Promise.race([
+        transporter.sendMail({
+          from: "info@dirtridecamp.com",
+          to: userEmail,
+          subject: "DRC Membership Application - Status Update",
+          html: `
+            <h2>Membership Application Status</h2>
+            <p>Hi ${userName},</p>
+            <p>Unfortunately, your DRC Membership application has been rejected.</p>
+            ${rejectionNote ? `<p><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
+            <p>If you have any questions, please contact us at info@dirtridecamp.com</p>
+            <p>Best regards,<br>DRC Team</p>
+          `,
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Email timeout")), 8000)),
+      ]);
       console.log(`✅ Rejection email sent to ${userEmail}`);
-    }).catch((error) => {
-      console.error(`❌ Email failed for ${userEmail}:`, error.message);
-    });
+    } catch (error) {
+      console.error(`❌ Email error for ${userEmail}:`, error instanceof Error ? error.message : String(error));
+    }
   }
 
   if (status === "active" && membership.users[0]?.email) {
@@ -109,23 +113,27 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email asynchronously (fire-and-forget)
-    transporter.sendMail({
-      from: "info@dirtridecamp.com",
-      to: userEmail,
-      subject: "Welcome to DRC Membership!",
-      html: `
-        <h2>Welcome to DRC Membership</h2>
-        <p>Hi ${userName},</p>
-        <p>Your DRC Membership application has been approved! Welcome to the tribe.</p>
-        <p>Your welcome kit will be dispatched within 7 working days.</p>
-        <p>Best regards,<br>DRC Team</p>
-      `,
-    }).then(() => {
+    // Send email with timeout
+    try {
+      await Promise.race([
+        transporter.sendMail({
+          from: "info@dirtridecamp.com",
+          to: userEmail,
+          subject: "Welcome to DRC Membership!",
+          html: `
+            <h2>Welcome to DRC Membership</h2>
+            <p>Hi ${userName},</p>
+            <p>Your DRC Membership application has been approved! Welcome to the tribe.</p>
+            <p>Your welcome kit will be dispatched within 7 working days.</p>
+            <p>Best regards,<br>DRC Team</p>
+          `,
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Email timeout")), 8000)),
+      ]);
       console.log(`✅ Approval email sent to ${userEmail}`);
-    }).catch((error) => {
-      console.error(`❌ Email failed for ${userEmail}:`, error.message);
-    });
+    } catch (error) {
+      console.error(`❌ Email error for ${userEmail}:`, error instanceof Error ? error.message : String(error));
+    }
   }
 
   return NextResponse.json({ membership });
