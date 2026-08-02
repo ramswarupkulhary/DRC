@@ -1,9 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import type { TransportOptions } from "nodemailer";
 
-// Create transporter with connection pooling
+// Create transporter
 const transporter = nodemailer.createTransport({
   host: "smtpout.secureserver.net",
   port: 465,
@@ -12,16 +11,7 @@ const transporter = nodemailer.createTransport({
     user: "info@dirtridecamp.com",
     pass: process.env.SMTP_PASSWORD,
   },
-  pool: {
-    maxConnections: 5,
-    maxMessages: 100,
-    rateDelta: 2000,
-    rateLimit: 10,
-  },
-  connectionTimeout: 5000,
-  greetingTimeout: 5000,
-  socketTimeout: 10000,
-} as TransportOptions);
+} as any);
 
 export async function GET() {
   const memberships = await prisma.membership.findMany({
