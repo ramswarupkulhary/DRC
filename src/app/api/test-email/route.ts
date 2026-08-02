@@ -37,11 +37,11 @@ export async function GET() {
       new Promise((_, reject) => setTimeout(() => reject(new Error("Send timeout")), 6000))
     ]);
 
-    console.log("[TEST] ✅ Email sent! MessageID:", info?.messageId);
+    console.log("[TEST] ✅ Email sent! MessageID:", (info as any)?.messageId);
     return NextResponse.json({
       success: true,
       message: "Email sent successfully",
-      messageId: info?.messageId,
+      messageId: (info as any)?.messageId,
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
