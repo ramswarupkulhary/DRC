@@ -1,16 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER || process.env.SMTP_FROM,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 
 export async function GET() {
   const memberships = await prisma.membership.findMany({
@@ -49,7 +41,7 @@ export async function PATCH(req: Request) {
 
   if (status === "rejected" && membership.users[0]?.email) {
     const userEmail = membership.users[0].email;
-    const userName = membership.users[0].name;
+    const userName = membership.users[0].name || "User";
 
     // Create in-app notification
     if (userId) {
@@ -63,12 +55,12 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email
+    // Send email via SendGrid
     try {
-      console.log(`Sending rejection email to ${userEmail} with SMTP host: ${process.env.SMTP_HOST}`);
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || "info@dirtridecamp.com",
+      console.log(`Sending rejection email to ${userEmail} via SendGrid`);
+      await sgMail.send({
         to: userEmail,
+        from: process.env.SENDGRID_FROM_EMAIL || "info@dirtridecamp.com",
         subject: "DRC Membership Application - Status Update",
         html: `
           <h2>Membership Application Status</h2>
@@ -79,15 +71,15 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
-      console.log(`Rejection email sent successfully to ${userEmail}`);
+      console.log(`✅ Rejection email sent successfully to ${userEmail}`);
     } catch (error) {
-      console.error("Email send error (rejection):", error);
+      console.error("❌ SendGrid error (rejection):", error);
     }
   }
 
   if (status === "active" && membership.users[0]?.email) {
     const userEmail = membership.users[0].email;
-    const userName = membership.users[0].name;
+    const userName = membership.users[0].name || "User";
 
     // Create in-app notification
     if (userId) {
@@ -101,12 +93,12 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email
+    // Send email via SendGrid
     try {
-      console.log(`Sending approval email to ${userEmail} with SMTP host: ${process.env.SMTP_HOST}`);
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || "info@dirtridecamp.com",
+      console.log(`Sending approval email to ${userEmail} via SendGrid`);
+      await sgMail.send({
         to: userEmail,
+        from: process.env.SENDGRID_FROM_EMAIL || "info@dirtridecamp.com",
         subject: "Welcome to DRC Membership!",
         html: `
           <h2>Welcome to DRC Membership</h2>
@@ -116,9 +108,9 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
-      console.log(`Approval email sent successfully to ${userEmail}`);
+      console.log(`✅ Approval email sent successfully to ${userEmail}`);
     } catch (error) {
-      console.error("Email send error (approval):", error);
+      console.error("❌ SendGrid error (approval):", error);
     }
   }
 
