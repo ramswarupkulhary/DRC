@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, User, LogOut, LayoutDashboard, FileText, BookOpen, Trophy, ChevronDown, Crown } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, FileText, BookOpen, Trophy, ChevronDown, Crown, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -25,6 +25,7 @@ const navLinks = [
 const userMenuLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/profile", label: "My Profile", icon: User },
+  { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/my-registrations", label: "My Registrations", icon: FileText },
   { href: "/ride-journal", label: "Ride Journal", icon: BookOpen },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },

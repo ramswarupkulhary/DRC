@@ -45,9 +45,25 @@ export async function PATCH(req: Request) {
     include: { users: { select: { name: true, email: true } } },
   });
 
+  const userId = membership.users[0]?.id;
+
   if (status === "rejected" && membership.users[0]?.email) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name;
+
+    // Create in-app notification
+    if (userId) {
+      await prisma.notification.create({
+        data: {
+          userId,
+          type: "membership",
+          title: "Membership Application Rejected",
+          message: rejectionNote ? `Your membership application was rejected. Reason: ${rejectionNote}` : "Your membership application has been rejected.",
+        },
+      });
+    }
+
+    // Send email
     try {
       console.log(`Sending rejection email to ${userEmail} with SMTP host: ${process.env.SMTP_HOST}`);
       await transporter.sendMail({
@@ -72,6 +88,20 @@ export async function PATCH(req: Request) {
   if (status === "active" && membership.users[0]?.email) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name;
+
+    // Create in-app notification
+    if (userId) {
+      await prisma.notification.create({
+        data: {
+          userId,
+          type: "membership",
+          title: "Welcome to DRC Membership!",
+          message: "Your membership application has been approved! Your welcome kit will be dispatched within 7 working days.",
+        },
+      });
+    }
+
+    // Send email
     try {
       console.log(`Sending approval email to ${userEmail} with SMTP host: ${process.env.SMTP_HOST}`);
       await transporter.sendMail({
