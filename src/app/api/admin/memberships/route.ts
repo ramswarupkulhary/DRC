@@ -2,9 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-// Create transporter with GoDaddy port 25
+// Create transporter using direct IP to bypass DNS/hostname issues
 const transporter = nodemailer.createTransport({
-  host: "relay.secureserver.net",
+  host: "216.69.141.27",
   port: 25,
   secure: false,
   auth: {
@@ -13,6 +13,7 @@ const transporter = nodemailer.createTransport({
   },
   connectionTimeout: 10000,
   socketTimeout: 10000,
+  tls: { rejectUnauthorized: false },
 } as any);
 
 export async function GET() {

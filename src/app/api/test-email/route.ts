@@ -6,7 +6,7 @@ export async function GET() {
   console.log("[TEST] SMTP_PASSWORD:", process.env.SMTP_PASSWORD ? "SET" : "MISSING");
 
   const transporter = nodemailer.createTransport({
-    host: "relay.secureserver.net",
+    host: "216.69.141.27",
     port: 25,
     secure: false,
     auth: {
@@ -15,6 +15,7 @@ export async function GET() {
     },
     connectionTimeout: 10000,
     socketTimeout: 10000,
+    tls: { rejectUnauthorized: false },
   } as any);
 
   try {
