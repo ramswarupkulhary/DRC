@@ -217,7 +217,7 @@ export default function AdminMembershipsPage() {
               >
                 Cancel
               </Button>
-              <Button size="sm" variant="error" onClick={handleReject} loading={submitting}>
+              <Button size="sm" variant="danger" onClick={handleReject} loading={submitting}>
                 Reject
               </Button>
             </div>
