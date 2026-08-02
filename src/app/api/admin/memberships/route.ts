@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import type { TransportOptions } from "nodemailer";
 
 // Create transporter with connection pooling
 const transporter = nodemailer.createTransport({
@@ -20,7 +21,7 @@ const transporter = nodemailer.createTransport({
   connectionTimeout: 5000,
   greetingTimeout: 5000,
   socketTimeout: 10000,
-});
+} as TransportOptions);
 
 export async function GET() {
   const memberships = await prisma.membership.findMany({
