@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+// Create transporter with connection pooling
 const transporter = nodemailer.createTransport({
   host: "smtpout.secureserver.net",
   port: 465,
@@ -10,6 +11,15 @@ const transporter = nodemailer.createTransport({
     user: "info@dirtridecamp.com",
     pass: process.env.SMTP_PASSWORD,
   },
+  pool: {
+    maxConnections: 5,
+    maxMessages: 100,
+    rateDelta: 2000,
+    rateLimit: 10,
+  },
+  connectionTimeout: 5000,
+  greetingTimeout: 5000,
+  socketTimeout: 10000,
 });
 
 export async function GET() {
@@ -63,26 +73,24 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email
-    try {
-      console.log(`📧 Sending rejection email to ${userEmail}...`);
-      await transporter.sendMail({
-        from: "info@dirtridecamp.com",
-        to: userEmail,
-        subject: "DRC Membership Application - Status Update",
-        html: `
-          <h2>Membership Application Status</h2>
-          <p>Hi ${userName},</p>
-          <p>Unfortunately, your DRC Membership application has been rejected.</p>
-          ${rejectionNote ? `<p><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
-          <p>If you have any questions, please contact us at info@dirtridecamp.com</p>
-          <p>Best regards,<br>DRC Team</p>
-        `,
-      });
+    // Send email asynchronously (fire-and-forget)
+    transporter.sendMail({
+      from: "info@dirtridecamp.com",
+      to: userEmail,
+      subject: "DRC Membership Application - Status Update",
+      html: `
+        <h2>Membership Application Status</h2>
+        <p>Hi ${userName},</p>
+        <p>Unfortunately, your DRC Membership application has been rejected.</p>
+        ${rejectionNote ? `<p><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
+        <p>If you have any questions, please contact us at info@dirtridecamp.com</p>
+        <p>Best regards,<br>DRC Team</p>
+      `,
+    }).then(() => {
       console.log(`✅ Rejection email sent to ${userEmail}`);
-    } catch (error) {
-      console.error("❌ Email error:", error);
-    }
+    }).catch((error) => {
+      console.error(`❌ Email failed for ${userEmail}:`, error.message);
+    });
   }
 
   if (status === "active" && membership.users[0]?.email) {
@@ -101,25 +109,23 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email
-    try {
-      console.log(`📧 Sending approval email to ${userEmail}...`);
-      await transporter.sendMail({
-        from: "info@dirtridecamp.com",
-        to: userEmail,
-        subject: "Welcome to DRC Membership!",
-        html: `
-          <h2>Welcome to DRC Membership</h2>
-          <p>Hi ${userName},</p>
-          <p>Your DRC Membership application has been approved! Welcome to the tribe.</p>
-          <p>Your welcome kit will be dispatched within 7 working days.</p>
-          <p>Best regards,<br>DRC Team</p>
-        `,
-      });
+    // Send email asynchronously (fire-and-forget)
+    transporter.sendMail({
+      from: "info@dirtridecamp.com",
+      to: userEmail,
+      subject: "Welcome to DRC Membership!",
+      html: `
+        <h2>Welcome to DRC Membership</h2>
+        <p>Hi ${userName},</p>
+        <p>Your DRC Membership application has been approved! Welcome to the tribe.</p>
+        <p>Your welcome kit will be dispatched within 7 working days.</p>
+        <p>Best regards,<br>DRC Team</p>
+      `,
+    }).then(() => {
       console.log(`✅ Approval email sent to ${userEmail}`);
-    } catch (error) {
-      console.error("❌ Email error:", error);
-    }
+    }).catch((error) => {
+      console.error(`❌ Email failed for ${userEmail}:`, error.message);
+    });
   }
 
   return NextResponse.json({ membership });
