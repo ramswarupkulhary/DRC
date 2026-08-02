@@ -1,16 +1,11 @@
 import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaLibSql } from "@prisma/adapter-libsql";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function makeClient() {
-  const url = process.env.TURSO_DATABASE_URL;
-  if (url) {
-    const adapter = new PrismaLibSql({
-      url,
-      authToken: process.env.TURSO_AUTH_TOKEN,
-    });
-    return new PrismaClient({ adapter });
+  const databaseUrl = process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL;
+  if (databaseUrl && databaseUrl.startsWith("postgresql")) {
+    return new PrismaClient();
   }
 
   // Local development fallback
