@@ -1,17 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 
-// Ultra-simple GoDaddy config
-const transporter = nodemailer.createTransport({
-  host: "relay.secureserver.net",
-  port: 465,
-  secure: true,
-  auth: {
-    user: "info@dirtridecamp.com",
-    pass: process.env.SMTP_PASSWORD,
-  },
-} as any);
+// Initialize SendGrid
+sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
 
 export async function GET() {
   const memberships = await prisma.membership.findMany({
@@ -68,11 +60,11 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email directly (skip verify to avoid Railway timeout)
+    // Send email via SendGrid
     try {
-      const info = await transporter.sendMail({
-        from: "info@dirtridecamp.com",
+      await sgMail.send({
         to: userEmail,
+        from: "info@dirtridecamp.com",
         subject: "DRC Membership Application - Status Update",
         html: `
           <h2>Membership Application Status</h2>
@@ -83,7 +75,7 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
-      console.log(`[EMAIL] ✅ Rejection sent. ID: ${(info as any)?.messageId}`);
+      console.log(`[EMAIL] ✅ Rejection sent to ${userEmail}`);
     } catch (error) {
       console.error(`[EMAIL] ❌ Failed:`, error instanceof Error ? error.message : String(error));
     }
@@ -107,11 +99,11 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email directly (skip verify to avoid Railway timeout)
+    // Send email via SendGrid
     try {
-      const info = await transporter.sendMail({
-        from: "info@dirtridecamp.com",
+      await sgMail.send({
         to: userEmail,
+        from: "info@dirtridecamp.com",
         subject: "Welcome to DRC Membership!",
         html: `
           <h2>Welcome to DRC Membership</h2>
@@ -121,7 +113,7 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
-      console.log(`[EMAIL] ✅ Approval sent. ID: ${(info as any)?.messageId}`);
+      console.log(`[EMAIL] ✅ Approval sent to ${userEmail}`);
     } catch (error) {
       console.error(`[EMAIL] ❌ Failed:`, error instanceof Error ? error.message : String(error));
     }
