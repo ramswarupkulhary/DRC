@@ -1,23 +1,32 @@
 import { NextResponse } from "next/server";
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+const transporter = nodemailer.createTransport({
+  host: "relay.secureserver.net",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "info@dirtridecamp.com",
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export async function GET() {
-  console.log("[TEST] Testing SendGrid email...");
+  console.log("[TEST] Testing GoDaddy SMTP email...");
 
   try {
-    await sgMail.send({
-      to: "kulhary.1999@gmail.com",
+    const info = await transporter.sendMail({
       from: "info@dirtridecamp.com",
+      to: "kulhary.1999@gmail.com",
       subject: "DRC Test Email",
-      html: `<h1>Test Email from SendGrid</h1><p>Test at ${new Date().toISOString()}</p>`,
+      html: `<h1>Test Email</h1><p>Test at ${new Date().toISOString()}</p>`,
     });
 
-    console.log("[TEST] ✅ Email sent via SendGrid");
+    console.log("[TEST] ✅ Email sent! ID:", (info as any)?.messageId);
     return NextResponse.json({
       success: true,
-      message: "Email sent successfully via SendGrid",
+      message: "Email sent successfully",
+      messageId: (info as any)?.messageId,
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

@@ -1,9 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 
-// Initialize SendGrid
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "");
+// GoDaddy SMTP - works fine, just blocked by Railway firewall
+const transporter = nodemailer.createTransport({
+  host: "relay.secureserver.net",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "info@dirtridecamp.com",
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 export async function GET() {
   const memberships = await prisma.membership.findMany({
@@ -60,11 +68,11 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email via SendGrid
+    // Send rejection email
     try {
-      await sgMail.send({
-        to: userEmail,
+      await transporter.sendMail({
         from: "info@dirtridecamp.com",
+        to: userEmail,
         subject: "DRC Membership Application - Status Update",
         html: `
           <h2>Membership Application Status</h2>
@@ -99,11 +107,11 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email via SendGrid
+    // Send approval email
     try {
-      await sgMail.send({
-        to: userEmail,
+      await transporter.sendMail({
         from: "info@dirtridecamp.com",
+        to: userEmail,
         subject: "Welcome to DRC Membership!",
         html: `
           <h2>Welcome to DRC Membership</h2>
