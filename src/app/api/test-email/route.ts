@@ -3,8 +3,6 @@ import nodemailer from "nodemailer";
 
 export async function GET() {
   console.log("[TEST] Starting email test");
-  console.log("[TEST] SMTP_PASSWORD exists:", !!process.env.SMTP_PASSWORD);
-  console.log("[TEST] SMTP_PASSWORD value:", process.env.SMTP_PASSWORD?.substring(0, 5) + "***");
 
   const transporter = nodemailer.createTransport({
     host: "smtpout.secureserver.net",
@@ -14,35 +12,42 @@ export async function GET() {
       user: "info@dirtridecamp.com",
       pass: process.env.SMTP_PASSWORD,
     },
+    connectionTimeout: 3000,
+    socketTimeout: 3000,
   } as any);
 
   try {
-    console.log("[TEST] Verifying SMTP connection...");
-    await transporter.verify();
-    console.log("[TEST] ✅ SMTP connection verified!");
-
     console.log("[TEST] Sending test email...");
-    const info = await transporter.sendMail({
+    const sendPromise = transporter.sendMail({
       from: "info@dirtridecamp.com",
       to: "kulhary.1999@gmail.com",
       subject: "DRC Test Email",
-      html: `<h1>Test Email</h1><p>This is a test email from DRC production at ${new Date().toISOString()}</p>`,
+      html: `<h1>Test Email</h1><p>Test at ${new Date().toISOString()}</p>`,
     });
 
-    console.log("[TEST] ✅ Email sent! MessageID:", info.messageId);
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("SMTP timeout after 5 seconds")), 5000)
+    );
+
+    const info = await Promise.race([sendPromise, timeoutPromise]);
+
+    console.log("[TEST] ✅ Email sent!");
     return NextResponse.json({
       success: true,
-      message: "Email sent successfully",
-      messageId: info.messageId,
+      message: "Email sent",
+      result: info,
     });
   } catch (error) {
-    console.error("[TEST] ❌ Error:", error);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("[TEST] ❌ Error:", msg);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: msg,
+        hint: "SMTP connection issue - check GoDaddy settings",
       },
       { status: 500 }
     );
   }
 }
+
