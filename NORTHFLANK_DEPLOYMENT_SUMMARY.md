@@ -29,12 +29,20 @@
 
 ## What Needs to be Done ⚠️
 
-### CRITICAL - Before Site is Fully Live
+### 🚨 IMMEDIATE FIX NEEDED - Build is Currently Failing
 
-1. **Set Up Turso Database** 
-   - Create a Turso database and get the database URL & auth token
-   - Update env variables `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` with real values
-   - Northflank URL: https://app.northflank.com/t/ramswarupkulharys-team/project/drc/services/dirtridecamp-web/environment
+**The build failed because Turso database credentials are placeholders.**
+
+1. **Set Up Turso Database** (REQUIRED - Build Won't Work Without This)
+   - Go to https://turso.tech and create a Turso account
+   - Create a new database (e.g., "drc-production")
+   - Get your database URL: `libsql://your-db-name.turso.io`
+   - Generate an auth token from the dashboard
+   - Update env variables in Northflank:
+     - `TURSO_DATABASE_URL` = your actual database URL
+     - `TURSO_AUTH_TOKEN` = your auth token
+   - Northflank Environment URL: https://app.northflank.com/t/ramswarupkulharys-team/project/drc/services/dirtridecamp-web/environment
+   - **After updating, trigger a new rebuild**
 
 2. **Configure Custom Domain (dirtridecamp.com)**
    - Add domain to Northflank: https://app.northflank.com/t/ramswarupkulharys-team/domains
