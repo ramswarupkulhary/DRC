@@ -54,7 +54,7 @@ export async function PATCH(req: Request) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name || "User";
 
-    console.log(`[EMAIL] Attempting rejection email to: ${userEmail}`);
+    console.log(`[EMAIL] Rejection email to: ${userEmail}`);
 
     // Create in-app notification
     if (userId) {
@@ -68,13 +68,8 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email - verify connection works first
+    // Send email directly (skip verify to avoid Railway timeout)
     try {
-      console.log(`[EMAIL] Verifying SMTP connection...`);
-      await transporter.verify();
-      console.log(`[EMAIL] ✅ SMTP connection verified`);
-
-      console.log(`[EMAIL] Sending rejection email...`);
       const info = await transporter.sendMail({
         from: "info@dirtridecamp.com",
         to: userEmail,
@@ -88,9 +83,9 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
-      console.log(`[EMAIL] ✅ Rejection email sent. MessageID: ${info.messageId}`);
+      console.log(`[EMAIL] ✅ Rejection sent. ID: ${(info as any)?.messageId}`);
     } catch (error) {
-      console.error(`[EMAIL] ❌ REJECTION EMAIL FAILED:`, error instanceof Error ? error.message : String(error));
+      console.error(`[EMAIL] ❌ Failed:`, error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -98,7 +93,7 @@ export async function PATCH(req: Request) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name || "User";
 
-    console.log(`[EMAIL] Attempting approval email to: ${userEmail}`);
+    console.log(`[EMAIL] Approval email to: ${userEmail}`);
 
     // Create in-app notification
     if (userId) {
@@ -112,13 +107,8 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send email - verify connection works first
+    // Send email directly (skip verify to avoid Railway timeout)
     try {
-      console.log(`[EMAIL] Verifying SMTP connection...`);
-      await transporter.verify();
-      console.log(`[EMAIL] ✅ SMTP connection verified`);
-
-      console.log(`[EMAIL] Sending approval email...`);
       const info = await transporter.sendMail({
         from: "info@dirtridecamp.com",
         to: userEmail,
@@ -131,9 +121,9 @@ export async function PATCH(req: Request) {
           <p>Best regards,<br>DRC Team</p>
         `,
       });
-      console.log(`[EMAIL] ✅ Approval email sent. MessageID: ${info.messageId}`);
+      console.log(`[EMAIL] ✅ Approval sent. ID: ${(info as any)?.messageId}`);
     } catch (error) {
-      console.error(`[EMAIL] ❌ APPROVAL EMAIL FAILED:`, error instanceof Error ? error.message : String(error));
+      console.error(`[EMAIL] ❌ Failed:`, error instanceof Error ? error.message : String(error));
     }
   }
 
