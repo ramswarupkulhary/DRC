@@ -7,8 +7,9 @@ export async function GET() {
 
   const transporter = nodemailer.createTransport({
     host: "smtpout.secureserver.net",
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
+    requireTLS: true,
     auth: {
       user: "info@dirtridecamp.com",
       pass: process.env.SMTP_PASSWORD,
