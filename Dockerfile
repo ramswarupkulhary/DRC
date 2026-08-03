@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY prisma/schema.prisma ./prisma/schema.prisma
 COPY prisma.config.ts ./prisma.config.ts
-RUN npm ci
+RUN npm install
 
 # --- builder: build Next.js ---
 FROM base AS builder
