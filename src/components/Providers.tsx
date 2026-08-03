@@ -9,8 +9,11 @@ function RefreshRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    const exempt = ["/", "/login", "/register", "/forgot-password"];
-    if (exempt.includes(pathname)) return;
+    const exempt = ["/", "/login", "/register", "/forgot-password", "/signup"];
+    if (exempt.includes(pathname)) {
+      sessionStorage.setItem("drc-active", "1");
+      return;
+    }
     if (pathname.startsWith("/api") || pathname.startsWith("/_next")) return;
 
     const entries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
