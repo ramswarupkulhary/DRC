@@ -217,7 +217,7 @@ export function Navbar() {
               </>
             )}
             <Link href="/rides">
-              <Button size="sm">Book a Ride</Button>
+              <Button size="sm" className="whitespace-nowrap">Book a Ride</Button>
             </Link>
           </div>
 
