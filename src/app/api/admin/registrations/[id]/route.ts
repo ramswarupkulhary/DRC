@@ -19,7 +19,7 @@ export async function PATCH(
     data,
     include: {
       user: { select: { email: true, name: true } },
-      ride: { select: { title: true } },
+      ride: { select: { title: true, whatsappGroupLink: true } },
       training: { select: { title: true } },
     },
   });
@@ -58,6 +58,7 @@ export async function PATCH(
         }),
       });
     } else if (body.status === "confirmed") {
+      const whatsappLink = registration.ride?.whatsappGroupLink;
       await prisma.notification.create({
         data: {
           userId: registration.userId,
@@ -76,6 +77,12 @@ export async function PATCH(
             <p style="color: #F1E9DD; font-size: 15px;">Hi ${riderName},</p>
             <p style="color: #B9A886; font-size: 14px;">Your registration for <strong style="color: #E8622C;">${eventTitle}</strong> has been confirmed!</p>
             <p style="color: #B9A886; font-size: 14px;">Get your bike ready and gear up. See you on the trail!</p>
+            ${whatsappLink ? `
+            <div style="background: #0D0D0D; border: 1px solid #25D366; border-radius: 4px; padding: 16px; margin: 16px 0; text-align: center;">
+              <p style="color: #F1E9DD; font-size: 14px; margin: 0 0 12px 0;"><strong>Join the WhatsApp Group</strong></p>
+              <a href="${whatsappLink}" style="display: inline-block; background: #25D366; color: #ffffff; padding: 10px 24px; border-radius: 4px; text-decoration: none; font-size: 14px; font-weight: bold;">Join WhatsApp Group</a>
+            </div>
+            ` : ""}
           `,
           ctaText: "My Registrations",
           ctaUrl: "https://www.dirtridecamp.com/my-registrations",

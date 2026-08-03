@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { RideRegistrationModal } from "./RideRegistrationModal";
+import { MessageCircle } from "lucide-react";
 
 interface Props {
   rideId: string;
@@ -19,7 +20,7 @@ export function RegisterButton({ rideId, rideSlug, rideTitle, ridePrice, soldOut
   const { status: authStatus } = useSession();
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const [regStatus, setRegStatus] = useState<{ status: string | null; notes: string | null }>({ status: null, notes: null });
+  const [regStatus, setRegStatus] = useState<{ status: string | null; notes: string | null; whatsappGroupLink: string | null }>({ status: null, notes: null, whatsappGroupLink: null });
   const [checking, setChecking] = useState(false);
 
   useEffect(() => {
@@ -56,11 +57,22 @@ export function RegisterButton({ rideId, rideSlug, rideTitle, ridePrice, soldOut
       checked_in: "success",
     };
     return (
-      <div className="space-y-2 text-center">
+      <div className="space-y-3 text-center">
         <Badge variant={statusColors[regStatus.status] || "warning"} className="text-base px-4 py-2">
           {statusLabels[regStatus.status] || regStatus.status}
         </Badge>
         <p className="text-xs text-muted">You have already registered for this ride</p>
+        {(regStatus.status === "confirmed" || regStatus.status === "checked_in") && regStatus.whatsappGroupLink && (
+          <a
+            href={regStatus.whatsappGroupLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/20 rounded-sm hover:bg-[#25D366]/20 transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Join WhatsApp Group
+          </a>
+        )}
       </div>
     );
   }

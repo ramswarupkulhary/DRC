@@ -27,12 +27,16 @@ export async function GET(req: Request) {
       status: { notIn: ["cancelled"] },
     },
     orderBy: { createdAt: "desc" },
-    select: { status: true, notes: true },
+    select: { status: true, notes: true, ride: { select: { whatsappGroupLink: true } } },
   });
 
   if (!registration) {
     return NextResponse.json({ status: null });
   }
 
-  return NextResponse.json({ status: registration.status, notes: registration.notes });
+  return NextResponse.json({
+    status: registration.status,
+    notes: registration.notes,
+    whatsappGroupLink: registration.ride?.whatsappGroupLink || null,
+  });
 }

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
-import { X, UserPlus } from "lucide-react";
+import { X, UserPlus, Clock } from "lucide-react";
 
 interface MembershipUser {
   id: string;
@@ -55,6 +55,9 @@ export default function AdminMembershipsPage() {
   const [assignForm, setAssignForm] = useState({ email: "", name: "", phone: "", planId: "", durationType: "1year", customDays: "" });
   const [assignError, setAssignError] = useState("");
   const [assignSuccess, setAssignSuccess] = useState("");
+  const [extendModal, setExtendModal] = useState<{ id: string; name: string; endDate: string | null } | null>(null);
+  const [extendDays, setExtendDays] = useState("365");
+  const [extendSubmitting, setExtendSubmitting] = useState(false);
 
   function fetchMemberships() {
     fetch("/api/admin/memberships")
@@ -134,6 +137,22 @@ export default function AdminMembershipsPage() {
     fetchMemberships();
   }
 
+  async function handleExtend() {
+    if (!extendModal) return;
+    setExtendSubmitting(true);
+    const res = await fetch("/api/admin/memberships/extend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ membershipId: extendModal.id, days: parseInt(extendDays) }),
+    });
+    setExtendSubmitting(false);
+    if (res.ok) {
+      setExtendModal(null);
+      setExtendDays("365");
+      fetchMemberships();
+    }
+  }
+
   if (loading) return <div className="text-muted py-12 text-center">Loading...</div>;
 
   return (
@@ -207,6 +226,7 @@ export default function AdminMembershipsPage() {
                 <th className="px-5 py-3">Plan</th>
                 <th className="px-5 py-3">T-Shirt Size</th>
                 <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3">Expires</th>
                 <th className="px-5 py-3">Payment Proof</th>
                 <th className="px-5 py-3">Date</th>
                 <th className="px-5 py-3">Actions</th>
@@ -215,6 +235,8 @@ export default function AdminMembershipsPage() {
             <tbody className="divide-y divide-border">
               {memberships.map((m) => {
                 const user = m.users[0];
+                const isExpired = m.endDate && new Date(m.endDate) < new Date();
+                const expiryStatus = m.status === "active" && isExpired ? "expired" : m.status;
                 return (
                   <tr key={m.id} className="hover:bg-surface-light/50">
                     <td className="px-5 py-3">
@@ -224,11 +246,29 @@ export default function AdminMembershipsPage() {
                     <td className="px-5 py-3">{m.plan.name}</td>
                     <td className="px-5 py-3">{m.tshirtSize || "—"}</td>
                     <td className="px-5 py-3">
-                      <Badge variant={statusVariant[m.status] || "muted"}>{m.status}</Badge>
+                      <Badge variant={statusVariant[expiryStatus] || "muted"}>{expiryStatus}</Badge>
                       {m.rejectionNote && (
                         <div className="text-xs text-muted mt-1 max-w-xs truncate" title={m.rejectionNote}>
                           Reason: {m.rejectionNote}
                         </div>
+                      )}
+                    </td>
+                    <td className="px-5 py-3">
+                      {m.endDate ? (
+                        <div className={`text-xs ${isExpired ? "text-error" : "text-muted"}`}>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {new Date(m.endDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                          </div>
+                          {isExpired && <span className="text-error text-[10px]">Expired</span>}
+                          {!isExpired && m.status === "active" && (
+                            <span className="text-success text-[10px]">
+                              {Math.ceil((new Date(m.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days left
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted text-xs">—</span>
                       )}
                     </td>
                     <td className="px-5 py-3">
@@ -248,27 +288,38 @@ export default function AdminMembershipsPage() {
                       {new Date(m.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-5 py-3">
-                      {m.status === "pending" && (
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="primary" onClick={() => handleApprove(m.id)}>
-                            Approve
-                          </Button>
+                      <div className="flex flex-wrap gap-2">
+                        {m.status === "pending" && (
+                          <>
+                            <Button size="sm" variant="primary" onClick={() => handleApprove(m.id)}>
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setRejectionModal({ id: m.id, name: user?.name || "User" })}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                        {(m.status === "active" || expiryStatus === "expired") && (
                           <Button
                             size="sm"
-                            variant="outline"
-                            onClick={() => setRejectionModal({ id: m.id, name: user?.name || "User" })}
+                            variant="secondary"
+                            onClick={() => setExtendModal({ id: m.id, name: user?.name || "User", endDate: m.endDate })}
                           >
-                            Reject
+                            Extend
                           </Button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
               })}
               {memberships.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-muted">
+                  <td colSpan={8} className="px-5 py-12 text-center text-muted">
                     No membership requests yet.
                   </td>
                 </tr>
@@ -324,6 +375,45 @@ export default function AdminMembershipsPage() {
               </Button>
               <Button size="sm" variant="danger" onClick={handleReject} loading={submitting}>
                 Reject
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Extend Modal */}
+      {extendModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface border border-border rounded-sm max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-heading text-lg font-semibold">Extend Membership</h3>
+              <button onClick={() => setExtendModal(null)} className="text-muted hover:text-foreground transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-sm text-muted">
+              Extend {extendModal.name}&apos;s membership.
+              {extendModal.endDate && (
+                <> Current expiry: <strong className="text-foreground">{new Date(extendModal.endDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</strong></>
+              )}
+            </p>
+            <Select
+              id="extendDays"
+              label="Extend By"
+              options={[
+                { value: "30", label: "30 Days (1 Month)" },
+                { value: "90", label: "90 Days (3 Months)" },
+                { value: "180", label: "180 Days (6 Months)" },
+                { value: "365", label: "365 Days (1 Year)" },
+              ]}
+              value={extendDays}
+              onChange={(e) => setExtendDays(e.target.value)}
+            />
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" size="sm" onClick={() => setExtendModal(null)} disabled={extendSubmitting}>
+                Cancel
+              </Button>
+              <Button size="sm" variant="primary" onClick={handleExtend} loading={extendSubmitting}>
+                Extend Membership
               </Button>
             </div>
           </div>
