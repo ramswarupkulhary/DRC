@@ -29,6 +29,11 @@ model User {
   bloodGroup       String?
   licenseNumber    String?
   city             String?
+  address          String?
+  addressState     String?
+  pincode          String?
+  tshirtSize       String?
+  instagramHandle  String?
 
   // Skill progression
   skillLevel    String  @default("bronze")
@@ -112,6 +117,18 @@ model PasswordReset {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Otp {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  type      String
+  expires   DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email, type])
+}
+
 // ─── RIDES & TRAININGS ──────────────────────────────
 
 model Ride {
@@ -137,7 +154,13 @@ model Ride {
   status      String   @default("draft")
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt     DateTime @updatedAt
+
+  // Ride link fields
+  whatsappGroupLink String?
+  photosLink        String?
+  photosPublished   Boolean  @default(false)
+  photosPublishedAt DateTime?
 
   // Trail map data
   routeData     String?
@@ -207,6 +230,9 @@ model Registration {
   notes         String?
   couponId      String?
   discount      Int      @default(0)
+  guestName     String?
+  guestEmail    String?
+  guestPhone    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

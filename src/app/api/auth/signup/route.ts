@@ -15,6 +15,18 @@ export async function POST(req: Request) {
     });
 
     if (existing) {
+      if (existing.email === email && !existing.passwordHash) {
+        await prisma.user.update({
+          where: { id: existing.id },
+          data: {
+            name,
+            phone: phone || existing.phone,
+            passwordHash: hashSync(password, 10),
+          },
+        });
+        return NextResponse.json({ id: existing.id, name, email, claimed: true }, { status: 201 });
+      }
+
       return NextResponse.json({ error: "An account with this email or phone already exists." }, { status: 409 });
     }
 

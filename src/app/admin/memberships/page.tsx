@@ -4,7 +4,9 @@ import { useState, useEffect } from "react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { X } from "lucide-react";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { X, UserPlus } from "lucide-react";
 
 interface MembershipUser {
   id: string;
@@ -46,6 +48,11 @@ export default function AdminMembershipsPage() {
   const [rejectionModal, setRejectionModal] = useState<{ id: string; name: string } | null>(null);
   const [rejectionNote, setRejectionNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showAssignForm, setShowAssignForm] = useState(false);
+  const [plans, setPlans] = useState<MembershipPlan[]>([]);
+  const [assignForm, setAssignForm] = useState({ email: "", name: "", phone: "", planId: "", durationType: "1year", customDays: "" });
+  const [assignError, setAssignError] = useState("");
+  const [assignSuccess, setAssignSuccess] = useState("");
 
   function fetchMemberships() {
     fetch("/api/admin/memberships")
@@ -87,11 +94,97 @@ export default function AdminMembershipsPage() {
     fetchMemberships();
   }
 
+  async function handleAssign(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    setAssignError("");
+    setAssignSuccess("");
+
+    const res = await fetch("/api/admin/memberships/assign", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...assignForm,
+        customDays: assignForm.customDays ? parseInt(assignForm.customDays) : undefined,
+      }),
+    });
+
+    const data = await res.json();
+    setSubmitting(false);
+
+    if (!res.ok) {
+      setAssignError(data.error || "Failed to assign");
+      return;
+    }
+
+    setAssignSuccess(`Membership assigned to ${assignForm.email}!`);
+    setAssignForm({ email: "", name: "", phone: "", planId: "", durationType: "1year", customDays: "" });
+    fetchMemberships();
+  }
+
   if (loading) return <div className="text-muted py-12 text-center">Loading...</div>;
 
   return (
     <div className="space-y-6">
-      <SectionHeader title="Membership Requests" align="left" />
+      <div className="flex items-center justify-between">
+        <SectionHeader title="Membership Requests" align="left" />
+        <Button
+          onClick={() => {
+            setShowAssignForm(!showAssignForm);
+            if (!showAssignForm && plans.length === 0) {
+              fetch("/api/membership/plans").then((r) => r.json()).then((d) => setPlans(d.plans || []));
+            }
+          }}
+        >
+          <UserPlus className="w-4 h-4 mr-2" />
+          Assign Membership
+        </Button>
+      </div>
+
+      {showAssignForm && (
+        <div className="bg-surface border border-border rounded-sm p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-heading text-lg font-semibold text-tan">Assign Membership</h3>
+            <button onClick={() => setShowAssignForm(false)} className="p-1 text-muted hover:text-foreground">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {assignError && <div className="bg-error/10 border border-error/30 text-error text-sm p-3 rounded-sm mb-4">{assignError}</div>}
+          {assignSuccess && <div className="bg-success/10 border border-success/30 text-success text-sm p-3 rounded-sm mb-4">{assignSuccess}</div>}
+          <form onSubmit={handleAssign} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input id="assignName" label="Name" value={assignForm.name} onChange={(e) => setAssignForm((p) => ({ ...p, name: e.target.value }))} required />
+            <Input id="assignEmail" label="Email" type="email" value={assignForm.email} onChange={(e) => setAssignForm((p) => ({ ...p, email: e.target.value }))} required />
+            <Input id="assignPhone" label="Phone" type="tel" value={assignForm.phone} onChange={(e) => setAssignForm((p) => ({ ...p, phone: e.target.value }))} />
+            <Select
+              id="assignPlan"
+              label="Plan"
+              options={[{ value: "", label: "Select plan..." }, ...plans.map((p) => ({ value: p.id, label: p.name }))]}
+              value={assignForm.planId}
+              onChange={(e) => setAssignForm((p) => ({ ...p, planId: e.target.value }))}
+              required
+            />
+            <Select
+              id="assignDuration"
+              label="Duration"
+              options={[
+                { value: "1day", label: "1 Day" },
+                { value: "1month", label: "1 Month" },
+                { value: "1year", label: "1 Year" },
+                { value: "lifetime", label: "Lifetime" },
+                { value: "custom", label: "Custom (days)" },
+              ]}
+              value={assignForm.durationType}
+              onChange={(e) => setAssignForm((p) => ({ ...p, durationType: e.target.value }))}
+            />
+            {assignForm.durationType === "custom" && (
+              <Input id="assignCustomDays" label="Custom Days" type="number" value={assignForm.customDays} onChange={(e) => setAssignForm((p) => ({ ...p, customDays: e.target.value }))} required />
+            )}
+            <div className="sm:col-span-2">
+              <Button type="submit" loading={submitting}>Assign & Send Email</Button>
+            </div>
+          </form>
+        </div>
+      )}
 
       <div className="bg-surface border border-border rounded-sm overflow-hidden">
         <div className="overflow-x-auto">

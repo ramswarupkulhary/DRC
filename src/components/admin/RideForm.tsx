@@ -49,13 +49,18 @@ interface RideFormProps {
     featured: boolean;
     inclusions: string | null;
     coverImage: string | null;
+    whatsappGroupLink: string | null;
+    photosLink: string | null;
+    photosPublished: boolean;
   };
 }
 
 export default function RideForm({ ride }: RideFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState("");
+  const [publishSuccess, setPublishSuccess] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(ride?.coverImage || null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -82,6 +87,8 @@ export default function RideForm({ ride }: RideFormProps) {
       featured: form.get("featured") === "on",
       inclusions: form.get("inclusions") || null,
       coverImage,
+      whatsappGroupLink: form.get("whatsappGroupLink") || null,
+      photosLink: form.get("photosLink") || null,
     };
 
     const url = ride ? `/api/admin/rides/${ride.id}` : "/api/admin/rides";
@@ -160,6 +167,50 @@ export default function RideForm({ ride }: RideFormProps) {
           placeholder="Camping & Tent&#10;Dinner&#10;Campfire"
           defaultValue={ride?.inclusions ? JSON.parse(ride.inclusions).join("\n") : ""}
         />
+      </div>
+
+      <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
+        <h3 className="font-heading text-lg font-semibold text-tan">Links & Media</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <Input name="whatsappGroupLink" id="whatsappGroupLink" label="WhatsApp Group Link" placeholder="https://chat.whatsapp.com/..." defaultValue={ride?.whatsappGroupLink || ""} />
+          <Input name="photosLink" id="photosLink" label="Photos/Videos Link" placeholder="https://drive.google.com/..." defaultValue={ride?.photosLink || ""} />
+        </div>
+        {ride && ride.photosLink && !ride.photosPublished && (
+          <div className="pt-2">
+            <Button
+              type="button"
+              variant="secondary"
+              loading={publishing}
+              onClick={async () => {
+                setPublishing(true);
+                setPublishSuccess("");
+                try {
+                  const res = await fetch(`/api/admin/rides/${ride.id}/publish-photos`, { method: "POST" });
+                  const data = await res.json();
+                  if (res.ok) {
+                    setPublishSuccess(`Photos published! ${data.emailsSent} riders notified. Share in WhatsApp group:`);
+                    if (data.whatsappShareUrl) {
+                      window.open(data.whatsappShareUrl, "_blank");
+                    }
+                  } else {
+                    setError(data.error || "Failed to publish");
+                  }
+                } catch {
+                  setError("Failed to publish photos");
+                } finally {
+                  setPublishing(false);
+                }
+              }}
+            >
+              Publish Photos & Videos
+            </Button>
+            <p className="text-xs text-muted mt-1">Emails all confirmed riders with the photos link</p>
+          </div>
+        )}
+        {ride?.photosPublished && (
+          <p className="text-sm text-success">Photos already published to riders</p>
+        )}
+        {publishSuccess && <p className="text-sm text-success">{publishSuccess}</p>}
       </div>
 
       <div className="flex gap-4">

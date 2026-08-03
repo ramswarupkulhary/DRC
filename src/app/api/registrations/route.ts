@@ -12,6 +12,13 @@ export async function POST(req: Request) {
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+  if (!user.emergencyName || !user.emergencyPhone) {
+    return NextResponse.json(
+      { error: "Please complete your emergency contact information before registering.", code: "EMERGENCY_CONTACT_REQUIRED" },
+      { status: 400 }
+    );
+  }
+
   const { rideId, trainingId } = await req.json();
 
   if (!rideId && !trainingId) {
@@ -19,7 +26,7 @@ export async function POST(req: Request) {
   }
 
   let amount = 0;
-  let totalSlots = 0;
+  let rideTitle = "";
 
   if (rideId) {
     const ride = await prisma.ride.findUnique({
@@ -35,10 +42,10 @@ export async function POST(req: Request) {
     if (existing) return NextResponse.json({ error: "You are already registered for this ride" }, { status: 409 });
 
     amount = ride.price;
-    totalSlots = ride.totalSlots;
+    rideTitle = ride.title;
     const bookedSlots = ride.registrations.length;
 
-    if (bookedSlots >= totalSlots) {
+    if (bookedSlots >= ride.totalSlots) {
       return NextResponse.json({ error: "This ride is sold out" }, { status: 400 });
     }
   }
@@ -54,6 +61,7 @@ export async function POST(req: Request) {
     if (existing) return NextResponse.json({ error: "You are already registered for this training" }, { status: 409 });
 
     amount = training.price;
+    rideTitle = training.title;
   }
 
   const registration = await prisma.registration.create({
@@ -66,6 +74,19 @@ export async function POST(req: Request) {
       paymentStatus: "unpaid",
     },
   });
+
+  const admins = await prisma.user.findMany({ where: { role: "admin" }, select: { id: true } });
+  for (const admin of admins) {
+    await prisma.notification.create({
+      data: {
+        userId: admin.id,
+        type: "registration",
+        title: "New Registration",
+        message: `${user.name || user.email} registered for ${rideTitle}`,
+        link: "/admin/registrations",
+      },
+    });
+  }
 
   return NextResponse.json({ registration }, { status: 201 });
 }

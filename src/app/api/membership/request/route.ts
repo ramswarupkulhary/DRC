@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const userId = (session.user as { id: string }).id;
   const { planId, tshirtSize, paymentProof } = await req.json();
 
-  if (!planId || !tshirtSize || !paymentProof) {
+  if (!planId || !paymentProof) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   await prisma.membership.create({
     data: {
       planId,
-      tshirtSize,
+      tshirtSize: tshirtSize || null,
       paymentProof,
       status: "pending",
       endDate,

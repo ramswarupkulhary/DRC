@@ -16,9 +16,8 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -29,8 +28,20 @@ export function NotificationBell() {
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
+    fetchCount();
+    const interval = setInterval(fetchCount, 15000);
+    return () => clearInterval(interval);
   }, []);
+
+  async function fetchCount() {
+    try {
+      const res = await fetch("/api/notifications/count");
+      if (res.ok) {
+        const data = await res.json();
+        setUnreadCount(data.unreadCount);
+      }
+    } catch {}
+  }
 
   async function fetchNotifications() {
     setLoading(true);
@@ -48,6 +59,7 @@ export function NotificationBell() {
   async function markAllRead() {
     await fetch("/api/notifications", { method: "PATCH" });
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setUnreadCount(0);
   }
 
   function toggle() {

@@ -1,16 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  host: "relay.secureserver.net",
-  port: 465,
-  secure: true,
-  auth: {
-    user: "info@dirtridecamp.com",
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+import { sendEmail, drcEmailTemplate } from "@/lib/email";
 
 export async function GET() {
   const memberships = await prisma.membership.findMany({
@@ -47,15 +37,10 @@ export async function PATCH(req: Request) {
 
   const userId = membership.users[0]?.id;
 
-  console.log(`[MEMBERSHIP] Status update: id=${id}, status=${status}, email=${membership.users[0]?.email}`);
-
   if (status === "rejected" && membership.users[0]?.email) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name || "User";
 
-    console.log(`[EMAIL] Rejection email to: ${userEmail}`);
-
-    // Create in-app notification
     if (userId) {
       await prisma.notification.create({
         data: {
@@ -67,22 +52,20 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send rejection email
     try {
-      await transporter.sendMail({
-        from: "info@dirtridecamp.com",
+      await sendEmail({
         to: userEmail,
         subject: "DRC Membership Application - Status Update",
-        html: `
-          <h2>Membership Application Status</h2>
-          <p>Hi ${userName},</p>
-          <p>Unfortunately, your DRC Membership application has been rejected.</p>
-          ${rejectionNote ? `<p><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
-          <p>If you have any questions, please contact us at info@dirtridecamp.com</p>
-          <p>Best regards,<br>DRC Team</p>
-        `,
+        html: drcEmailTemplate({
+          title: "Membership Application Status",
+          body: `
+            <p style="color: #F1E9DD;">Hi ${userName},</p>
+            <p style="color: #F1E9DD;">Unfortunately, your DRC Membership application has been rejected.</p>
+            ${rejectionNote ? `<p style="color: #F1E9DD;"><strong>Reason:</strong> ${rejectionNote}</p>` : ""}
+            <p style="color: #888888;">If you have any questions, please contact us at info@dirtridecamp.com</p>
+          `,
+        }),
       });
-      console.log(`[EMAIL] ✅ Rejection sent to ${userEmail}`);
     } catch (error) {
       console.error(`[EMAIL] ❌ Failed:`, error instanceof Error ? error.message : String(error));
     }
@@ -92,9 +75,6 @@ export async function PATCH(req: Request) {
     const userEmail = membership.users[0].email;
     const userName = membership.users[0].name || "User";
 
-    console.log(`[EMAIL] Approval email to: ${userEmail}`);
-
-    // Create in-app notification
     if (userId) {
       await prisma.notification.create({
         data: {
@@ -106,21 +86,19 @@ export async function PATCH(req: Request) {
       });
     }
 
-    // Send approval email
     try {
-      await transporter.sendMail({
-        from: "info@dirtridecamp.com",
+      await sendEmail({
         to: userEmail,
         subject: "Welcome to DRC Membership!",
-        html: `
-          <h2>Welcome to DRC Membership</h2>
-          <p>Hi ${userName},</p>
-          <p>Your DRC Membership application has been approved! Welcome to the tribe.</p>
-          <p>Your welcome kit will be dispatched within 7 working days.</p>
-          <p>Best regards,<br>DRC Team</p>
-        `,
+        html: drcEmailTemplate({
+          title: "Welcome to DRC Membership!",
+          body: `
+            <p style="color: #F1E9DD;">Hi ${userName},</p>
+            <p style="color: #F1E9DD;">Your DRC Membership application has been approved! Welcome to the tribe.</p>
+            <p style="color: #F1E9DD;">Your welcome kit will be dispatched within 7 working days.</p>
+          `,
+        }),
       });
-      console.log(`[EMAIL] ✅ Approval sent to ${userEmail}`);
     } catch (error) {
       console.error(`[EMAIL] ❌ Failed:`, error instanceof Error ? error.message : String(error));
     }
@@ -128,4 +106,3 @@ export async function PATCH(req: Request) {
 
   return NextResponse.json({ membership });
 }
-

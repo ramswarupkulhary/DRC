@@ -16,7 +16,7 @@ export async function GET() {
     where: { userId: user.id },
     orderBy: { createdAt: "desc" },
     include: {
-      ride: { select: { title: true, slug: true, location: true, startDate: true } },
+      ride: { select: { title: true, slug: true, location: true, startDate: true, whatsappGroupLink: true, photosLink: true, photosPublished: true } },
       training: { select: { title: true, slug: true, location: true } },
     },
   });

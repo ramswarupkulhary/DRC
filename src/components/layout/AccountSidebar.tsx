@@ -12,19 +12,21 @@ import {
   Crown,
   Award,
   Brain,
+  Images,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const sidebarLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/profile", label: "My Profile", icon: User },
-  { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/my-registrations", label: "My Registrations", icon: FileText },
+  { href: "/my-gallery", label: "My Gallery", icon: Images },
+  { href: "/notifications", label: "Notifications", icon: Bell },
   { href: "/ride-journal", label: "Ride Journal", icon: BookOpen },
+  { href: "/skill-assessment", label: "Skill Assessment", icon: Brain },
   { href: "/membership", label: "Membership", icon: Crown },
   { href: "/certificates", label: "Certificates", icon: Award },
-  { href: "/skill-assessment", label: "Skill Assessment", icon: Brain },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
+  { href: "/profile", label: "My Profile", icon: User },
 ];
 
 export function AccountSidebar() {

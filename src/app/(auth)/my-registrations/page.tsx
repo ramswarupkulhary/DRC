@@ -7,7 +7,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { formatPrice, formatDate } from "@/lib/utils";
 import Link from "next/link";
-import { MapPin, Calendar } from "lucide-react";
+import { MapPin, Calendar, MessageCircle, Image as ImageIcon } from "lucide-react";
 
 interface Registration {
   id: string;
@@ -15,7 +15,15 @@ interface Registration {
   paymentStatus: string;
   amount: number;
   createdAt: string;
-  ride?: { title: string; slug: string; location: string; startDate: string };
+  ride?: {
+    title: string;
+    slug: string;
+    location: string;
+    startDate: string;
+    whatsappGroupLink: string | null;
+    photosLink: string | null;
+    photosPublished: boolean;
+  };
   training?: { title: string; slug: string; location: string | null };
 }
 
@@ -25,6 +33,14 @@ const statusVariant: Record<string, "success" | "warning" | "error" | "muted" | 
   cancelled: "error",
   waitlist: "muted",
   checked_in: "success",
+};
+
+const statusLabel: Record<string, string> = {
+  confirmed: "Confirmed",
+  pending: "Awaiting Approval",
+  cancelled: "Cancelled",
+  waitlist: "Waitlisted",
+  checked_in: "Checked In",
 };
 
 const paymentVariant: Record<string, "success" | "warning" | "error" | "muted"> = {
@@ -80,9 +96,10 @@ export default function MyRegistrationsPage() {
           {registrations.map((reg) => {
             const item = reg.ride || reg.training;
             const href = reg.ride ? `/rides/${reg.ride.slug}` : `/trainings/${reg.training?.slug}`;
+            const isConfirmedPaid = reg.status === "confirmed" && reg.paymentStatus === "paid";
             return (
-              <Link key={reg.id} href={href} className="block group">
-                <div className="bg-surface border border-border rounded-sm p-5 hover:border-orange/30 transition-colors">
+              <div key={reg.id} className="bg-surface border border-border rounded-sm p-5 hover:border-orange/30 transition-colors">
+                <Link href={href} className="block group">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="space-y-1">
                       <h3 className="font-heading text-lg font-semibold group-hover:text-orange transition-colors">
@@ -102,13 +119,42 @@ export default function MyRegistrationsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge variant={statusVariant[reg.status] || "muted"}>{reg.status}</Badge>
+                      <Badge variant={statusVariant[reg.status] || "muted"}>
+                        {statusLabel[reg.status] || reg.status}
+                      </Badge>
                       <Badge variant={paymentVariant[reg.paymentStatus] || "muted"}>{reg.paymentStatus}</Badge>
                       <span className="font-heading text-lg font-bold text-orange">{formatPrice(reg.amount)}</span>
                     </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+
+                {isConfirmedPaid && (reg.ride?.whatsappGroupLink || (reg.ride?.photosLink && reg.ride?.photosPublished)) && (
+                  <div className="mt-3 pt-3 border-t border-border flex flex-wrap gap-3">
+                    {reg.ride?.whatsappGroupLink && (
+                      <a
+                        href={reg.ride.whatsappGroupLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-success/10 text-success border border-success/20 rounded-sm hover:bg-success/20 transition-colors"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Join WhatsApp Group
+                      </a>
+                    )}
+                    {reg.ride?.photosLink && reg.ride?.photosPublished && (
+                      <a
+                        href={reg.ride.photosLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-orange/10 text-orange border border-orange/20 rounded-sm hover:bg-orange/20 transition-colors"
+                      >
+                        <ImageIcon className="w-3.5 h-3.5" />
+                        View Photos & Videos
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

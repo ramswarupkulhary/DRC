@@ -3,25 +3,31 @@
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { ImageCropper } from "@/components/ui/ImageCropper";
+import { PasswordChangeModal } from "@/components/ui/PasswordChangeModal";
 
 interface Profile {
   name: string;
   email: string;
   phone: string;
+  city: string;
+  address: string;
+  addressState: string;
+  pincode: string;
+  tshirtSize: string;
+  instagramHandle: string;
   bikeName: string;
   bikeCC: string;
   ridingExperience: string;
+  licenseNumber: string;
   emergencyName: string;
   emergencyPhone: string;
   bloodGroup: string;
-  licenseNumber: string;
-  city: string;
   image: string | null;
 }
 
@@ -44,17 +50,32 @@ const bloodGroupOptions = [
   { value: "O-", label: "O-" },
 ];
 
+const tshirtOptions = [
+  { value: "", label: "Select size" },
+  { value: "S", label: "S" },
+  { value: "M", label: "M" },
+  { value: "L", label: "L" },
+  { value: "XL", label: "XL" },
+  { value: "XXL", label: "XXL" },
+];
+
 export default function ProfilePage() {
   const { data: session, status, update: updateSession } = useSession();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [savingPhoto, setSavingPhoto] = useState(false);
   const [convertingFile, setConvertingFile] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [savingPersonal, setSavingPersonal] = useState(false);
+  const [savedPersonal, setSavedPersonal] = useState(false);
+  const [savingBike, setSavingBike] = useState(false);
+  const [savedBike, setSavedBike] = useState(false);
+  const [savingEmergency, setSavingEmergency] = useState(false);
+  const [savedEmergency, setSavedEmergency] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -83,20 +104,67 @@ export default function ProfilePage() {
 
   function update(field: keyof Profile, value: string) {
     setProfile((prev) => prev && { ...prev, [field]: value });
-    setSaved(false);
+    setSavedPersonal(false);
+    setSavedBike(false);
+    setSavedEmergency(false);
   }
 
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault();
-    setSaving(true);
+  async function handleSavePersonal() {
+    if (!profile) return;
+    setSavingPersonal(true);
     await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...profile, image }),
+      body: JSON.stringify({
+        section: "personal",
+        name: profile.name,
+        phone: profile.phone,
+        city: profile.city,
+        address: profile.address,
+        addressState: profile.addressState,
+        pincode: profile.pincode,
+        tshirtSize: profile.tshirtSize,
+        instagramHandle: profile.instagramHandle,
+      }),
     });
     await updateSession();
-    setSaving(false);
-    setSaved(true);
+    setSavingPersonal(false);
+    setSavedPersonal(true);
+  }
+
+  async function handleSaveBike() {
+    if (!profile) return;
+    setSavingBike(true);
+    await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        section: "bike",
+        bikeName: profile.bikeName,
+        bikeCC: profile.bikeCC,
+        ridingExperience: profile.ridingExperience,
+        licenseNumber: profile.licenseNumber,
+      }),
+    });
+    setSavingBike(false);
+    setSavedBike(true);
+  }
+
+  async function handleSaveEmergency() {
+    if (!profile) return;
+    setSavingEmergency(true);
+    await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        section: "emergency",
+        emergencyName: profile.emergencyName,
+        emergencyPhone: profile.emergencyPhone,
+        bloodGroup: profile.bloodGroup,
+      }),
+    });
+    setSavingEmergency(false);
+    setSavedEmergency(true);
   }
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -216,8 +284,8 @@ export default function ProfilePage() {
         />
       )}
 
-      {/* Profile Form */}
-      <form onSubmit={handleSave} className="mt-8 space-y-8">
+      {/* Personal Info Section */}
+      <div className="mt-8 space-y-8">
         <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
           <h3 className="font-heading text-lg font-semibold text-tan">Personal Info</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -225,6 +293,17 @@ export default function ProfilePage() {
             <Input id="email" label="Email" type="email" value={profile.email} disabled />
             <Input id="phone" label="Phone" type="tel" value={profile.phone} onChange={(e) => update("phone", e.target.value)} />
             <Input id="city" label="City" value={profile.city} onChange={(e) => update("city", e.target.value)} />
+            <Input id="instagramHandle" label="Instagram Handle" placeholder="@yourusername" value={profile.instagramHandle} onChange={(e) => update("instagramHandle", e.target.value)} />
+            <Select id="tshirtSize" label="T-Shirt Size" options={tshirtOptions} value={profile.tshirtSize} onChange={(e) => update("tshirtSize", e.target.value)} />
+            <Input id="address" label="Address" value={profile.address} onChange={(e) => update("address", e.target.value)} className="sm:col-span-2" />
+            <Input id="addressState" label="State" value={profile.addressState} onChange={(e) => update("addressState", e.target.value)} />
+            <Input id="pincode" label="Pincode" value={profile.pincode} onChange={(e) => update("pincode", e.target.value)} />
+          </div>
+          <div className="flex items-center gap-4">
+            <Button onClick={handleSavePersonal} loading={savingPersonal}>
+              Save Personal Info
+            </Button>
+            {savedPersonal && <span className="text-success text-sm">Saved!</span>}
           </div>
         </div>
 
@@ -236,6 +315,12 @@ export default function ProfilePage() {
             <Select id="ridingExperience" label="Riding Experience" options={experienceOptions} value={profile.ridingExperience} onChange={(e) => update("ridingExperience", e.target.value)} />
             <Input id="licenseNumber" label="License Number" value={profile.licenseNumber} onChange={(e) => update("licenseNumber", e.target.value)} />
           </div>
+          <div className="flex items-center gap-4">
+            <Button onClick={handleSaveBike} loading={savingBike}>
+              Save Bike Info
+            </Button>
+            {savedBike && <span className="text-success text-sm">Saved!</span>}
+          </div>
         </div>
 
         <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
@@ -245,68 +330,32 @@ export default function ProfilePage() {
             <Input id="emergencyPhone" label="Contact Phone" type="tel" value={profile.emergencyPhone} onChange={(e) => update("emergencyPhone", e.target.value)} />
             <Select id="bloodGroup" label="Blood Group" options={bloodGroupOptions} value={profile.bloodGroup} onChange={(e) => update("bloodGroup", e.target.value)} />
           </div>
+          <div className="flex items-center gap-4">
+            <Button onClick={handleSaveEmergency} loading={savingEmergency}>
+              Save Emergency Contact
+            </Button>
+            {savedEmergency && <span className="text-success text-sm">Saved!</span>}
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <Button type="submit" loading={saving}>
-            Save Profile
-          </Button>
-          {saved && <span className="text-success text-sm">Profile saved successfully!</span>}
+        {/* Password Section */}
+        <div className="bg-surface border border-border rounded-sm p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-heading text-lg font-semibold text-tan">Password</h3>
+              <p className="text-sm text-muted mt-1">Change your account password via OTP verification</p>
+            </div>
+            <Button variant="secondary" onClick={() => setShowPasswordModal(true)}>
+              <Lock className="w-4 h-4 mr-2" />
+              Update Password
+            </Button>
+          </div>
         </div>
-      </form>
-
-      <ChangePasswordSection />
-    </div>
-  );
-}
-
-function ChangePasswordSection() {
-  const [current, setCurrent] = useState("");
-  const [newPw, setNewPw] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setSuccess(false);
-
-    if (newPw !== confirm) { setError("Passwords do not match"); return; }
-    if (newPw.length < 6) { setError("Password must be at least 6 characters"); return; }
-
-    setLoading(true);
-    const res = await fetch("/api/auth/change-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ currentPassword: current, newPassword: newPw }),
-    });
-
-    const data = await res.json();
-    setLoading(false);
-
-    if (!res.ok) {
-      setError(data.error || "Failed to change password");
-    } else {
-      setSuccess(true);
-      setCurrent("");
-      setNewPw("");
-      setConfirm("");
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="mt-8 bg-surface border border-border rounded-sm p-6 space-y-5">
-      <h3 className="font-heading text-lg font-semibold text-tan">Change Password</h3>
-      {error && <div className="bg-error/10 border border-error/30 text-error text-sm p-3 rounded-sm">{error}</div>}
-      {success && <div className="bg-success/10 border border-success/30 text-success text-sm p-3 rounded-sm">Password changed successfully!</div>}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <Input id="currentPassword" label="Current Password" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} required />
-        <Input id="newPassword" label="New Password" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} required />
-        <Input id="confirmPassword" label="Confirm New Password" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
       </div>
-      <Button type="submit" variant="secondary" loading={loading}>Update Password</Button>
-    </form>
+
+      {showPasswordModal && (
+        <PasswordChangeModal onClose={() => setShowPasswordModal(false)} />
+      )}
+    </div>
   );
 }

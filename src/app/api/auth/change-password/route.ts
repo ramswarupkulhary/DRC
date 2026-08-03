@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   }
 
   const userId = (session.user as { id: string }).id;
-  const { currentPassword, newPassword } = await req.json();
+  const { currentPassword, newPassword, verificationId } = await req.json();
 
   if (!newPassword || newPassword.length < 6) {
     return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
@@ -24,6 +24,13 @@ export async function POST(req: Request) {
 
   if (!compareSync(currentPassword, user.passwordHash)) {
     return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
+  }
+
+  if (verificationId) {
+    const otp = await prisma.otp.findUnique({ where: { id: verificationId } });
+    if (!otp || otp.email !== user.email || !otp.used) {
+      return NextResponse.json({ error: "Invalid verification" }, { status: 400 });
+    }
   }
 
   await prisma.user.update({

@@ -33,6 +33,8 @@ export async function PUT(req: Request, { params }: Props) {
       featured: body.featured || false,
       inclusions,
       coverImage: body.coverImage || null,
+      whatsappGroupLink: body.whatsappGroupLink || null,
+      photosLink: body.photosLink || null,
     },
   });
 
