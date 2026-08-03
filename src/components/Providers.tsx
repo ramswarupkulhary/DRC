@@ -10,23 +10,26 @@ function RefreshRedirect() {
 
   useEffect(() => {
     const exempt = ["/", "/login", "/register", "/forgot-password", "/signup"];
-    if (exempt.includes(pathname)) {
-      sessionStorage.setItem("drc-active", "1");
-      return;
-    }
+    if (exempt.includes(pathname)) return;
     if (pathname.startsWith("/api") || pathname.startsWith("/_next")) return;
 
     const entries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
-    if (entries.length > 0) {
-      const navType = entries[0].type;
-      if (navType === "reload" || navType === "navigate") {
-        if (!sessionStorage.getItem("drc-active")) {
-          router.replace("/");
-          return;
-        }
+    if (entries.length === 0) return;
+
+    const navEntry = entries[0];
+    const navType = navEntry.type;
+
+    if (navType === "reload") {
+      router.replace("/");
+      return;
+    }
+
+    if (navType === "navigate") {
+      const loadedPath = new URL(navEntry.name).pathname;
+      if (loadedPath === pathname) {
+        router.replace("/");
       }
     }
-    sessionStorage.setItem("drc-active", "1");
   }, [pathname, router]);
 
   return null;
