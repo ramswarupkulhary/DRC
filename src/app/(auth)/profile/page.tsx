@@ -44,7 +44,7 @@ const bloodGroupOptions = [
 ];
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [saving, setSaving] = useState(false);
@@ -91,6 +91,7 @@ export default function ProfilePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...profile, image }),
     });
+    await updateSession();
     setSaving(false);
     setSaved(true);
   }

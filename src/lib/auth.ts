@@ -43,12 +43,23 @@ export const authOptions: AuthOptions = {
     newUser: "/signup",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role || "rider";
         token.image = user.image || null;
         token.isMember = (user as { isMember?: boolean }).isMember || false;
+      }
+      if (trigger === "update") {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          include: { membership: true },
+        });
+        if (dbUser) {
+          token.image = dbUser.image || null;
+          token.role = dbUser.role;
+          token.isMember = !!(dbUser.membership && dbUser.membership.status === "active" && new Date(dbUser.membership.endDate) > new Date());
+        }
       }
       return token;
     },
