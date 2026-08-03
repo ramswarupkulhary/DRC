@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, User, LogOut, LayoutDashboard, FileText, BookOpen, Trophy, ChevronDown, Crown, Bell } from "lucide-react";
+import { Menu, X, User, LogOut, ChevronDown, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,12 +23,7 @@ const navLinks = [
 ];
 
 const userMenuLinks = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/profile", label: "My Profile", icon: User },
-  { href: "/notifications", label: "Notifications", icon: Bell },
-  { href: "/my-registrations", label: "My Registrations", icon: FileText },
-  { href: "/ride-journal", label: "Ride Journal", icon: BookOpen },
-  { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
 ];
 
 export function Navbar() {
@@ -292,25 +287,13 @@ export function Navbar() {
                       </div>
                     </div>
 
-                    {userMenuLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setMobileOpen(false)}
-                        className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground/80 hover:text-orange hover:bg-surface-light rounded-sm transition-colors"
-                      >
-                        <link.icon className="w-4 h-4" />
-                        {link.label}
-                      </Link>
-                    ))}
-
                     <Link
-                      href="/membership"
+                      href="/profile"
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 text-sm font-semibold text-orange hover:bg-orange/10 rounded-sm transition-colors"
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground/80 hover:text-orange hover:bg-surface-light rounded-sm transition-colors"
                     >
-                      <Crown className="w-4 h-4" />
-                      {isMember ? "My Membership" : "Join Membership"}
+                      <User className="w-4 h-4" />
+                      My Profile
                     </Link>
 
                     <button

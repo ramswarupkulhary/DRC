@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ImageCropper } from "@/components/ui/ImageCropper";
 
 interface Profile {
   name: string;
@@ -50,7 +51,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [image, setImage] = useState<string | null>(null);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [savingPhoto, setSavingPhoto] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -96,74 +98,94 @@ export default function ProfilePage() {
     setSaved(true);
   }
 
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(reader.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+
+  async function handleCropComplete(blob: Blob) {
+    setSavingPhoto(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", blob, "profile.webp");
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!uploadRes.ok) throw new Error("Upload failed");
+      const { url } = await uploadRes.json();
+
+      await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...profile, image: url }),
+      });
+
+      setImage(url);
+      setProfile((prev) => prev && { ...prev, image: url });
+      await updateSession();
+    } catch {
+      alert("Failed to save photo. Please try again.");
+    } finally {
+      setSavingPhoto(false);
+      setCropSrc(null);
+    }
+  }
+
+  const userInitials = profile.name
+    ? profile.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "?";
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <SectionHeader accent="Your account" title="Rider Profile" align="left" />
 
-      <form onSubmit={handleSave} className="mt-8 space-y-8">
-        {/* Avatar Section */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border">
-              {image ? (
-                <img
-                  src={image}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                  onError={() => setImage(null)}
-                />
-              ) : (
-                <div className="w-full h-full bg-orange flex items-center justify-center">
-                  <span className="text-2xl font-bold text-white">
-                    {profile.name
-                      ? profile.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2)
-                      : "?"}
-                  </span>
-                </div>
-              )}
-            </div>
-            <button
-              type="button"
-              disabled={uploadingPhoto}
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 p-1.5 bg-orange rounded-full text-white hover:bg-orange/80 transition-colors disabled:opacity-50"
-            >
-              <Camera className="w-4 h-4" />
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                setUploadingPhoto(true);
-                try {
-                  const formData = new FormData();
-                  formData.append("file", file);
-                  const res = await fetch("/api/upload", { method: "POST", body: formData });
-                  if (!res.ok) throw new Error("Upload failed");
-                  const { url } = await res.json();
-                  setImage(url);
-                  setSaved(false);
-                } catch {
-                  alert("Image upload failed. Please try again.");
-                } finally {
-                  setUploadingPhoto(false);
-                  e.target.value = "";
-                }
-              }}
+      {/* Profile Photo Section */}
+      <div className="mt-8 flex flex-col items-center gap-4 pb-8 border-b border-border">
+        <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-border">
+          {image ? (
+            <img
+              src={image}
+              alt="Profile"
+              className="w-full h-full object-cover"
+              onError={() => setImage(null)}
             />
-          </div>
-          {uploadingPhoto && <span className="text-sm text-muted">Uploading...</span>}
+          ) : (
+            <div className="w-full h-full bg-orange flex items-center justify-center">
+              <span className="text-3xl font-bold text-white">{userInitials}</span>
+            </div>
+          )}
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Camera className="w-4 h-4 mr-2" />
+          Change Photo
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileSelect}
+        />
+      </div>
 
+      {/* Crop Modal */}
+      {cropSrc && (
+        <ImageCropper
+          imageSrc={cropSrc}
+          onCropComplete={handleCropComplete}
+          onCancel={() => setCropSrc(null)}
+          saving={savingPhoto}
+        />
+      )}
+
+      {/* Profile Form */}
+      <form onSubmit={handleSave} className="mt-8 space-y-8">
         <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
           <h3 className="font-heading text-lg font-semibold text-tan">Personal Info</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
