@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
   const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
     cloudinary.uploader
-      .upload_stream({ folder: "drc", resource_type: "auto" }, (error, result) => {
+      .upload_stream({ folder: "drc", resource_type: "image", format: "webp" }, (error, result) => {
         if (error || !result) return reject(error);
         resolve(result);
       })

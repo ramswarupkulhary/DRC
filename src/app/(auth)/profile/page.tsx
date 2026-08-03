@@ -106,7 +106,12 @@ export default function ProfilePage() {
           <div className="relative">
             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border">
               {image ? (
-                <img src={image} alt="Profile" className="w-full h-full object-cover" />
+                <img
+                  src={image}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                  onError={() => setImage(null)}
+                />
               ) : (
                 <div className="w-full h-full bg-orange flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
