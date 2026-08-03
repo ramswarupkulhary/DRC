@@ -119,6 +119,7 @@ export default function MyRegistrationsPage() {
             const item = reg.ride || reg.training;
             const href = reg.ride ? `/rides/${reg.ride.slug}` : `/trainings/${reg.training?.slug}`;
             const isConfirmedPaid = (reg.status === "confirmed" || reg.status === "checked_in") && reg.paymentStatus === "paid";
+            const isConfirmed = reg.status === "confirmed" || reg.status === "checked_in";
             return (
               <div key={reg.id} className="bg-surface border border-border rounded-sm p-5 hover:border-orange/30 transition-colors">
                 <Link href={href} className="block group">
@@ -150,7 +151,7 @@ export default function MyRegistrationsPage() {
                   </div>
                 </Link>
 
-                {isConfirmedPaid && (reg.ride?.whatsappGroupLink || (reg.ride?.photosLink && reg.ride?.photosPublished)) && (
+                {isConfirmed && (reg.ride?.whatsappGroupLink || (reg.ride?.photosLink && reg.ride?.photosPublished)) && (
                   <div className="mt-3 pt-3 border-t border-border flex flex-wrap gap-3">
                     {reg.ride?.whatsappGroupLink && (
                       <a
@@ -177,7 +178,7 @@ export default function MyRegistrationsPage() {
                   </div>
                 )}
 
-                {isConfirmedPaid && reg.ride && (
+                {isConfirmed && reg.ride && (
                   <div className="mt-3 pt-3 border-t border-border">
                     {reviewSuccess === reg.ride.id ? (
                       <p className="text-sm text-success">Review submitted! It will appear on the homepage once approved.</p>
