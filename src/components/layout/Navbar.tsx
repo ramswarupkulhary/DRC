@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, User, LogOut, ChevronDown, Crown } from "lucide-react";
+import { Menu, X, User, LogOut, ChevronDown, Crown, Bell, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -294,6 +294,33 @@ export function Navbar() {
                     >
                       <User className="w-4 h-4" />
                       My Profile
+                    </Link>
+
+                    <Link
+                      href="/notifications"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground/80 hover:text-orange hover:bg-surface-light rounded-sm transition-colors"
+                    >
+                      <Bell className="w-4 h-4" />
+                      Notifications
+                    </Link>
+
+                    <Link
+                      href="/membership"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground/80 hover:text-orange hover:bg-surface-light rounded-sm transition-colors"
+                    >
+                      <Crown className="w-4 h-4" />
+                      {isMember ? "My Membership" : "Membership"}
+                    </Link>
+
+                    <Link
+                      href="/my-registrations"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground/80 hover:text-orange hover:bg-surface-light rounded-sm transition-colors"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      My Registrations
                     </Link>
 
                     <button

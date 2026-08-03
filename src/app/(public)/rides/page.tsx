@@ -14,7 +14,7 @@ export default async function RidesPage() {
   const rides = await prisma.ride.findMany({
     where: { status: "published" },
     orderBy: { startDate: "asc" },
-    include: { registrations: { where: { status: { not: "cancelled" } } } },
+    include: { registrations: { where: { status: { in: ["confirmed", "checked_in"] } } } },
   });
 
   const upcoming = rides.filter((r) => r.startDate >= new Date());

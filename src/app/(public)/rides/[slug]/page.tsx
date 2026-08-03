@@ -24,7 +24,7 @@ export default async function RideDetailPage({ params }: Props) {
   const { slug } = await params;
   const ride = await prisma.ride.findUnique({
     where: { slug },
-    include: { registrations: { where: { status: { not: "cancelled" } } } },
+    include: { registrations: { where: { status: { in: ["confirmed", "checked_in"] } } } },
   });
 
   if (!ride) notFound();
@@ -174,7 +174,7 @@ export default async function RideDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <RegisterButton rideId={ride.id} rideSlug={ride.slug} soldOut={soldOut} />
+            <RegisterButton rideId={ride.id} rideSlug={ride.slug} rideTitle={ride.title} ridePrice={ride.price} soldOut={soldOut} />
 
             <a href="https://wa.me/919414870102" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="md" className="w-full mt-2">

@@ -104,7 +104,7 @@ export default async function TrainingDetailPage({ params }: Props) {
               <span className="text-sm text-muted">per rider</span>
             </div>
 
-            <TrainingRegisterButton trainingId={training.id} trainingSlug={training.slug} />
+            <TrainingRegisterButton trainingId={training.id} trainingSlug={training.slug} trainingTitle={training.title} trainingPrice={training.price} />
 
             <a href="https://wa.me/919414870102" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="md" className="w-full mt-2">

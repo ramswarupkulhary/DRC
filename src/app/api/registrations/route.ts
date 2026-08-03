@@ -19,30 +19,30 @@ export async function POST(req: Request) {
     );
   }
 
-  const { rideId, trainingId } = await req.json();
+  const { rideId, trainingId, paymentProof } = await req.json();
 
   if (!rideId && !trainingId) {
     return NextResponse.json({ error: "Must specify a ride or training" }, { status: 400 });
   }
 
   let amount = 0;
-  let rideTitle = "";
+  let eventTitle = "";
 
   if (rideId) {
     const ride = await prisma.ride.findUnique({
       where: { id: rideId },
-      include: { registrations: { where: { status: { not: "cancelled" } } } },
+      include: { registrations: { where: { status: { in: ["confirmed", "checked_in"] } } } },
     });
     if (!ride) return NextResponse.json({ error: "Ride not found" }, { status: 404 });
     if (ride.status !== "published") return NextResponse.json({ error: "Ride is not available" }, { status: 400 });
 
     const existing = await prisma.registration.findFirst({
-      where: { userId: user.id, rideId, status: { not: "cancelled" } },
+      where: { userId: user.id, rideId, status: { notIn: ["cancelled", "rejected"] } },
     });
     if (existing) return NextResponse.json({ error: "You are already registered for this ride" }, { status: 409 });
 
     amount = ride.price;
-    rideTitle = ride.title;
+    eventTitle = ride.title;
     const bookedSlots = ride.registrations.length;
 
     if (bookedSlots >= ride.totalSlots) {
@@ -56,12 +56,12 @@ export async function POST(req: Request) {
     if (training.status !== "published") return NextResponse.json({ error: "Training is not available" }, { status: 400 });
 
     const existing = await prisma.registration.findFirst({
-      where: { userId: user.id, trainingId, status: { not: "cancelled" } },
+      where: { userId: user.id, trainingId, status: { notIn: ["cancelled", "rejected"] } },
     });
     if (existing) return NextResponse.json({ error: "You are already registered for this training" }, { status: 409 });
 
     amount = training.price;
-    rideTitle = training.title;
+    eventTitle = training.title;
   }
 
   const registration = await prisma.registration.create({
@@ -71,7 +71,8 @@ export async function POST(req: Request) {
       trainingId: trainingId || null,
       amount,
       status: "pending",
-      paymentStatus: "unpaid",
+      paymentStatus: paymentProof ? "pending" : "unpaid",
+      paymentProof: paymentProof || null,
     },
   });
 
@@ -82,7 +83,7 @@ export async function POST(req: Request) {
         userId: admin.id,
         type: "registration",
         title: "New Registration",
-        message: `${user.name || user.email} registered for ${rideTitle}`,
+        message: `${user.name || user.email} registered for ${eventTitle}`,
         link: "/admin/registrations",
       },
     });

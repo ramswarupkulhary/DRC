@@ -62,6 +62,7 @@ export default function RideForm({ ride }: RideFormProps) {
   const [error, setError] = useState("");
   const [publishSuccess, setPublishSuccess] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(ride?.coverImage || null);
+  const [rideType, setRideType] = useState(ride?.type || "ride");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -71,18 +72,18 @@ export default function RideForm({ ride }: RideFormProps) {
     const form = new FormData(e.currentTarget);
     const data = {
       title: form.get("title"),
-      description: form.get("description"),
+      description: form.get("description") || "",
       shortDesc: form.get("shortDesc") || null,
       location: form.get("location"),
       state: form.get("state") || null,
       startDate: form.get("startDate"),
-      endDate: form.get("endDate"),
+      endDate: rideType === "ride" ? form.get("startDate") : form.get("endDate"),
       startPoint: form.get("startPoint") || null,
       startTime: form.get("startTime") || null,
       price: parseInt(form.get("price") as string),
       totalSlots: parseInt(form.get("totalSlots") as string),
       difficulty: form.get("difficulty"),
-      type: form.get("type"),
+      type: rideType,
       status: form.get("status"),
       featured: form.get("featured") === "on",
       inclusions: form.get("inclusions") || null,
@@ -123,7 +124,7 @@ export default function RideForm({ ride }: RideFormProps) {
         <h3 className="font-heading text-lg font-semibold text-tan">Basic Info</h3>
         <Input name="title" id="title" label="Title" defaultValue={ride?.title} required />
         <Input name="shortDesc" id="shortDesc" label="Short Description" defaultValue={ride?.shortDesc || ""} />
-        <Textarea name="description" id="description" label="Full Description" defaultValue={ride?.description} required />
+        <Textarea name="description" id="description" label="Full Description (optional)" defaultValue={ride?.description} />
       </div>
 
       <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
@@ -136,8 +137,10 @@ export default function RideForm({ ride }: RideFormProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Input name="location" id="location" label="Location" defaultValue={ride?.location} required />
           <Input name="state" id="state" label="State" defaultValue={ride?.state || ""} />
-          <Input name="startDate" id="startDate" label="Start Date" type="date" defaultValue={ride ? formatDateForInput(ride.startDate) : ""} required />
-          <Input name="endDate" id="endDate" label="End Date" type="date" defaultValue={ride ? formatDateForInput(ride.endDate) : ""} required />
+          <Input name="startDate" id="startDate" label={rideType === "ride" ? "Date" : "Start Date"} type="date" defaultValue={ride ? formatDateForInput(ride.startDate) : ""} required />
+          {rideType !== "ride" && (
+            <Input name="endDate" id="endDate" label="End Date" type="date" defaultValue={ride ? formatDateForInput(ride.endDate) : ""} required />
+          )}
           <Input name="startPoint" id="startPoint" label="Meeting Point" defaultValue={ride?.startPoint || ""} />
           <Input name="startTime" id="startTime" label="Start Time" placeholder="e.g. 3:00 PM" defaultValue={ride?.startTime || ""} />
         </div>
@@ -149,7 +152,7 @@ export default function RideForm({ ride }: RideFormProps) {
           <Input name="price" id="price" label="Price (INR)" type="number" defaultValue={ride?.price} required />
           <Input name="totalSlots" id="totalSlots" label="Total Slots" type="number" defaultValue={ride?.totalSlots} required />
           <Select name="difficulty" id="difficulty" label="Difficulty" options={difficultyOptions} defaultValue={ride?.difficulty || "moderate"} />
-          <Select name="type" id="type" label="Type" options={typeOptions} defaultValue={ride?.type || "ride"} />
+          <Select name="type" id="type" label="Type" options={typeOptions} value={rideType} onChange={(e) => setRideType(e.target.value)} />
           <Select name="status" id="status" label="Status" options={statusOptions} defaultValue={ride?.status || "draft"} />
           <div className="flex items-center gap-3 pt-6">
             <input type="checkbox" name="featured" id="featured" defaultChecked={ride?.featured} className="w-4 h-4 accent-orange" />

@@ -230,6 +230,7 @@ model Registration {
   notes         String?
   couponId      String?
   discount      Int      @default(0)
+  paymentProof  String?
   guestName     String?
   guestEmail    String?
   guestPhone    String?

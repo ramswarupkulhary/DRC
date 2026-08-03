@@ -4,12 +4,12 @@ import { formatPrice, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import { Plus, Edit } from "lucide-react";
+import { Plus, Edit, Users } from "lucide-react";
 
 export default async function AdminRidesPage() {
   const rides = await prisma.ride.findMany({
     orderBy: { startDate: "desc" },
-    include: { registrations: { where: { status: { not: "cancelled" } } } },
+    include: { registrations: { where: { status: { in: ["confirmed", "checked_in"] } } } },
   });
 
   return (
@@ -58,9 +58,14 @@ export default async function AdminRidesPage() {
                       </Badge>
                     </td>
                     <td className="px-5 py-3">
-                      <Link href={`/admin/rides/${ride.id}/edit`} className="text-orange hover:underline inline-flex items-center gap-1 text-xs">
-                        <Edit className="w-3.5 h-3.5" /> Edit
-                      </Link>
+                      <div className="flex items-center gap-3">
+                        <Link href={`/admin/rides/${ride.id}`} className="text-tan hover:underline inline-flex items-center gap-1 text-xs">
+                          <Users className="w-3.5 h-3.5" /> Registrations
+                        </Link>
+                        <Link href={`/admin/rides/${ride.id}/edit`} className="text-orange hover:underline inline-flex items-center gap-1 text-xs">
+                          <Edit className="w-3.5 h-3.5" /> Edit
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 );
