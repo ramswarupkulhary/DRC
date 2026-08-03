@@ -156,6 +156,9 @@ model Ride {
   createdAt   DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // Member discount (percentage, 0-100)
+  memberDiscount Int @default(0)
+
   // Ride link fields
   whatsappGroupLink String?
   photosLink        String?

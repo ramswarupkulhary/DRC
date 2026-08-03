@@ -15,7 +15,7 @@ import {
 } from "@/components/home/AnimatedSections";
 
 async function getHomeData() {
-  const [rides, trainings] = await Promise.all([
+  const [rides, trainings, reviews] = await Promise.all([
     prisma.ride.findMany({
       where: { status: "published" },
       orderBy: { startDate: "asc" },
@@ -27,12 +27,25 @@ async function getHomeData() {
       orderBy: { featured: "desc" },
       take: 3,
     }),
+    prisma.review.findMany({
+      where: { approved: true },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+      include: { user: { select: { name: true } } },
+    }),
   ]);
-  return { rides, trainings };
+  return { rides, trainings, reviews };
 }
 
 export default async function HomePage() {
-  const { rides, trainings } = await getHomeData();
+  const { rides, trainings, reviews } = await getHomeData();
+
+  const reviewsForDisplay = reviews.map((r) => ({
+    name: r.user.name || "DRC Rider",
+    text: r.comment || "",
+    location: "",
+    rating: r.rating,
+  }));
 
   return (
     <>
@@ -83,7 +96,7 @@ export default async function HomePage() {
         </AnimatedTrainingsSection>
       )}
 
-      <AnimatedTestimonials />
+      <AnimatedTestimonials reviews={reviewsForDisplay} />
       <AnimatedCTA />
     </>
   );

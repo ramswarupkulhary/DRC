@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -43,6 +44,7 @@ const statusVariant: Record<string, "orange" | "success" | "error" | "muted"> = 
 };
 
 export default function AdminMembershipsPage() {
+  const searchParams = useSearchParams();
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
   const [rejectionModal, setRejectionModal] = useState<{ id: string; name: string } | null>(null);
@@ -65,7 +67,17 @@ export default function AdminMembershipsPage() {
 
   useEffect(() => {
     fetchMemberships();
-  }, []);
+    if (searchParams.get("assign") === "true") {
+      setAssignForm((prev) => ({
+        ...prev,
+        email: searchParams.get("email") || "",
+        name: searchParams.get("name") || "",
+        phone: searchParams.get("phone") || "",
+      }));
+      setShowAssignForm(true);
+      fetch("/api/membership/plans").then((r) => r.json()).then((d) => setPlans(d.plans || []));
+    }
+  }, [searchParams]);
 
   async function handleApprove(id: string) {
     await fetch("/api/admin/memberships", {

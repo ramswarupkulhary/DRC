@@ -14,6 +14,7 @@ export default async function EditRidePage({ params }: Props) {
     ...ride,
     startDate: ride.startDate.toISOString(),
     endDate: ride.endDate.toISOString(),
+    memberDiscount: ride.memberDiscount,
   };
 
   return (

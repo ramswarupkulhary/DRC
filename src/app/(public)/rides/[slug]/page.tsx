@@ -36,6 +36,9 @@ export default async function RideDetailPage({ params }: Props) {
   const bookedSlots = ride.registrations.length;
   const slotsText = getSlotsText(ride.totalSlots, bookedSlots);
   const soldOut = ride.totalSlots - bookedSlots <= 0;
+  const hasMemberDiscount = ride.memberDiscount > 0;
+  const discountedPrice = hasMemberDiscount ? Math.round(ride.price * (1 - ride.memberDiscount / 100)) : ride.price;
+  const savings = ride.price - discountedPrice;
 
   const difficultyColors: Record<string, "success" | "warning" | "orange" | "error"> = {
     easy: "success",
@@ -157,6 +160,13 @@ export default async function RideDetailPage({ params }: Props) {
                 {formatPrice(ride.price)}
               </div>
               <span className="text-sm text-muted">per rider</span>
+              {hasMemberDiscount && (
+                <div className="mt-2 p-3 bg-success/10 border border-success/20 rounded-sm">
+                  <div className="text-xs font-semibold text-success uppercase tracking-wider">DRC Members</div>
+                  <div className="font-heading text-2xl font-bold text-success mt-0.5">{formatPrice(discountedPrice)}</div>
+                  <div className="text-xs text-success/80">You save {formatPrice(savings)} ({ride.memberDiscount}% off)</div>
+                </div>
+              )}
             </div>
 
             <div className="border-t border-border pt-4">

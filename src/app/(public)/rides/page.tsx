@@ -11,14 +11,23 @@ export const metadata: Metadata = {
 };
 
 export default async function RidesPage() {
-  const rides = await prisma.ride.findMany({
-    where: { status: "published" },
-    orderBy: { startDate: "asc" },
-    include: { registrations: { where: { status: { in: ["confirmed", "checked_in"] } } } },
-  });
+  const [publishedRides, completedRides] = await Promise.all([
+    prisma.ride.findMany({
+      where: { status: "published" },
+      orderBy: { startDate: "asc" },
+      include: { registrations: { where: { status: { in: ["confirmed", "checked_in"] } } } },
+    }),
+    prisma.ride.findMany({
+      where: { status: "completed" },
+      orderBy: { startDate: "desc" },
+      take: 6,
+      include: { registrations: { where: { status: { in: ["confirmed", "checked_in"] } } } },
+    }),
+  ]);
 
-  const upcoming = rides.filter((r) => r.startDate >= new Date());
-  const past = rides.filter((r) => r.startDate < new Date());
+  const upcoming = publishedRides.filter((r) => r.startDate >= new Date());
+  const past = publishedRides.filter((r) => r.startDate < new Date());
+  const pastShowcase = [...past, ...completedRides];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
@@ -69,15 +78,16 @@ export default async function RidesPage() {
         </AnimatedSection>
       )}
 
-      {past.length > 0 && (
+      {pastShowcase.length > 0 && (
         <div className="mt-16">
           <AnimatedSection>
-            <h3 className="font-heading text-xl font-semibold text-tan mb-6 uppercase tracking-wider">
-              Past Rides
+            <h3 className="font-heading text-xl font-semibold text-tan mb-2 uppercase tracking-wider">
+              Past Adventures
             </h3>
+            <p className="text-muted text-sm mb-6">Check out some of the amazing rides we&apos;ve done!</p>
           </AnimatedSection>
           <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 opacity-60">
-            {past.map((ride) => (
+            {pastShowcase.map((ride) => (
               <AnimatedGridItem key={ride.id}>
                 <RideCard
                   slug={ride.slug}

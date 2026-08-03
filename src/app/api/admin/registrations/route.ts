@@ -11,7 +11,7 @@ export async function GET(req: Request) {
     where,
     orderBy: { createdAt: "desc" },
     include: {
-      user: { select: { name: true, email: true, phone: true } },
+      user: { select: { id: true, name: true, email: true, phone: true } },
       ride: { select: { title: true, startDate: true } },
       training: { select: { title: true } },
     },

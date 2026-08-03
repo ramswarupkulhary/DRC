@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { formatPrice, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-import { ChevronLeft, Eye, Check, X } from "lucide-react";
+import { ChevronLeft, Eye, Check, X, Edit, ChevronDown, ChevronUp, MessageCircle, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 
 interface Registration {
@@ -17,7 +18,7 @@ interface Registration {
   paymentProof: string | null;
   notes: string | null;
   createdAt: string;
-  user: { name: string | null; email: string; phone: string | null };
+  user: { id: string; name: string | null; email: string; phone: string | null };
 }
 
 interface RideInfo {
@@ -27,29 +28,70 @@ interface RideInfo {
   endDate: string;
   location: string;
   totalSlots: number;
+  price: number;
+  memberDiscount: number;
   type: string;
+  status: string;
+  whatsappGroupLink: string | null;
+  photosLink: string | null;
+  photosPublished: boolean;
 }
+
+interface RiderHistory {
+  registrations: {
+    id: string;
+    status: string;
+    notes: string | null;
+    createdAt: string;
+    paymentStatus: string;
+    amount: number;
+    ride: { title: string } | null;
+    training: { title: string } | null;
+  }[];
+}
+
+const statusVariant: Record<string, "success" | "warning" | "error" | "muted" | "orange"> = {
+  confirmed: "success",
+  pending: "warning",
+  rejected: "error",
+  cancelled: "muted",
+  checked_in: "success",
+};
 
 export default function AdminRideDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const rideId = params.id as string;
   const [ride, setRide] = useState<RideInfo | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [rejectId, setRejectId] = useState<string | null>(null);
+  const [cancelId, setCancelId] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState("");
+  const [cancelNote, setCancelNote] = useState("");
   const [submitting, setSubmitting] = useState("");
+  const [expandedRider, setExpandedRider] = useState<string | null>(null);
+  const [riderHistory, setRiderHistory] = useState<Record<string, RiderHistory>>({});
+  const [linksForm, setLinksForm] = useState({ whatsappGroupLink: "", photosLink: "" });
+  const [savingLinks, setSavingLinks] = useState(false);
+  const [linksSaved, setLinksSaved] = useState(false);
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     Promise.all([
       fetch(`/api/admin/rides/${rideId}/details`).then((r) => r.json()),
       fetch(`/api/admin/registrations?rideId=${rideId}`).then((r) => r.json()),
     ]).then(([rideData, regsData]) => {
       setRide(rideData);
       setRegistrations(regsData);
+      setLinksForm({
+        whatsappGroupLink: rideData.whatsappGroupLink || "",
+        photosLink: rideData.photosLink || "",
+      });
       setLoading(false);
     });
   }, [rideId]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   async function updateStatus(id: string, status: string, notes?: string) {
     setSubmitting(id);
@@ -58,12 +100,12 @@ export default function AdminRideDetailPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, ...(notes ? { notes } : {}) }),
     });
-    setRegistrations((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status, ...(notes ? { notes } : {}) } : r))
-    );
+    fetchData();
     setSubmitting("");
     setRejectId(null);
+    setCancelId(null);
     setRejectNote("");
+    setCancelNote("");
   }
 
   async function updatePayment(id: string, paymentStatus: string) {
@@ -79,18 +121,39 @@ export default function AdminRideDetailPage() {
     setSubmitting("");
   }
 
-  const statusVariant: Record<string, "success" | "warning" | "error" | "muted" | "orange"> = {
-    confirmed: "success",
-    pending: "warning",
-    rejected: "error",
-    cancelled: "muted",
-    checked_in: "success",
-  };
+  async function loadRiderHistory(userId: string) {
+    if (riderHistory[userId]) return;
+    const res = await fetch(`/api/admin/riders/${userId}/history`);
+    const data = await res.json();
+    setRiderHistory((prev) => ({ ...prev, [userId]: data }));
+  }
+
+  async function saveLinks() {
+    setSavingLinks(true);
+    setLinksSaved(false);
+    await fetch(`/api/admin/rides/${rideId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(linksForm),
+    });
+    setRide((prev) => prev ? { ...prev, ...linksForm } : prev);
+    setSavingLinks(false);
+    setLinksSaved(true);
+    setTimeout(() => setLinksSaved(false), 3000);
+  }
 
   if (loading) return <div className="text-muted py-12 text-center">Loading...</div>;
   if (!ride) return <div className="text-error py-12 text-center">Ride not found</div>;
 
   const confirmedCount = registrations.filter((r) => r.status === "confirmed" || r.status === "checked_in").length;
+  const uniqueRiders = new Map<string, Registration>();
+  registrations.forEach((r) => {
+    const existing = uniqueRiders.get(r.user.id);
+    if (!existing || new Date(r.createdAt) > new Date(existing.createdAt)) {
+      uniqueRiders.set(r.user.id, r);
+    }
+  });
+  const latestPerRider = Array.from(uniqueRiders.values());
 
   return (
     <div className="space-y-6">
@@ -99,22 +162,66 @@ export default function AdminRideDetailPage() {
       </Link>
 
       <div className="bg-surface border border-border rounded-sm p-6">
-        <h1 className="font-heading text-2xl font-bold">{ride.title}</h1>
-        <div className="flex flex-wrap gap-4 text-sm text-muted mt-2">
-          <span>{formatDate(ride.startDate)}</span>
-          <span>{ride.location}</span>
-          <span className="text-orange font-semibold">{confirmedCount}/{ride.totalSlots} confirmed</span>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-heading text-2xl font-bold">{ride.title}</h1>
+            <div className="flex flex-wrap gap-4 text-sm text-muted mt-2">
+              <span>{formatDate(ride.startDate)}</span>
+              <span>{ride.location}</span>
+              <span className="text-orange font-semibold">{confirmedCount}/{ride.totalSlots} confirmed</span>
+              <Badge variant={ride.status === "published" ? "success" : ride.status === "completed" ? "muted" : "warning"}>{ride.status}</Badge>
+              {ride.memberDiscount > 0 && <span className="text-success">Members: {ride.memberDiscount}% off</span>}
+            </div>
+          </div>
+          <Link href={`/admin/rides/${ride.id}/edit`}>
+            <Button size="sm" variant="outline"><Edit className="w-4 h-4 mr-1" /> Edit Ride</Button>
+          </Link>
         </div>
       </div>
 
+      {/* Links & Media */}
+      <div className="bg-surface border border-border rounded-sm p-6 space-y-4">
+        <h2 className="font-heading text-lg font-semibold flex items-center gap-2">
+          <LinkIcon className="w-5 h-5 text-orange" /> Links & Media
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-foreground block mb-1.5">WhatsApp Group Link</label>
+            <input
+              type="text"
+              value={linksForm.whatsappGroupLink}
+              onChange={(e) => setLinksForm((p) => ({ ...p, whatsappGroupLink: e.target.value }))}
+              placeholder="https://chat.whatsapp.com/..."
+              className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-foreground block mb-1.5">Photos/Videos Link</label>
+            <input
+              type="text"
+              value={linksForm.photosLink}
+              onChange={(e) => setLinksForm((p) => ({ ...p, photosLink: e.target.value }))}
+              placeholder="https://drive.google.com/..."
+              className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none"
+            />
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button size="sm" onClick={saveLinks} loading={savingLinks}>Save Links</Button>
+          {linksSaved && <span className="text-sm text-success">Saved!</span>}
+        </div>
+      </div>
+
+      {/* Registrations */}
       <div className="bg-surface border border-border rounded-sm overflow-hidden">
-        <div className="px-5 py-3 border-b border-border">
-          <h2 className="font-heading text-lg font-semibold">Registrations ({registrations.length})</h2>
+        <div className="px-5 py-3 border-b border-border flex items-center justify-between">
+          <h2 className="font-heading text-lg font-semibold">Registrations ({latestPerRider.length} riders)</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-surface-light text-left text-muted text-xs uppercase tracking-wider">
+                <th className="px-5 py-3"></th>
                 <th className="px-5 py-3">Rider</th>
                 <th className="px-5 py-3">Phone</th>
                 <th className="px-5 py-3">Status</th>
@@ -125,87 +232,128 @@ export default function AdminRideDetailPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {registrations.map((reg) => (
-                <tr key={reg.id} className="hover:bg-surface-light/50">
-                  <td className="px-5 py-3">
-                    <div className="font-medium">{reg.user.name || "—"}</div>
-                    <div className="text-xs text-muted">{reg.user.email}</div>
-                  </td>
-                  <td className="px-5 py-3 text-muted">{reg.user.phone || "—"}</td>
-                  <td className="px-5 py-3">
-                    <Badge variant={statusVariant[reg.status] || "muted"}>{reg.status}</Badge>
-                    {reg.notes && reg.status === "rejected" && (
-                      <p className="text-xs text-error/70 mt-1 max-w-[150px] truncate" title={reg.notes}>{reg.notes}</p>
-                    )}
-                  </td>
-                  <td className="px-5 py-3">
-                    <Badge variant={reg.paymentStatus === "paid" ? "success" : "warning"}>
-                      {reg.paymentStatus}
-                    </Badge>
-                  </td>
-                  <td className="px-5 py-3">
-                    {reg.paymentProof ? (
-                      <a href={reg.paymentProof} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-orange hover:underline text-xs">
-                        <Eye className="w-3.5 h-3.5" /> View
-                      </a>
-                    ) : (
-                      <span className="text-muted text-xs">—</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3 text-muted text-xs">{new Date(reg.createdAt).toLocaleDateString()}</td>
-                  <td className="px-5 py-3">
-                    <div className="flex flex-wrap gap-2">
-                      {reg.status === "pending" && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            loading={submitting === reg.id}
-                            onClick={() => updateStatus(reg.id, "confirmed")}
-                          >
-                            <Check className="w-3.5 h-3.5 mr-1" /> Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setRejectId(reg.id)}
-                          >
-                            <X className="w-3.5 h-3.5 mr-1" /> Reject
-                          </Button>
-                        </>
+              {latestPerRider.map((reg) => (
+                <>
+                  <tr key={reg.id} className="hover:bg-surface-light/50">
+                    <td className="px-3 py-3">
+                      <button
+                        onClick={() => {
+                          const newId = expandedRider === reg.user.id ? null : reg.user.id;
+                          setExpandedRider(newId);
+                          if (newId) loadRiderHistory(newId);
+                        }}
+                        className="p-1 text-muted hover:text-orange transition-colors"
+                      >
+                        {expandedRider === reg.user.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </button>
+                    </td>
+                    <td className="px-5 py-3">
+                      <Link href={`/admin/riders/${reg.user.id}`} className="group">
+                        <div className="font-medium group-hover:text-orange transition-colors">{reg.user.name || "—"}</div>
+                        <div className="text-xs text-muted">{reg.user.email}</div>
+                      </Link>
+                    </td>
+                    <td className="px-5 py-3 text-muted">{reg.user.phone || "—"}</td>
+                    <td className="px-5 py-3">
+                      <Badge variant={statusVariant[reg.status] || "muted"}>{reg.status}</Badge>
+                      {reg.notes && reg.status === "rejected" && (
+                        <p className="text-xs text-error/70 mt-1 max-w-[150px] truncate" title={reg.notes}>{reg.notes}</p>
                       )}
-                      {reg.paymentStatus !== "paid" && reg.status !== "rejected" && (
-                        <Button size="sm" variant="secondary" loading={submitting === reg.id} onClick={() => updatePayment(reg.id, "paid")}>
-                          Mark Paid
-                        </Button>
+                      {reg.notes && reg.status === "cancelled" && (
+                        <p className="text-xs text-muted mt-1 max-w-[150px] truncate" title={reg.notes}>{reg.notes}</p>
                       )}
-                    </div>
-
-                    {rejectId === reg.id && (
-                      <div className="mt-3 space-y-2 max-w-xs">
-                        <Textarea
-                          id={`reject-${reg.id}`}
-                          label="Rejection reason"
-                          placeholder="Enter reason for rejection..."
-                          value={rejectNote}
-                          onChange={(e) => setRejectNote(e.target.value)}
-                        />
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="primary" loading={submitting === reg.id} onClick={() => updateStatus(reg.id, "rejected", rejectNote)}>
-                            Confirm Reject
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => { setRejectId(null); setRejectNote(""); }}>
+                    </td>
+                    <td className="px-5 py-3">
+                      <Badge variant={reg.paymentStatus === "paid" ? "success" : "warning"}>
+                        {reg.paymentStatus}
+                      </Badge>
+                    </td>
+                    <td className="px-5 py-3">
+                      {reg.paymentProof ? (
+                        <a href={reg.paymentProof} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-orange hover:underline text-xs">
+                          <Eye className="w-3.5 h-3.5" /> View
+                        </a>
+                      ) : (
+                        <span className="text-muted text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3 text-muted text-xs">{new Date(reg.createdAt).toLocaleDateString()}</td>
+                    <td className="px-5 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        {reg.status === "pending" && (
+                          <>
+                            <Button size="sm" variant="primary" loading={submitting === reg.id} onClick={() => updateStatus(reg.id, "confirmed")}>
+                              <Check className="w-3.5 h-3.5 mr-1" /> Approve
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => setRejectId(reg.id)}>
+                              <X className="w-3.5 h-3.5 mr-1" /> Reject
+                            </Button>
+                          </>
+                        )}
+                        {(reg.status === "confirmed" || reg.status === "checked_in") && (
+                          <Button size="sm" variant="outline" onClick={() => setCancelId(reg.id)}>
                             Cancel
                           </Button>
-                        </div>
+                        )}
+                        {reg.paymentStatus !== "paid" && reg.status !== "rejected" && reg.status !== "cancelled" && (
+                          <Button size="sm" variant="secondary" loading={submitting === reg.id} onClick={() => updatePayment(reg.id, "paid")}>
+                            Mark Paid
+                          </Button>
+                        )}
                       </div>
-                    )}
-                  </td>
-                </tr>
+
+                      {rejectId === reg.id && (
+                        <div className="mt-3 space-y-2 max-w-xs">
+                          <Textarea id={`reject-${reg.id}`} label="Rejection reason" placeholder="Enter reason..." value={rejectNote} onChange={(e) => setRejectNote(e.target.value)} />
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="primary" loading={submitting === reg.id} onClick={() => updateStatus(reg.id, "rejected", rejectNote)}>Confirm Reject</Button>
+                            <Button size="sm" variant="ghost" onClick={() => { setRejectId(null); setRejectNote(""); }}>Cancel</Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {cancelId === reg.id && (
+                        <div className="mt-3 space-y-2 max-w-xs">
+                          <Textarea id={`cancel-${reg.id}`} label="Cancellation note" placeholder="Rider requested cancellation..." value={cancelNote} onChange={(e) => setCancelNote(e.target.value)} />
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="primary" loading={submitting === reg.id} onClick={() => updateStatus(reg.id, "cancelled", cancelNote)}>Confirm Cancel</Button>
+                            <Button size="sm" variant="ghost" onClick={() => { setCancelId(null); setCancelNote(""); }}>Back</Button>
+                          </div>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+
+                  {expandedRider === reg.user.id && (
+                    <tr key={`history-${reg.user.id}`}>
+                      <td colSpan={8} className="bg-background/50 px-8 py-4">
+                        <h4 className="font-heading text-sm font-semibold text-tan mb-3">Registration History — {reg.user.name}</h4>
+                        {!riderHistory[reg.user.id] ? (
+                          <p className="text-sm text-muted">Loading...</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {riderHistory[reg.user.id].registrations.map((h) => (
+                              <div key={h.id} className="flex items-center gap-3 text-xs border-b border-border/50 pb-2">
+                                <Badge variant={statusVariant[h.status] || "muted"} className="text-[10px]">{h.status}</Badge>
+                                <span className="text-foreground">{h.ride?.title || h.training?.title || "—"}</span>
+                                <span className="text-muted">{formatPrice(h.amount)}</span>
+                                <span className="text-muted">{new Date(h.createdAt).toLocaleDateString()}</span>
+                                {h.notes && <span className="text-muted italic truncate max-w-[200px]" title={h.notes}>Note: {h.notes}</span>}
+                              </div>
+                            ))}
+                            {riderHistory[reg.user.id].registrations.length === 0 && (
+                              <p className="text-xs text-muted">No history found.</p>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </>
               ))}
-              {registrations.length === 0 && (
+              {latestPerRider.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-muted">No registrations yet.</td>
+                  <td colSpan={8} className="px-5 py-12 text-center text-muted">No registrations yet.</td>
                 </tr>
               )}
             </tbody>

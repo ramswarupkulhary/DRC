@@ -52,6 +52,7 @@ interface RideFormProps {
     whatsappGroupLink: string | null;
     photosLink: string | null;
     photosPublished: boolean;
+    memberDiscount?: number;
   };
 }
 
@@ -88,6 +89,7 @@ export default function RideForm({ ride }: RideFormProps) {
       featured: form.get("featured") === "on",
       inclusions: form.get("inclusions") || null,
       coverImage,
+      memberDiscount: parseInt(form.get("memberDiscount") as string) || 0,
       whatsappGroupLink: form.get("whatsappGroupLink") || null,
       photosLink: form.get("photosLink") || null,
     };
@@ -151,6 +153,7 @@ export default function RideForm({ ride }: RideFormProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <Input name="price" id="price" label="Price (INR)" type="number" defaultValue={ride?.price} required />
           <Input name="totalSlots" id="totalSlots" label="Total Slots" type="number" defaultValue={ride?.totalSlots} required />
+          <Input name="memberDiscount" id="memberDiscount" label="Member Discount (%)" type="number" defaultValue={ride?.memberDiscount || 0} />
           <Select name="difficulty" id="difficulty" label="Difficulty" options={difficultyOptions} defaultValue={ride?.difficulty || "moderate"} />
           <Select name="type" id="type" label="Type" options={typeOptions} value={rideType} onChange={(e) => setRideType(e.target.value)} />
           <Select name="status" id="status" label="Status" options={statusOptions} defaultValue={ride?.status || "draft"} />

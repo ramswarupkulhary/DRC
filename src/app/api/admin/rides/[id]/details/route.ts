@@ -16,7 +16,13 @@ export async function GET(
       endDate: true,
       location: true,
       totalSlots: true,
+      price: true,
+      memberDiscount: true,
       type: true,
+      status: true,
+      whatsappGroupLink: true,
+      photosLink: true,
+      photosPublished: true,
     },
   });
 

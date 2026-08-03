@@ -26,6 +26,7 @@ export async function GET() {
           startDate: true,
           coverImage: true,
           photosLink: true,
+          whatsappGroupLink: true,
         },
       },
     },

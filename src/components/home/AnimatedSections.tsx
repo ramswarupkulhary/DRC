@@ -13,7 +13,7 @@ const features = [
   { icon: Users, title: "Small Groups", desc: "Limited slots for every ride — ensuring quality, safety, and a personal experience." },
 ];
 
-const testimonials = [
+const defaultTestimonials = [
   { name: "Arjun M.", text: "My first off-road experience with DRC was unforgettable. The trails were thrilling, the campfire was magical, and the crew made sure everyone felt safe. Can't wait for the next ride!", location: "Bangalore", rating: 5 },
   { name: "Priya S.", text: "As a beginner, I was nervous about dirt riding. DRC's training program built my confidence from scratch. The instructors were patient and the progression was perfect.", location: "Mysore", rating: 5 },
   { name: "Rahul K.", text: "The Krishnagiri overnighter was exactly what I needed — a break from the city with amazing trails and great people. DRC knows how to curate an adventure.", location: "Bangalore", rating: 5 },
@@ -160,7 +160,8 @@ export function AnimatedFeatures() {
   );
 }
 
-export function AnimatedTestimonials() {
+export function AnimatedTestimonials({ reviews }: { reviews?: { name: string; text: string; location: string; rating: number }[] }) {
+  const testimonials = reviews && reviews.length > 0 ? reviews : defaultTestimonials;
   return (
     <section className="bg-surface border-y border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">

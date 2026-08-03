@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Images, ExternalLink, Calendar } from "lucide-react";
+import { Images, ExternalLink, Calendar, MessageCircle } from "lucide-react";
 
 interface RideGallery {
   id: string;
@@ -9,6 +9,7 @@ interface RideGallery {
   startDate: string;
   coverImage: string | null;
   photosLink: string | null;
+  whatsappGroupLink: string | null;
 }
 
 export default function MyGalleryPage() {
@@ -65,17 +66,33 @@ export default function MyGalleryPage() {
                   <Calendar className="w-3.5 h-3.5" />
                   {new Date(ride.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                 </div>
-                {ride.photosLink && (
-                  <a
-                    href={ride.photosLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-orange hover:underline font-medium"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    View Photos & Videos
-                  </a>
-                )}
+                <div className="flex flex-col gap-2">
+                  {ride.whatsappGroupLink && (
+                    <a
+                      href={ride.whatsappGroupLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-success hover:underline font-medium"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      WhatsApp Group
+                    </a>
+                  )}
+                  {ride.photosLink && (
+                    <a
+                      href={ride.photosLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-orange hover:underline font-medium"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      View Photos & Videos
+                    </a>
+                  )}
+                  {!ride.whatsappGroupLink && !ride.photosLink && (
+                    <p className="text-xs text-muted">Links will appear once added by admin</p>
+                  )}
+                </div>
               </div>
             </div>
           ))}

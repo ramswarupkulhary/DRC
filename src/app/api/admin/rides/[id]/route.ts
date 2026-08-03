@@ -33,11 +33,26 @@ export async function PUT(req: Request, { params }: Props) {
       featured: body.featured || false,
       inclusions,
       coverImage: body.coverImage || null,
+      memberDiscount: body.memberDiscount ?? 0,
       whatsappGroupLink: body.whatsappGroupLink || null,
       photosLink: body.photosLink || null,
     },
   });
 
+  return NextResponse.json({ ride });
+}
+
+export async function PATCH(req: Request, { params }: Props) {
+  const { id } = await params;
+  const body = await req.json();
+
+  const data: Record<string, unknown> = {};
+  if (body.whatsappGroupLink !== undefined) data.whatsappGroupLink = body.whatsappGroupLink || null;
+  if (body.photosLink !== undefined) data.photosLink = body.photosLink || null;
+  if (body.status !== undefined) data.status = body.status;
+  if (body.memberDiscount !== undefined) data.memberDiscount = body.memberDiscount;
+
+  const ride = await prisma.ride.update({ where: { id }, data });
   return NextResponse.json({ ride });
 }
 
