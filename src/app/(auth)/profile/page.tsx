@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -53,6 +53,7 @@ export default function ProfilePage() {
   const [image, setImage] = useState<string | null>(null);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [savingPhoto, setSavingPhoto] = useState(false);
+  const [convertingFile, setConvertingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -98,13 +99,34 @@ export default function ProfilePage() {
     setSaved(true);
   }
 
-  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setCropSrc(reader.result as string);
-    reader.readAsDataURL(file);
     e.target.value = "";
+
+    const isHeic = file.name.toLowerCase().endsWith(".heic") ||
+      file.name.toLowerCase().endsWith(".heif") ||
+      file.type === "image/heic" ||
+      file.type === "image/heif";
+
+    if (isHeic) {
+      setConvertingFile(true);
+      try {
+        const heic2any = (await import("heic2any")).default;
+        const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+        const convertedBlob = Array.isArray(blob) ? blob[0] : blob;
+        const url = URL.createObjectURL(convertedBlob);
+        setCropSrc(url);
+      } catch {
+        alert("Could not read this image. Please try a JPG or PNG file.");
+      } finally {
+        setConvertingFile(false);
+      }
+    } else {
+      const reader = new FileReader();
+      reader.onload = () => setCropSrc(reader.result as string);
+      reader.readAsDataURL(file);
+    }
   }
 
   async function handleCropComplete(blob: Blob) {
@@ -161,9 +183,19 @@ export default function ProfilePage() {
           variant="outline"
           size="sm"
           onClick={() => fileInputRef.current?.click()}
+          disabled={convertingFile}
         >
-          <Camera className="w-4 h-4 mr-2" />
-          Change Photo
+          {convertingFile ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Converting...
+            </>
+          ) : (
+            <>
+              <Camera className="w-4 h-4 mr-2" />
+              Change Photo
+            </>
+          )}
         </Button>
         <input
           ref={fileInputRef}

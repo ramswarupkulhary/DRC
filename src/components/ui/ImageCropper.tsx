@@ -37,7 +37,10 @@ export function ImageCropper({ imageSrc, onCropComplete, onCancel, saving }: Ima
           </button>
         </div>
 
-        <div className="relative w-full aspect-square bg-background">
+        <div
+          className="relative w-full bg-background"
+          style={{ height: "min(60vh, 400px)", touchAction: "none", userSelect: "none" }}
+        >
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -48,6 +51,7 @@ export function ImageCropper({ imageSrc, onCropComplete, onCancel, saving }: Ima
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={(_, area) => onCropChange(area)}
+            objectFit="contain"
           />
         </div>
 
