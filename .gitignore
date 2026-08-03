@@ -50,4 +50,3 @@ next-env.d.ts
 .windsurf/
 .agents/
 .claude/
-package-lock.json

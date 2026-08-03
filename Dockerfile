@@ -1,0 +1,44 @@
+FROM node:20-alpine AS base
+
+# --- deps: install ALL dependencies for build ---
+FROM base AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# --- builder: generate prisma client and build Next.js ---
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npx prisma generate
+RUN npm run build
+
+# --- runner: minimal production image ---
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# standalone output (includes server.js + traced node_modules)
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# prisma schema + config for db push at startup
+COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+
+# install prisma CLI for runtime db push (before switching to non-root user)
+RUN npm install --no-save prisma@7.9.1
+
+USER nextjs
+
+EXPOSE 8080
+ENV PORT=8080
+ENV HOSTNAME="0.0.0.0"
+
+CMD npx prisma db push --skip-generate && node server.js
