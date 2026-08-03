@@ -33,6 +33,7 @@ export async function PUT(req: Request, { params }: Props) {
       featured: body.featured || false,
       inclusions,
       coverImage: body.coverImage || null,
+      images: body.images || null,
       memberDiscount: body.memberDiscount ?? 0,
       whatsappGroupLink: body.whatsappGroupLink || null,
       photosLink: body.photosLink || null,

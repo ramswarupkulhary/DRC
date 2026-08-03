@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import ImageUpload from "@/components/admin/ImageUpload";
+import MediaGalleryUpload, { MediaItem } from "@/components/admin/MediaGalleryUpload";
 
 const difficultyOptions = [
   { value: "easy", label: "Easy" },
@@ -53,6 +54,7 @@ interface RideFormProps {
     photosLink: string | null;
     photosPublished: boolean;
     memberDiscount?: number;
+    images?: string | null;
   };
 }
 
@@ -63,6 +65,7 @@ export default function RideForm({ ride }: RideFormProps) {
   const [error, setError] = useState("");
   const [publishSuccess, setPublishSuccess] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(ride?.coverImage || null);
+  const [galleryMedia, setGalleryMedia] = useState<MediaItem[]>(ride?.images ? JSON.parse(ride.images) : []);
   const [rideType, setRideType] = useState(ride?.type || "ride");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -89,6 +92,7 @@ export default function RideForm({ ride }: RideFormProps) {
       featured: form.get("featured") === "on",
       inclusions: form.get("inclusions") || null,
       coverImage,
+      images: galleryMedia.length > 0 ? JSON.stringify(galleryMedia) : null,
       memberDiscount: parseInt(form.get("memberDiscount") as string) || 0,
       whatsappGroupLink: form.get("whatsappGroupLink") || null,
       photosLink: form.get("photosLink") || null,
@@ -132,6 +136,10 @@ export default function RideForm({ ride }: RideFormProps) {
       <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
         <h3 className="font-heading text-lg font-semibold text-tan">Cover Image</h3>
         <ImageUpload value={coverImage} onChange={setCoverImage} />
+      </div>
+
+      <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
+        <MediaGalleryUpload value={galleryMedia} onChange={setGalleryMedia} />
       </div>
 
       <div className="bg-surface border border-border rounded-sm p-6 space-y-5">

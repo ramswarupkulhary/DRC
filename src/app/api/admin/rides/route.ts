@@ -30,6 +30,7 @@ export async function POST(req: Request) {
       featured: body.featured || false,
       inclusions,
       coverImage: body.coverImage || null,
+      images: body.images || null,
       whatsappGroupLink: body.whatsappGroupLink || null,
       photosLink: body.photosLink || null,
     },

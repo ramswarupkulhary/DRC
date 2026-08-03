@@ -20,6 +20,8 @@ export async function POST(req: Request) {
       status: body.status || "draft",
       featured: body.featured || false,
       curriculum: body.curriculum,
+      coverImage: body.coverImage || null,
+      images: body.images || null,
     },
   });
 

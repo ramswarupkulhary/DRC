@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
+import ImageUpload from "@/components/admin/ImageUpload";
+import MediaGalleryUpload, { MediaItem } from "@/components/admin/MediaGalleryUpload";
 
 const levelOptions = [
   { value: "beginner", label: "Beginner" },
@@ -24,6 +26,8 @@ export default function NewTrainingPage() {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [galleryMedia, setGalleryMedia] = useState<MediaItem[]>([]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,6 +47,8 @@ export default function NewTrainingPage() {
       status: form.get("status"),
       featured: form.get("featured") === "on",
       curriculum: form.get("curriculum") || null,
+      coverImage,
+      images: galleryMedia.length > 0 ? JSON.stringify(galleryMedia) : null,
     };
 
     const res = await fetch("/api/admin/trainings", {
@@ -91,6 +97,13 @@ export default function NewTrainingPage() {
         </div>
         <div className="bg-surface border border-border rounded-sm p-6">
           <Textarea name="curriculum" id="curriculum" label="Curriculum (one topic per line)" placeholder="Standing position&#10;Throttle control&#10;Braking techniques" />
+        </div>
+        <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
+          <h3 className="font-heading text-lg font-semibold text-tan">Cover Image</h3>
+          <ImageUpload value={coverImage} onChange={setCoverImage} />
+        </div>
+        <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
+          <MediaGalleryUpload value={galleryMedia} onChange={setGalleryMedia} />
         </div>
         <div className="flex gap-4">
           <Button type="submit" loading={saving}>Create Training</Button>

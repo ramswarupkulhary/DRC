@@ -34,6 +34,8 @@ export async function PUT(
       status: body.status,
       featured: body.featured,
       curriculum: body.curriculum,
+      coverImage: body.coverImage || null,
+      images: body.images || null,
     },
   });
 

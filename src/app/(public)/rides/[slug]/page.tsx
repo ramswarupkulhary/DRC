@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { MapPin, Calendar, Clock, Users, Mountain, ChevronLeft, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { MediaGallery } from "@/components/ui/MediaGallery";
 import { formatPrice, formatDateRange, getSlotsText } from "@/lib/utils";
 import { TrailMap } from "@/components/rides/TrailMap";
 import { RegisterButton } from "@/components/rides/RegisterButton";
@@ -33,6 +34,7 @@ export default async function RideDetailPage({ params }: Props) {
   const itinerary: { time: string; title: string; desc: string }[] = ride.itinerary
     ? JSON.parse(ride.itinerary)
     : [];
+  const galleryItems: { url: string; type: "image" | "video" }[] = ride.images ? JSON.parse(ride.images) : [];
   const bookedSlots = ride.registrations.length;
   const slotsText = getSlotsText(ride.totalSlots, bookedSlots);
   const soldOut = ride.totalSlots - bookedSlots <= 0;
@@ -90,6 +92,13 @@ export default async function RideDetailPage({ params }: Props) {
           <Mountain className="w-24 h-24 text-muted/20" />
         )}
       </div>
+
+      {galleryItems.length > 0 && (
+        <div className="mt-6">
+          <h2 className="font-heading text-xl font-semibold mb-4">Photos & Videos</h2>
+          <MediaGallery items={galleryItems} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-10">
         {/* Main content */}

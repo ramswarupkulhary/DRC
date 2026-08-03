@@ -18,9 +18,16 @@ export async function POST(req: Request) {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
+  const isVideo = file.type.startsWith("video/");
+  const uploadOptions: Record<string, unknown> = {
+    folder: "drc",
+    resource_type: isVideo ? "video" : "image",
+    ...(isVideo ? {} : { format: "webp" }),
+  };
+
   const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
     cloudinary.uploader
-      .upload_stream({ folder: "drc", resource_type: "image", format: "webp" }, (error, result) => {
+      .upload_stream(uploadOptions, (error, result) => {
         if (error || !result) return reject(error);
         resolve(result);
       })

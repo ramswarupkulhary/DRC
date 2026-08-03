@@ -53,7 +53,8 @@ export default function MediaGalleryUpload({ value, onChange }: MediaGalleryUplo
 
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium text-foreground">Ride Gallery (Photos & Videos)</label>
+      <label className="text-sm font-medium text-foreground">Gallery (Photos & Videos)</label>
+      <p className="text-xs text-muted -mt-1">Recommended image size: <strong>1200×800px</strong> (3:2 ratio). Videos: MP4, max 100MB.</p>
 
       {value.length > 0 && (
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">

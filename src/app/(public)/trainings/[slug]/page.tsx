@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Clock, MapPin, Users, ChevronLeft, CheckCircle2, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { MediaGallery } from "@/components/ui/MediaGallery";
 import { formatPrice } from "@/lib/utils";
 import { TrainingRegisterButton } from "@/components/rides/TrainingRegisterButton";
 import Link from "next/link";
@@ -25,6 +26,7 @@ export default async function TrainingDetailPage({ params }: Props) {
   if (!training) notFound();
 
   const curriculum: string[] = training.curriculum ? JSON.parse(training.curriculum) : [];
+  const galleryItems: { url: string; type: "image" | "video" }[] = training.images ? JSON.parse(training.images) : [];
 
   const levelColors: Record<string, "success" | "warning" | "orange"> = {
     beginner: "success",
@@ -71,6 +73,13 @@ export default async function TrainingDetailPage({ params }: Props) {
           <BarChart3 className="w-24 h-24 text-muted/20" />
         )}
       </div>
+
+      {galleryItems.length > 0 && (
+        <div className="mt-6">
+          <h2 className="font-heading text-xl font-semibold mb-4">Photos & Videos</h2>
+          <MediaGallery items={galleryItems} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-10">
         <div className="lg:col-span-2 space-y-8">

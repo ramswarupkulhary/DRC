@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
+import ImageUpload from "@/components/admin/ImageUpload";
+import MediaGalleryUpload, { MediaItem } from "@/components/admin/MediaGalleryUpload";
 
 const levelOptions = [
   { value: "beginner", label: "Beginner" },
@@ -27,11 +29,18 @@ export default function EditTrainingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [training, setTraining] = useState<Record<string, unknown> | null>(null);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [galleryMedia, setGalleryMedia] = useState<MediaItem[]>([]);
 
   useEffect(() => {
     fetch(`/api/admin/trainings/${params.id}`)
       .then((r) => r.json())
-      .then((data) => { setTraining(data); setLoading(false); })
+      .then((data) => {
+        setTraining(data);
+        setCoverImage((data.coverImage as string) || null);
+        setGalleryMedia(data.images ? JSON.parse(data.images as string) : []);
+        setLoading(false);
+      })
       .catch(() => { setError("Failed to load training"); setLoading(false); });
   }, [params.id]);
 
@@ -53,6 +62,8 @@ export default function EditTrainingPage() {
       status: form.get("status"),
       featured: form.get("featured") === "on",
       curriculum: form.get("curriculum") || null,
+      coverImage,
+      images: galleryMedia.length > 0 ? JSON.stringify(galleryMedia) : null,
     };
 
     const res = await fetch(`/api/admin/trainings/${params.id}`, {
@@ -104,6 +115,13 @@ export default function EditTrainingPage() {
         </div>
         <div className="bg-surface border border-border rounded-sm p-6">
           <Textarea name="curriculum" id="curriculum" label="Curriculum (one topic per line)" defaultValue={(training.curriculum as string) || ""} />
+        </div>
+        <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
+          <h3 className="font-heading text-lg font-semibold text-tan">Cover Image</h3>
+          <ImageUpload value={coverImage} onChange={setCoverImage} />
+        </div>
+        <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
+          <MediaGalleryUpload value={galleryMedia} onChange={setGalleryMedia} />
         </div>
         <div className="flex gap-4">
           <Button type="submit" loading={saving}>Update Training</Button>
