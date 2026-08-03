@@ -5,6 +5,7 @@ import { Clock, MapPin, Users, ChevronLeft, CheckCircle2, BarChart3 } from "luci
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatPrice } from "@/lib/utils";
+import { TrainingRegisterButton } from "@/components/rides/TrainingRegisterButton";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -103,9 +104,7 @@ export default async function TrainingDetailPage({ params }: Props) {
               <span className="text-sm text-muted">per rider</span>
             </div>
 
-            <Link href={`/login?redirect=/trainings/${training.slug}/register`}>
-              <Button size="lg" className="w-full">Enroll Now</Button>
-            </Link>
+            <TrainingRegisterButton trainingId={training.id} trainingSlug={training.slug} />
 
             <a href="https://wa.me/919414870102" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="md" className="w-full mt-2">

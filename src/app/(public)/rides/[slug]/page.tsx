@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { formatPrice, formatDateRange, getSlotsText } from "@/lib/utils";
 import { TrailMap } from "@/components/rides/TrailMap";
+import { RegisterButton } from "@/components/rides/RegisterButton";
 import { RideEventJsonLd } from "@/components/seo/JsonLd";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -173,11 +174,7 @@ export default async function RideDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <Link href={soldOut ? "#" : `/login?redirect=/rides/${ride.slug}/register`}>
-              <Button size="lg" className="w-full" disabled={soldOut}>
-                {soldOut ? "Sold Out" : "Register Now"}
-              </Button>
-            </Link>
+            <RegisterButton rideId={ride.id} rideSlug={ride.slug} soldOut={soldOut} />
 
             <a href="https://wa.me/919414870102" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="md" className="w-full mt-2">
