@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "postinstall": "prisma generate",
-    "start": "prisma db push --skip-generate && next start -p ${PORT:-3000}",
+    "start": "bash scripts/start.sh",
     "lint": "eslint",
     "db:seed": "tsx prisma/seed.ts",
     "db:migrate": "npx prisma migrate dev",
