@@ -17,18 +17,8 @@ function RefreshRedirect() {
     if (entries.length === 0) return;
 
     const navEntry = entries[0];
-    const navType = navEntry.type;
-
-    if (navType === "reload") {
+    if (navEntry.type === "reload") {
       router.replace("/");
-      return;
-    }
-
-    if (navType === "navigate") {
-      const loadedPath = new URL(navEntry.name).pathname;
-      if (loadedPath === pathname) {
-        router.replace("/");
-      }
     }
   }, [pathname, router]);
 
