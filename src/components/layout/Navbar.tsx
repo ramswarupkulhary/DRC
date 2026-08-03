@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, User, LogOut, ChevronDown, Crown, Bell, Calendar } from "lucide-react";
+import { Menu, X, User, LogOut, ChevronDown, Crown, Bell, Calendar, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -107,6 +107,14 @@ export function Navbar() {
             {session ? (
               <>
                 <NotificationBell />
+                {userRole === "admin" && (
+                  <Link href="/admin/dashboard">
+                    <Button variant="outline" size="sm" className="text-orange border-orange/30 bg-orange/10 hover:bg-orange/20">
+                      <Shield className="w-4 h-4 mr-1.5" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
                 <Link href="/membership">
                   <Button variant={isMember ? "ghost" : "outline"} size="sm" className={isMember ? "text-orange border-orange/30 bg-orange/10 hover:bg-orange/20" : ""}>
                     <Crown className="w-4 h-4 mr-1.5" />
@@ -286,6 +294,17 @@ export function Navbar() {
                         </span>
                       </div>
                     </div>
+
+                    {userRole === "admin" && (
+                      <Link
+                        href="/admin/dashboard"
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 text-sm text-orange font-medium hover:bg-orange/10 rounded-sm transition-colors"
+                      >
+                        <Shield className="w-4 h-4" />
+                        Admin Panel
+                      </Link>
+                    )}
 
                     <Link
                       href="/profile"

@@ -31,6 +31,15 @@ export async function PATCH(
   try {
     if (body.status === "rejected") {
       const reason = body.notes || "No reason provided";
+      await prisma.notification.create({
+        data: {
+          userId: registration.userId,
+          type: "registration",
+          title: "Registration Rejected",
+          message: `Your registration for ${eventTitle} was rejected. Reason: ${reason}`,
+          link: "/my-registrations",
+        },
+      });
       await sendEmail({
         to: riderEmail,
         subject: `Registration Rejected — ${eventTitle}`,
@@ -49,6 +58,15 @@ export async function PATCH(
         }),
       });
     } else if (body.status === "confirmed") {
+      await prisma.notification.create({
+        data: {
+          userId: registration.userId,
+          type: "registration",
+          title: "Registration Confirmed!",
+          message: `Your registration for ${eventTitle} has been confirmed. See you on the trail!`,
+          link: "/my-registrations",
+        },
+      });
       await sendEmail({
         to: riderEmail,
         subject: `Registration Confirmed — ${eventTitle}`,

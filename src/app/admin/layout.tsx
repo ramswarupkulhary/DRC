@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Bike, GraduationCap, Users, ClipboardList, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown } from "lucide-react";
+import { LayoutDashboard, Bike, GraduationCap, Users, ClipboardList, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown, ShoppingBag } from "lucide-react";
 
 const sidebarLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -19,6 +19,7 @@ const sidebarLinks = [
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/corporate", label: "Corporate", icon: Building2 },
   { href: "/admin/coupons", label: "Coupons", icon: Tag },
+  { href: "/admin/store", label: "Store", icon: ShoppingBag },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

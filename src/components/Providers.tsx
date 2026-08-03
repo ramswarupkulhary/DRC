@@ -11,7 +11,7 @@ function RefreshRedirect() {
   useEffect(() => {
     const exempt = ["/", "/login", "/register", "/forgot-password", "/signup"];
     if (exempt.includes(pathname)) return;
-    if (pathname.startsWith("/api") || pathname.startsWith("/_next")) return;
+    if (pathname.startsWith("/api") || pathname.startsWith("/_next") || pathname.startsWith("/admin")) return;
 
     const entries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
     if (entries.length === 0) return;
