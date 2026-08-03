@@ -24,7 +24,7 @@ export function PasswordChangeModal({ onClose }: Props) {
 
   const email = session?.user?.email || "";
 
-  async function handleSendOtp() {
+  async function handleVerifyAndSendOtp() {
     if (!currentPassword) {
       setError("Please enter your current password");
       return;
@@ -32,27 +32,34 @@ export function PasswordChangeModal({ onClose }: Props) {
     setLoading(true);
     setError("");
 
-    const verifyRes = await fetch("/api/auth/change-password", {
+    const verifyRes = await fetch("/api/auth/verify-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ currentPassword, newPassword: "temp-verify-only", verifyOnly: true }),
+      body: JSON.stringify({ currentPassword }),
     });
 
-    const res = await fetch("/api/auth/otp/send", {
+    const verifyData = await verifyRes.json();
+
+    if (!verifyRes.ok) {
+      setLoading(false);
+      setError(verifyData.error || "Password verification failed");
+      return;
+    }
+
+    const otpRes = await fetch("/api/auth/otp/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, type: "password_change" }),
     });
 
+    const otpData = await otpRes.json();
     setLoading(false);
-    const data = await res.json();
 
-    if (!res.ok) {
-      setError(data.error || "Failed to send OTP");
+    if (!otpRes.ok) {
+      setError(otpData.error || "Failed to send verification code");
       return;
     }
 
-    void verifyRes;
     setStep(2);
   }
 
@@ -140,7 +147,7 @@ export function PasswordChangeModal({ onClose }: Props) {
 
           {step === 1 && !success && (
             <>
-              <p className="text-sm text-muted">Enter your current password. We'll send a verification code to your email.</p>
+              <p className="text-sm text-muted">Enter your current password to verify your identity.</p>
               <Input
                 id="currentPw"
                 label="Current Password"
@@ -149,8 +156,8 @@ export function PasswordChangeModal({ onClose }: Props) {
                 onChange={(e) => { setCurrentPassword(e.target.value); setError(""); }}
                 required
               />
-              <Button onClick={handleSendOtp} loading={loading} className="w-full">
-                Send Verification Code
+              <Button onClick={handleVerifyAndSendOtp} loading={loading} className="w-full">
+                Verify & Send Code
               </Button>
             </>
           )}
