@@ -3,7 +3,7 @@ FROM node:20-slim AS base
 # --- deps: install ALL dependencies ---
 FROM base AS deps
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json ./
 COPY prisma/schema.prisma ./prisma/schema.prisma
 COPY prisma.config.ts ./prisma.config.ts
 RUN npm install
