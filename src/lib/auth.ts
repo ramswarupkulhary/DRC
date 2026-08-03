@@ -2,6 +2,9 @@ import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compareSync } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { sendEmail, drcEmailTemplate } from "@/lib/email";
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.dirtridecamp.com";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -74,4 +77,37 @@ export const authOptions: AuthOptions = {
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
+  events: {
+    async signIn({ user }) {
+      if (!user?.email || !user?.name) return;
+      const email = user.email;
+      const name = user.name;
+      const role = (user as { role?: string }).role;
+      if (role === "admin") return;
+
+      try {
+        await sendEmail({
+          to: email,
+          subject: "You're logged in to DRC!",
+          html: drcEmailTemplate({
+            title: "Welcome Back, Rider!",
+            body: `
+              <p style="color: #F1E9DD; font-size: 15px;">Hi ${name},</p>
+              <p style="color: #B9A886; font-size: 14px;">You just logged in to your <strong style="color: #E8622C;">Dirt Ride Camp</strong> account.</p>
+              <p style="color: #B9A886; font-size: 14px;">Check out upcoming rides, track your progress, or explore membership benefits.</p>
+              <div style="background: #0D0D0D; border: 1px solid #E8622C; border-radius: 4px; padding: 16px; margin: 20px 0; text-align: center;">
+                <p style="color: #F1E9DD; font-size: 14px; margin: 0 0 4px;">DRC Membership</p>
+                <p style="color: #B9A886; font-size: 13px; margin: 0;">Welcome kit, priority booking & member-only rides — <strong style="color: #E8622C;">₹999/year</strong></p>
+              </div>
+              <p style="color: #666; font-size: 12px;">If this wasn't you, please change your password immediately.</p>
+            `,
+            ctaText: "Explore Membership",
+            ctaUrl: `${baseUrl}/membership`,
+          }),
+        });
+      } catch (err) {
+        console.error("[EMAIL] Login email failed:", err instanceof Error ? err.message : String(err));
+      }
+    },
+  },
 };
