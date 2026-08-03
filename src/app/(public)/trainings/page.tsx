@@ -16,10 +16,18 @@ export default async function TrainingsPage() {
     orderBy: [{ featured: "desc" }, { level: "asc" }],
   });
 
-  const grouped = {
+  const grouped: Record<string, typeof trainings> = {
     beginner: trainings.filter((t) => t.level === "beginner"),
     intermediate: trainings.filter((t) => t.level === "intermediate"),
     advanced: trainings.filter((t) => t.level === "advanced"),
+    all: trainings.filter((t) => !["beginner", "intermediate", "advanced"].includes(t.level)),
+  };
+
+  const levelLabels: Record<string, string> = {
+    beginner: "Beginner Level",
+    intermediate: "Intermediate Level",
+    advanced: "Advanced Level",
+    all: "All Levels",
   };
 
   return (
@@ -37,8 +45,8 @@ export default async function TrainingsPage() {
           items.length > 0 && (
             <div key={level} className="mt-14">
               <AnimatedSection>
-                <h3 className="font-heading text-xl font-semibold text-tan mb-6 uppercase tracking-wider capitalize">
-                  {level} Level
+                <h3 className="font-heading text-xl font-semibold text-tan mb-6 uppercase tracking-wider">
+                  {levelLabels[level] || `${level} Level`}
                 </h3>
               </AnimatedSection>
               <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
