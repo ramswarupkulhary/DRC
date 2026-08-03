@@ -1,12 +1,14 @@
 FROM node:20-alpine AS base
 
-# --- deps: install ALL dependencies for build ---
+# --- deps: install ALL dependencies ---
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts
+COPY prisma/schema.prisma ./prisma/schema.prisma
+COPY prisma.config.ts ./prisma.config.ts
+RUN npm ci
 
-# --- builder: generate prisma client and build Next.js ---
+# --- builder: build Next.js ---
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -33,7 +35,7 @@ COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 # install prisma CLI for runtime db push (before switching to non-root user)
-RUN npm install --no-save --ignore-scripts prisma@7.9.1
+RUN npm install --no-save prisma@7.9.1
 
 USER nextjs
 
