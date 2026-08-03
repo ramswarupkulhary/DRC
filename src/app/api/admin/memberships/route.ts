@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-// GoDaddy SMTP - works fine, just blocked by Railway firewall
 const transporter = nodemailer.createTransport({
   host: "relay.secureserver.net",
   port: 465,
