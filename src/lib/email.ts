@@ -1,13 +1,16 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "relay.secureserver.net",
-  port: 465,
-  secure: true,
+  host: "smtpout.secureserver.net",
+  port: 587,
+  secure: false,
   auth: {
     user: "info@dirtridecamp.com",
     pass: process.env.SMTP_PASSWORD,
   },
+  connectionTimeout: 15000,
+  greetingTimeout: 10000,
+  socketTimeout: 20000,
 });
 
 const FROM = "info@dirtridecamp.com";
