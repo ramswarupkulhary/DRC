@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-import { ChevronLeft, Eye, Check, X, Edit, ChevronDown, ChevronUp, MessageCircle, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { ChevronLeft, Eye, Check, X, Edit, ChevronDown, ChevronUp, MessageCircle, Image as ImageIcon, Link as LinkIcon, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 interface Registration {
@@ -75,6 +75,8 @@ export default function AdminRideDetailPage() {
   const [linksForm, setLinksForm] = useState({ whatsappGroupLink: "", photosLink: "" });
   const [savingLinks, setSavingLinks] = useState(false);
   const [linksSaved, setLinksSaved] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchData = useCallback(() => {
     Promise.all([
@@ -173,9 +175,14 @@ export default function AdminRideDetailPage() {
               {ride.memberDiscount > 0 && <span className="text-success">Members: {ride.memberDiscount}% off</span>}
             </div>
           </div>
-          <Link href={`/admin/rides/${ride.id}/edit`}>
-            <Button size="sm" variant="outline"><Edit className="w-4 h-4 mr-1" /> Edit Ride</Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href={`/admin/rides/${ride.id}/edit`}>
+              <Button size="sm" variant="outline"><Edit className="w-4 h-4 mr-1" /> Edit Ride</Button>
+            </Link>
+            <Button size="sm" variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+              <Trash2 className="w-4 h-4 mr-1" /> Delete
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -360,6 +367,45 @@ export default function AdminRideDetailPage() {
           </table>
         </div>
       </div>
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface border border-border rounded-sm max-w-md w-full p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-heading text-lg font-semibold text-error">Delete Ride</h3>
+              <button onClick={() => setShowDeleteConfirm(false)} className="text-muted hover:text-foreground transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-sm text-muted">
+              Are you sure you want to delete <strong className="text-foreground">{ride.title}</strong>?
+            </p>
+            {confirmedCount > 0 && new Date(ride.startDate) > new Date() && (
+              <div className="bg-error/10 border border-error/30 rounded-sm p-3">
+                <p className="text-error text-sm font-medium">{confirmedCount} confirmed rider(s) will be notified via email about the cancellation.</p>
+              </div>
+            )}
+            <p className="text-xs text-muted">This action cannot be undone. All registrations for this ride will also be deleted.</p>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                loading={deleting}
+                onClick={async () => {
+                  setDeleting(true);
+                  await fetch(`/api/admin/rides/${rideId}`, { method: "DELETE" });
+                  router.push("/admin/rides");
+                }}
+              >
+                Delete Ride
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

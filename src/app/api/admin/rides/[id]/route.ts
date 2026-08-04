@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { slugify } from "@/lib/utils";
+import { sendEmail, drcEmailTemplate } from "@/lib/email";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -59,6 +60,64 @@ export async function PATCH(req: Request, { params }: Props) {
 
 export async function DELETE(_req: Request, { params }: Props) {
   const { id } = await params;
+
+  const ride = await prisma.ride.findUnique({
+    where: { id },
+    include: {
+      registrations: {
+        where: { status: { in: ["confirmed", "checked_in"] } },
+        include: { user: { select: { email: true, name: true, id: true } } },
+      },
+    },
+  });
+
+  if (!ride) {
+    return NextResponse.json({ error: "Ride not found" }, { status: 404 });
+  }
+
+  const isFutureRide = new Date(ride.startDate) > new Date();
+
+  if (isFutureRide && ride.registrations.length > 0) {
+    const dateStr = new Date(ride.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+    for (const reg of ride.registrations) {
+      try {
+        await prisma.notification.create({
+          data: {
+            userId: reg.user.id,
+            type: "registration",
+            title: "Ride Cancelled",
+            message: `The ride "${ride.title}" on ${dateStr} has been cancelled. We apologize for the inconvenience.`,
+            link: "/rides",
+          },
+        });
+        await sendEmail({
+          to: reg.user.email,
+          subject: `Ride Cancelled — ${ride.title}`,
+          html: drcEmailTemplate({
+            title: "Ride Cancelled",
+            body: `
+              <p style="color: #F1E9DD; font-size: 15px;">Hi ${reg.user.name || "Rider"},</p>
+              <p style="color: #B9A886; font-size: 14px;">We regret to inform you that the ride <strong style="color: #E8622C;">${ride.title}</strong> scheduled for <strong style="color: #F1E9DD;">${dateStr}</strong> has been cancelled.</p>
+              <p style="color: #B9A886; font-size: 14px;">We sincerely apologize for the inconvenience. If you have any questions or need a refund, please reach out to us.</p>
+              <p style="color: #B9A886; font-size: 14px;">Check out our other upcoming rides below!</p>
+            `,
+            ctaText: "Browse Rides",
+            ctaUrl: "https://www.dirtridecamp.com/rides",
+          }),
+        });
+      } catch (err) {
+        console.error("[EMAIL] Ride cancellation email failed:", err);
+      }
+    }
+  }
+
+  await prisma.registration.deleteMany({ where: { rideId: id } });
+  await prisma.review.deleteMany({ where: { rideId: id } });
+  await prisma.galleryImage.deleteMany({ where: { rideId: id } });
+  await prisma.rideLog.deleteMany({ where: { rideId: id } });
+  await prisma.rideJournal.deleteMany({ where: { rideId: id } });
+  await prisma.waitlist.deleteMany({ where: { rideId: id } });
+  await prisma.survey.deleteMany({ where: { rideId: id } });
   await prisma.ride.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }
