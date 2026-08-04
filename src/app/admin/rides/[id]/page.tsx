@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-import { ChevronLeft, Eye, Check, X, Edit, ChevronDown, ChevronUp, MessageCircle, Image as ImageIcon, Link as LinkIcon, Trash2 } from "lucide-react";
+import { ChevronLeft, Eye, Check, X, Edit, ChevronDown, ChevronUp, MessageCircle, Image as ImageIcon, Link as LinkIcon, Trash2, Copy, ClipboardList, Award } from "lucide-react";
 import Link from "next/link";
 
 interface Registration {
@@ -176,8 +176,35 @@ export default function AdminRideDetailPage() {
             </div>
           </div>
           <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={async () => {
+              const res = await fetch(`/api/admin/rides/${rideId}/duplicate`, { method: "POST" });
+              const data = await res.json();
+              if (res.ok) router.push(`/admin/rides/${data.ride.id}/edit`);
+            }}>
+              <Copy className="w-4 h-4 mr-1" /> Duplicate
+            </Button>
+            {ride.status === "completed" && (
+              <>
+                <Button size="sm" variant="secondary" onClick={async () => {
+                  const res = await fetch(`/api/admin/rides/${rideId}/create-survey`, { method: "POST" });
+                  const data = await res.json();
+                  if (res.ok) alert(`Survey created! ${data.notified} riders notified.`);
+                  else alert(data.error || "Failed");
+                }}>
+                  <ClipboardList className="w-4 h-4 mr-1" /> Send Survey
+                </Button>
+                <Button size="sm" variant="secondary" onClick={async () => {
+                  const res = await fetch(`/api/admin/rides/${rideId}/generate-certificates`, { method: "POST" });
+                  const data = await res.json();
+                  if (res.ok) alert(`${data.certificatesGenerated} certificates generated!`);
+                  else alert(data.error || "Failed");
+                }}>
+                  <Award className="w-4 h-4 mr-1" /> Certificates
+                </Button>
+              </>
+            )}
             <Link href={`/admin/rides/${ride.id}/edit`}>
-              <Button size="sm" variant="outline"><Edit className="w-4 h-4 mr-1" /> Edit Ride</Button>
+              <Button size="sm" variant="outline"><Edit className="w-4 h-4 mr-1" /> Edit</Button>
             </Link>
             <Button size="sm" variant="danger" onClick={() => setShowDeleteConfirm(true)}>
               <Trash2 className="w-4 h-4 mr-1" /> Delete

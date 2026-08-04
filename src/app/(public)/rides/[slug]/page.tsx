@@ -39,8 +39,10 @@ export default async function RideDetailPage({ params }: Props) {
   const slotsText = getSlotsText(ride.totalSlots, bookedSlots);
   const soldOut = ride.totalSlots - bookedSlots <= 0;
   const hasMemberDiscount = ride.memberDiscount > 0;
-  const discountedPrice = hasMemberDiscount ? Math.round(ride.price * (1 - ride.memberDiscount / 100)) : ride.price;
-  const savings = ride.price - discountedPrice;
+  const isEarlyBird = ride.earlyBirdPrice && ride.earlyBirdDeadline && new Date(ride.earlyBirdDeadline) > new Date();
+  const displayPrice = isEarlyBird ? ride.earlyBirdPrice! : ride.price;
+  const discountedPrice = hasMemberDiscount ? Math.round(displayPrice * (1 - ride.memberDiscount / 100)) : displayPrice;
+  const savings = displayPrice - discountedPrice;
 
   const difficultyColors: Record<string, "success" | "warning" | "orange" | "error"> = {
     easy: "success",
@@ -165,10 +167,25 @@ export default async function RideDetailPage({ params }: Props) {
           <div className="sticky top-24 bg-surface border border-border rounded-sm p-6 space-y-6">
             <div>
               <span className="text-sm text-muted uppercase tracking-wider">Rider Fee</span>
-              <div className="font-heading text-4xl font-bold text-orange mt-1">
-                {formatPrice(ride.price)}
-              </div>
-              <span className="text-sm text-muted">per rider</span>
+              {isEarlyBird ? (
+                <>
+                  <div className="font-heading text-4xl font-bold text-orange mt-1">
+                    {formatPrice(ride.earlyBirdPrice!)}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-sm text-muted line-through">{formatPrice(ride.price)}</span>
+                    <span className="text-xs bg-orange/20 text-orange px-2 py-0.5 rounded-sm font-semibold">Early Bird</span>
+                  </div>
+                  <p className="text-xs text-muted mt-1">Offer ends {new Date(ride.earlyBirdDeadline!).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
+                </>
+              ) : (
+                <>
+                  <div className="font-heading text-4xl font-bold text-orange mt-1">
+                    {formatPrice(ride.price)}
+                  </div>
+                  <span className="text-sm text-muted">per rider</span>
+                </>
+              )}
               {hasMemberDiscount && (
                 <div className="mt-2 p-3 bg-success/10 border border-success/20 rounded-sm">
                   <div className="text-xs font-semibold text-success uppercase tracking-wider">DRC Members</div>

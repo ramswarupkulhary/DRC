@@ -54,6 +54,8 @@ interface RideFormProps {
     photosLink: string | null;
     photosPublished: boolean;
     memberDiscount?: number;
+    earlyBirdPrice?: number | null;
+    earlyBirdDeadline?: string | null;
     images?: string | null;
   };
 }
@@ -94,6 +96,8 @@ export default function RideForm({ ride }: RideFormProps) {
       coverImage,
       images: galleryMedia.length > 0 ? JSON.stringify(galleryMedia) : null,
       memberDiscount: parseInt(form.get("memberDiscount") as string) || 0,
+      earlyBirdPrice: form.get("earlyBirdPrice") ? parseInt(form.get("earlyBirdPrice") as string) : null,
+      earlyBirdDeadline: form.get("earlyBirdDeadline") || null,
       whatsappGroupLink: form.get("whatsappGroupLink") || null,
       photosLink: form.get("photosLink") || null,
     };
@@ -162,6 +166,8 @@ export default function RideForm({ ride }: RideFormProps) {
           <Input name="price" id="price" label="Price (INR)" type="number" defaultValue={ride?.price} required />
           <Input name="totalSlots" id="totalSlots" label="Total Slots" type="number" defaultValue={ride?.totalSlots} required />
           <Input name="memberDiscount" id="memberDiscount" label="Member Discount (%)" type="number" defaultValue={ride?.memberDiscount || 0} />
+          <Input name="earlyBirdPrice" id="earlyBirdPrice" label="Early Bird Price (INR)" type="number" placeholder="Leave empty if no early bird" defaultValue={ride?.earlyBirdPrice || ""} />
+          <Input name="earlyBirdDeadline" id="earlyBirdDeadline" label="Early Bird Deadline" type="date" defaultValue={ride?.earlyBirdDeadline ? formatDateForInput(ride.earlyBirdDeadline) : ""} />
           <Select name="difficulty" id="difficulty" label="Difficulty" options={difficultyOptions} defaultValue={ride?.difficulty || "moderate"} />
           <Select name="type" id="type" label="Type" options={typeOptions} value={rideType} onChange={(e) => setRideType(e.target.value)} />
           <Select name="status" id="status" label="Status" options={statusOptions} defaultValue={ride?.status || "draft"} />

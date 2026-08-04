@@ -13,6 +13,8 @@ import {
   Award,
   Brain,
   Images,
+  Gift,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +27,8 @@ const sidebarLinks = [
   { href: "/skill-assessment", label: "Skill Assessment", icon: Brain },
   { href: "/membership", label: "Membership", icon: Crown },
   { href: "/certificates", label: "Certificates", icon: Award },
+  { href: "/skill-passport", label: "Skill Passport", icon: Shield },
+  { href: "/referrals", label: "Refer & Earn", icon: Gift },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/profile", label: "My Profile", icon: User },
 ];

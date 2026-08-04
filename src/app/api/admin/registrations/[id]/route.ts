@@ -123,5 +123,44 @@ export async function PATCH(
     console.error("[EMAIL] Failed to send status email:", err);
   }
 
+  // Waitlist auto-promotion: when a slot opens, notify next waitlisted rider
+  if (body.status === "cancelled" && registration.rideId) {
+    try {
+      const nextWaitlisted = await prisma.waitlist.findFirst({
+        where: { rideId: registration.rideId, status: "waiting", notified: false },
+        orderBy: { createdAt: "asc" },
+        include: { user: { select: { id: true, email: true, name: true } }, ride: { select: { title: true, slug: true } } },
+      });
+      if (nextWaitlisted && nextWaitlisted.ride) {
+        await prisma.waitlist.update({ where: { id: nextWaitlisted.id }, data: { notified: true, status: "notified" } });
+        await prisma.notification.create({
+          data: {
+            userId: nextWaitlisted.user.id,
+            type: "waitlist",
+            title: "Spot Available!",
+            message: `A spot just opened for ${nextWaitlisted.ride.title}! Register now before it's taken.`,
+            link: `/rides/${nextWaitlisted.ride.slug}`,
+          },
+        });
+        await sendEmail({
+          to: nextWaitlisted.user.email,
+          subject: `Spot Available — ${nextWaitlisted.ride.title}!`,
+          html: drcEmailTemplate({
+            title: "A Spot Just Opened Up!",
+            body: `
+              <p style="color: #F1E9DD; font-size: 15px;">Hi ${nextWaitlisted.user.name || "Rider"},</p>
+              <p style="color: #B9A886; font-size: 14px;">Great news! A spot just opened for <strong style="color: #E8622C;">${nextWaitlisted.ride.title}</strong>.</p>
+              <p style="color: #B9A886; font-size: 14px;">You were on the waitlist — now's your chance! Register quickly before someone else takes it.</p>
+            `,
+            ctaText: "Register Now",
+            ctaUrl: `https://www.dirtridecamp.com/rides/${nextWaitlisted.ride.slug}`,
+          }),
+        });
+      }
+    } catch (err) {
+      console.error("[WAITLIST] Auto-promotion failed:", err);
+    }
+  }
+
   return NextResponse.json(registration);
 }

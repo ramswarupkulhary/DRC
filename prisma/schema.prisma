@@ -156,6 +156,10 @@ model Ride {
   createdAt   DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // Early bird pricing
+  earlyBirdPrice    Int?
+  earlyBirdDeadline DateTime?
+
   // Member discount (percentage, 0-100)
   memberDiscount Int @default(0)
 
@@ -182,6 +186,7 @@ model Ride {
   journals      RideJournal[]
   waitlists     Waitlist[]
   surveys       Survey[]
+  certificates  Certificate[]
   instructor    Instructor? @relation(fields: [instructorId], references: [id])
 }
 
@@ -492,6 +497,7 @@ model Certificate {
   id          String   @id @default(cuid())
   userId      String
   trainingId  String?
+  rideId      String?
   title       String
   type        String
   certNumber  String   @unique
@@ -501,6 +507,7 @@ model Certificate {
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   training Training? @relation(fields: [trainingId], references: [id])
+  ride     Ride?     @relation(fields: [rideId], references: [id])
 }
 
 // ─── OPERATIONS ─────────────────────────────────────
@@ -638,6 +645,8 @@ model ContactMessage {
   subject   String?
   message   String
   read      Boolean  @default(false)
+  replied   Boolean  @default(false)
+  repliedAt DateTime?
   createdAt DateTime @default(now())
 }
 

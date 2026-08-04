@@ -10,7 +10,10 @@ export async function GET() {
 
   const certs = await prisma.certificate.findMany({
     where: { userId },
-    include: { training: { select: { title: true, level: true } } },
+    include: {
+      training: { select: { title: true, level: true } },
+      ride: { select: { title: true, difficulty: true } },
+    },
     orderBy: { issuedAt: "desc" },
   });
 

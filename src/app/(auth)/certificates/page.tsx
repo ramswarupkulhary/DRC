@@ -12,6 +12,7 @@ interface Cert {
   certNumber: string;
   issuedAt: string;
   training: { title: string; level: string } | null;
+  ride: { title: string; difficulty: string } | null;
 }
 
 export default function CertificatesPage() {
@@ -45,8 +46,8 @@ export default function CertificatesPage() {
               </div>
               <div className="flex-1">
                 <h3 className="font-heading text-lg font-semibold">{cert.title}</h3>
-                {cert.training && (
-                  <p className="text-sm text-muted">{cert.training.title}</p>
+                {(cert.training || cert.ride) && (
+                  <p className="text-sm text-muted">{cert.training?.title || cert.ride?.title}</p>
                 )}
                 <div className="flex items-center gap-3 mt-2">
                   <Badge variant="orange">{cert.type}</Badge>
