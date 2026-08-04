@@ -88,6 +88,36 @@ export async function PATCH(
           ctaUrl: "https://www.dirtridecamp.com/my-registrations",
         }),
       });
+    } else if (body.status === "cancelled") {
+      const reason = body.notes || "No specific reason provided";
+      await prisma.notification.create({
+        data: {
+          userId: registration.userId,
+          type: "registration",
+          title: "Registration Cancelled",
+          message: `Your registration for ${eventTitle} has been cancelled. Reason: ${reason}`,
+          link: "/my-registrations",
+        },
+      });
+      await sendEmail({
+        to: riderEmail,
+        subject: `Registration Cancelled — ${eventTitle}`,
+        html: drcEmailTemplate({
+          title: "Registration Cancelled",
+          body: `
+            <p style="color: #F1E9DD; font-size: 15px;">Hi ${riderName},</p>
+            <p style="color: #B9A886; font-size: 14px;">Your registration for <strong style="color: #E8622C;">${eventTitle}</strong> has been cancelled.</p>
+            ${reason !== "No specific reason provided" ? `
+            <div style="background: #0D0D0D; border: 1px solid #E8622C; border-radius: 4px; padding: 12px; margin: 16px 0;">
+              <p style="color: #F1E9DD; font-size: 13px; margin: 0;"><strong>Reason:</strong> ${reason}</p>
+            </div>
+            ` : ""}
+            <p style="color: #B9A886; font-size: 14px;">If you believe this is an error or have questions, please reach out to us.</p>
+          `,
+          ctaText: "View Rides",
+          ctaUrl: "https://www.dirtridecamp.com/rides",
+        }),
+      });
     }
   } catch (err) {
     console.error("[EMAIL] Failed to send status email:", err);
