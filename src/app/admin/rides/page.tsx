@@ -7,7 +7,14 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 
 export default async function AdminRidesPage() {
+  // Auto-archive rides whose date has passed
+  await prisma.ride.updateMany({
+    where: { status: { in: ["published", "draft"] }, endDate: { lt: new Date() } },
+    data: { status: "past" },
+  });
+
   const rides = await prisma.ride.findMany({
+    where: { status: { not: "past" } },
     orderBy: { startDate: "desc" },
     include: {
       registrations: { where: { status: { in: ["confirmed", "checked_in"] } } },

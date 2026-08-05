@@ -12,6 +12,13 @@ export const metadata: Metadata = {
 
 export default async function RidesPage() {
   const now = new Date();
+
+  // Auto-archive rides whose date has passed
+  await prisma.ride.updateMany({
+    where: { status: { in: ["published", "draft"] }, endDate: { lt: now } },
+    data: { status: "past" },
+  });
+
   const [publishedRides, pastRides] = await Promise.all([
     prisma.ride.findMany({
       where: { status: "published", startDate: { gte: now } },
