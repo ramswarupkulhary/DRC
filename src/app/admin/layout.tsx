@@ -2,11 +2,12 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Bike, GraduationCap, Users, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown, ShoppingBag } from "lucide-react";
+import { LayoutDashboard, Bike, GraduationCap, Users, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown, ShoppingBag, History } from "lucide-react";
 
 const sidebarLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/rides", label: "Rides", icon: Bike },
+  { href: "/admin/past-rides", label: "Past Rides", icon: History },
   { href: "/admin/trainings", label: "Trainings", icon: GraduationCap },
   { href: "/admin/events", label: "Events", icon: Trophy },
   { href: "/admin/blog", label: "Blog", icon: FileText },
