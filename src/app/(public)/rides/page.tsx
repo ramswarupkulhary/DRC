@@ -65,8 +65,8 @@ export default async function RidesPage() {
                   slug={ride.slug}
                   title={ride.title}
                   location={ride.location}
-                  startDate={ride.startDate.toISOString()}
-                  endDate={ride.endDate.toISOString()}
+                  startDate={ride.startDate?.toISOString()}
+                  endDate={ride.endDate?.toISOString()}
                   price={ride.price}
                   totalSlots={ride.totalSlots}
                   bookedSlots={ride.registrations.length}
@@ -98,15 +98,15 @@ export default async function RidesPage() {
             </h3>
             <p className="text-muted text-sm mb-6">Check out some of the amazing rides we&apos;ve done!</p>
           </AnimatedSection>
-          <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 opacity-60">
+          <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {pastRides.map((ride) => (
               <AnimatedGridItem key={ride.id}>
                 <RideCard
                   slug={ride.slug}
                   title={ride.title}
                   location={ride.location}
-                  startDate={ride.startDate.toISOString()}
-                  endDate={ride.endDate.toISOString()}
+                  startDate={ride.startDate?.toISOString()}
+                  endDate={ride.endDate?.toISOString()}
                   price={ride.price}
                   totalSlots={ride.totalSlots}
                   bookedSlots={ride.registrations.length}

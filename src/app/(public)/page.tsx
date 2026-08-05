@@ -60,8 +60,8 @@ export default async function HomePage() {
               slug={ride.slug}
               title={ride.title}
               location={ride.location}
-              startDate={ride.startDate.toISOString()}
-              endDate={ride.endDate.toISOString()}
+              startDate={ride.startDate?.toISOString()}
+              endDate={ride.endDate?.toISOString()}
               price={ride.price}
               totalSlots={ride.totalSlots}
               bookedSlots={ride.registrations.length}

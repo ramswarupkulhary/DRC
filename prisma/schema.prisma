@@ -139,8 +139,8 @@ model Ride {
   shortDesc   String?
   location    String
   state       String?
-  startDate   DateTime
-  endDate     DateTime
+  startDate   DateTime?
+  endDate     DateTime?
   startPoint  String?
   startTime   String?
   price       Int

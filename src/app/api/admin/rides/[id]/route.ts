@@ -75,10 +75,10 @@ export async function DELETE(_req: Request, { params }: Props) {
     return NextResponse.json({ error: "Ride not found" }, { status: 404 });
   }
 
-  const isFutureRide = new Date(ride.startDate) > new Date();
+  const isFutureRide = ride.startDate ? new Date(ride.startDate) > new Date() : false;
 
   if (isFutureRide && ride.registrations.length > 0) {
-    const dateStr = new Date(ride.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+    const dateStr = ride.startDate ? new Date(ride.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "";
     for (const reg of ride.registrations) {
       try {
         await prisma.notification.create({

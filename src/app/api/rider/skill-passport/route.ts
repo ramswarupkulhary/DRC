@@ -43,7 +43,7 @@ export async function GET() {
       .filter((r) => r.ride)
       .map((r) => ({
         id: r.id, title: r.ride!.title,
-        date: r.ride!.startDate.toISOString(),
+        date: r.ride!.startDate?.toISOString() || "",
         difficulty: r.ride!.difficulty, location: r.ride!.location,
       })),
     trainingsCompleted,

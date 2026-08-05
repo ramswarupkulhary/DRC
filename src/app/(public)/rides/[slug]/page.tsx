@@ -53,7 +53,7 @@ export default async function RideDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <RideEventJsonLd ride={{ title: ride.title, slug: ride.slug, description: ride.description, location: ride.location, startDate: ride.startDate.toISOString(), endDate: ride.endDate.toISOString(), price: ride.price, totalSlots: ride.totalSlots, bookedSlots }} />
+      {ride.startDate && <RideEventJsonLd ride={{ title: ride.title, slug: ride.slug, description: ride.description, location: ride.location, startDate: ride.startDate.toISOString(), endDate: (ride.endDate || ride.startDate).toISOString(), price: ride.price, totalSlots: ride.totalSlots, bookedSlots }} />}
       <Link href="/rides" className="inline-flex items-center gap-1 text-sm text-muted hover:text-orange mb-6 transition-colors">
         <ChevronLeft className="w-4 h-4" /> Back to Rides
       </Link>
@@ -73,10 +73,12 @@ export default async function RideDetailPage({ params }: Props) {
             <MapPin className="w-5 h-5 text-orange" />
             <span>{ride.location}</span>
           </div>
+          {ride.startDate && (
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-orange" />
-            <span>{formatDateRange(ride.startDate.toISOString(), ride.endDate.toISOString())}</span>
+            <span>{formatDateRange(ride.startDate.toISOString(), (ride.endDate || ride.startDate).toISOString())}</span>
           </div>
+          )}
           {ride.startTime && (
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5 text-orange" />

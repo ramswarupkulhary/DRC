@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     });
 
     for (const ride of upcomingRides) {
-      const rideDate = ride.startDate.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
+      const rideDate = ride.startDate!.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
       const rideTime = ride.startTime || "as scheduled";
 
       for (const reg of ride.registrations) {

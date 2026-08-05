@@ -62,7 +62,7 @@ export async function POST(req: Request) {
           <p style="color: #F1E9DD;">Hi ${name},</p>
           <p style="color: #F1E9DD;">You have been registered for <strong>${ride.title}</strong> by the DRC team.</p>
           <p style="color: #F1E9DD;">📍 ${ride.location}</p>
-          <p style="color: #F1E9DD;">📅 ${ride.startDate.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
+          <p style="color: #F1E9DD;">📅 ${ride.startDate!.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
           ${!hasAccount ? `<p style="color: #888888;">Create your DRC account to view your registrations, ride photos, and more.</p>` : `<p style="color: #888888;">Log in to your DRC account to view this registration.</p>`}
         `,
         ctaText: hasAccount ? "View My Registrations" : "Create Your Account",

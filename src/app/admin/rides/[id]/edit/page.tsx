@@ -12,8 +12,8 @@ export default async function EditRidePage({ params }: Props) {
 
   const rideData = {
     ...ride,
-    startDate: ride.startDate.toISOString(),
-    endDate: ride.endDate.toISOString(),
+    startDate: ride.startDate?.toISOString() ?? new Date().toISOString(),
+    endDate: ride.endDate?.toISOString() ?? new Date().toISOString(),
     memberDiscount: ride.memberDiscount,
     earlyBirdDeadline: ride.earlyBirdDeadline?.toISOString() ?? null,
   };

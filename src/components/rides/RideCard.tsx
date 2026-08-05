@@ -8,8 +8,8 @@ interface RideCardProps {
   slug: string;
   title: string;
   location: string;
-  startDate: string;
-  endDate: string;
+  startDate?: string | null;
+  endDate?: string | null;
   price: number;
   totalSlots: number;
   bookedSlots: number;
@@ -76,10 +76,12 @@ export function RideCard({
               <MapPin className="w-4 h-4 text-orange shrink-0" />
               <span className="line-clamp-1">{location}</span>
             </div>
+            {startDate && (
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-orange shrink-0" />
-              <span>{formatDateRange(startDate, endDate)}</span>
+              <span>{formatDateRange(startDate, endDate || startDate)}</span>
             </div>
+            )}
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-orange shrink-0" />
               <span className={soldOut ? "text-error font-semibold" : totalSlots - bookedSlots <= 3 ? "text-orange font-semibold" : ""}>

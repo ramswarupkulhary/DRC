@@ -58,7 +58,7 @@ export default async function AdminRidesPage() {
                       </Link>
                       <div className="text-xs text-muted mt-0.5">{ride._count.registrations} total registrations</div>
                     </td>
-                    <td className="px-5 py-3 text-muted">{formatDate(ride.startDate)}</td>
+                    <td className="px-5 py-3 text-muted">{ride.startDate ? formatDate(ride.startDate) : "—"}</td>
                     <td className="px-5 py-3 text-muted">{ride.location}</td>
                     <td className="px-5 py-3 text-orange font-semibold">{formatPrice(ride.price)}</td>
                     <td className="px-5 py-3">

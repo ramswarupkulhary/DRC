@@ -27,6 +27,7 @@ export default async function CalendarPage() {
 
   const months: Record<string, typeof rides> = {};
   for (const ride of rides) {
+    if (!ride.startDate) continue;
     const key = ride.startDate.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
     if (!months[key]) months[key] = [];
     months[key].push(ride);
@@ -57,10 +58,10 @@ export default async function CalendarPage() {
                   <div className="bg-surface border border-border rounded-sm p-4 flex items-center gap-4 hover:border-orange/50 transition-colors">
                     <div className="w-16 text-center shrink-0">
                       <p className="font-heading text-2xl font-bold text-orange">
-                        {ride.startDate.getDate()}
+                        {ride.startDate!.getDate()}
                       </p>
                       <p className="text-xs text-muted uppercase">
-                        {ride.startDate.toLocaleDateString("en-IN", { weekday: "short" })}
+                        {ride.startDate!.toLocaleDateString("en-IN", { weekday: "short" })}
                       </p>
                     </div>
                     <div className="flex-1 min-w-0">
