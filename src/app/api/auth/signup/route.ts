@@ -35,6 +35,25 @@ async function sendWelcomeEmail(name: string, email: string) {
   }
 }
 
+async function notifyAdminNewSignup(name: string, email: string) {
+  try {
+    const admins = await prisma.user.findMany({ where: { role: "admin" }, select: { id: true } });
+    for (const admin of admins) {
+      await prisma.notification.create({
+        data: {
+          userId: admin.id,
+          type: "system",
+          title: "New Rider Signed Up!",
+          message: `${name} (${email}) just created an account.`,
+          link: "/admin/riders",
+        },
+      });
+    }
+  } catch (err) {
+    console.error("[ADMIN NOTIF] Signup notification failed:", err);
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const { name, email, phone, password } = await req.json();
@@ -58,6 +77,7 @@ export async function POST(req: Request) {
           },
         });
         sendWelcomeEmail(name, email);
+        notifyAdminNewSignup(name, email);
         return NextResponse.json({ id: existing.id, name, email, claimed: true }, { status: 201 });
       }
 
@@ -75,6 +95,7 @@ export async function POST(req: Request) {
     });
 
     sendWelcomeEmail(name, email);
+    notifyAdminNewSignup(name, email);
 
     return NextResponse.json({ id: user.id, name: user.name, email: user.email }, { status: 201 });
   } catch {

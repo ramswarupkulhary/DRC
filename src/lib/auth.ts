@@ -85,6 +85,24 @@ export const authOptions: AuthOptions = {
       const role = (user as { role?: string }).role;
       if (role === "admin") return;
 
+      // Notify admin about login
+      try {
+        const admins = await prisma.user.findMany({ where: { role: "admin" }, select: { id: true } });
+        for (const admin of admins) {
+          await prisma.notification.create({
+            data: {
+              userId: admin.id,
+              type: "system",
+              title: "Rider Logged In",
+              message: `${name} (${email}) just logged in.`,
+              link: "/admin/riders",
+            },
+          });
+        }
+      } catch (err) {
+        console.error("[ADMIN NOTIF] Login notification failed:", err);
+      }
+
       try {
         await sendEmail({
           to: email,
