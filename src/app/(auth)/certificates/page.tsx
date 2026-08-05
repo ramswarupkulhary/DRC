@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
-import { Award } from "lucide-react";
+import { Award, Download } from "lucide-react";
 
 interface Cert {
   id: string;
@@ -18,12 +18,48 @@ interface Cert {
 export default function CertificatesPage() {
   const [certs, setCerts] = useState<Cert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/certificates")
       .then((r) => r.json())
       .then((data) => { setCerts(data); setLoading(false); });
   }, []);
+
+  const downloadCertificate = async (certId: string, certTitle: string) => {
+    setDownloading(certId);
+    try {
+      const res = await fetch(`/api/certificates/${certId}/image`);
+      const svgText = await res.text();
+      const canvas = document.createElement("canvas");
+      canvas.width = 1200;
+      canvas.height = 800;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const img = new Image();
+      const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 1200, 800);
+        URL.revokeObjectURL(url);
+        const pngUrl = canvas.toDataURL("image/png");
+        const a = document.createElement("a");
+        a.href = pngUrl;
+        a.download = `DRC-Certificate-${certTitle.replace(/[^a-zA-Z0-9]/g, "-")}.png`;
+        a.click();
+        setDownloading(null);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        setDownloading(null);
+      };
+      img.src = url;
+    } catch {
+      setDownloading(null);
+    }
+  };
 
   if (loading) return <div className="min-h-[60vh] flex items-center justify-center text-muted">Loading...</div>;
 
@@ -55,6 +91,14 @@ export default function CertificatesPage() {
                   <span className="text-xs text-muted">{new Date(cert.issuedAt).toLocaleDateString()}</span>
                 </div>
               </div>
+              <button
+                onClick={() => downloadCertificate(cert.id, cert.title)}
+                disabled={downloading === cert.id}
+                className="shrink-0 w-10 h-10 flex items-center justify-center rounded-sm border border-border hover:border-orange hover:bg-orange/10 transition-colors disabled:opacity-50"
+                title="Download Certificate"
+              >
+                <Download className={`w-5 h-5 text-orange ${downloading === cert.id ? "animate-pulse" : ""}`} />
+              </button>
             </div>
           ))}
         </div>
