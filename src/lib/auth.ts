@@ -40,20 +40,19 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 24 * 60 * 60 },
   pages: {
     signIn: "/login",
     newUser: "/signup",
   },
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role || "rider";
         token.image = user.image || null;
         token.isMember = (user as { isMember?: boolean }).isMember || false;
-      }
-      if (trigger === "update") {
+      } else if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
           include: { membership: true },
@@ -61,6 +60,7 @@ export const authOptions: AuthOptions = {
         if (dbUser) {
           token.image = dbUser.image || null;
           token.role = dbUser.role;
+          token.name = dbUser.name;
           token.isMember = !!(dbUser.membership && dbUser.membership.status === "active" && new Date(dbUser.membership.endDate) > new Date());
         }
       }
