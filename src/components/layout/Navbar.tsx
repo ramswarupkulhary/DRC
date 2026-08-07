@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { Menu, X, User, LogOut, ChevronDown, Crown, Bell, Calendar, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -32,6 +33,10 @@ export function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { data: session } = useSession();
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -95,10 +100,18 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-orange transition-colors uppercase tracking-wider relative group"
+                className={cn(
+                  "px-3 py-2 text-sm font-medium transition-colors uppercase tracking-wider relative group",
+                  isActive(link.href)
+                    ? "text-orange"
+                    : "text-foreground/80 hover:text-orange"
+                )}
               >
                 {link.label}
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-orange transition-all duration-300 group-hover:w-full" />
+                <span className={cn(
+                  "absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-orange transition-all duration-300",
+                  isActive(link.href) ? "w-full" : "w-0 group-hover:w-full"
+                )} />
               </Link>
             ))}
           </div>
@@ -258,7 +271,12 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
-                    className="block px-3 py-2.5 text-sm font-medium text-foreground/80 hover:text-orange hover:bg-surface-light rounded-sm transition-colors uppercase tracking-wider"
+                    className={cn(
+                      "block px-3 py-2.5 text-sm font-medium rounded-sm transition-colors uppercase tracking-wider",
+                      isActive(link.href)
+                        ? "text-orange bg-orange/10"
+                        : "text-foreground/80 hover:text-orange hover:bg-surface-light"
+                    )}
                   >
                     {link.label}
                   </Link>
