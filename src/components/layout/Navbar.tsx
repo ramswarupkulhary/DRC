@@ -95,13 +95,13 @@ export function Navbar() {
             </div>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-0.5">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "px-3 py-2 text-sm font-medium transition-colors uppercase tracking-wider relative group",
+                  "px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium transition-colors uppercase tracking-wider relative group",
                   isActive(link.href)
                     ? "text-orange"
                     : "text-foreground/80 hover:text-orange"
@@ -116,22 +116,22 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-2">
             {session ? (
               <>
                 <NotificationBell />
                 {userRole === "admin" && (
                   <Link href="/admin/dashboard">
-                    <Button variant="outline" size="sm" className="text-orange border-orange/30 bg-orange/10 hover:bg-orange/20">
-                      <Shield className="w-4 h-4 mr-1.5" />
-                      Admin
+                    <Button variant="outline" size="sm" className="text-orange border-orange/30 bg-orange/10 hover:bg-orange/20 px-2">
+                      <Shield className="w-4 h-4" />
+                      <span className="hidden xl:inline ml-1.5">Admin</span>
                     </Button>
                   </Link>
                 )}
                 <Link href="/membership">
-                  <Button variant={isMember ? "ghost" : "outline"} size="sm" className={isMember ? "text-orange border-orange/30 bg-orange/10 hover:bg-orange/20" : ""}>
-                    <Crown className="w-4 h-4 mr-1.5" />
-                    {isMember ? "Member" : "Membership"}
+                  <Button variant={isMember ? "ghost" : "outline"} size="sm" className={cn("px-2", isMember ? "text-orange border-orange/30 bg-orange/10 hover:bg-orange/20" : "")}>
+                    <Crown className="w-4 h-4" />
+                    <span className="hidden xl:inline ml-1.5">{isMember ? "Member" : "Membership"}</span>
                   </Button>
                 </Link>
                 <div ref={userMenuRef} className="relative">
@@ -238,7 +238,10 @@ export function Navbar() {
               </>
             )}
             <Link href="/rides">
-              <Button size="sm" className="whitespace-nowrap">Book a Ride</Button>
+              <Button size="sm" className="whitespace-nowrap px-3">
+                <span className="hidden xl:inline">Book a Ride</span>
+                <span className="xl:hidden">Book</span>
+              </Button>
             </Link>
           </div>
 
