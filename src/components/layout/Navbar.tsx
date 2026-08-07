@@ -80,7 +80,7 @@ export function Navbar() {
           : "bg-background/80 backdrop-blur-sm border-b border-transparent"
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 xl:px-8">
         <div className={cn("flex items-center justify-between transition-all duration-300", scrolled ? "h-16" : "h-16 sm:h-20")}>
           <Link href="/" className="flex items-center gap-3 shrink-0">
             <div className="flex flex-col">
@@ -95,13 +95,14 @@ export function Navbar() {
             </div>
           </Link>
 
-          <div className="hidden lg:flex items-center gap-0.5">
+          {/* Desktop nav links - only on xl (1280px+) */}
+          <div className="hidden xl:flex items-center gap-0.5">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium transition-colors uppercase tracking-wider relative group",
+                  "px-2 2xl:px-3 py-2 text-xs 2xl:text-sm font-medium transition-colors uppercase tracking-wider relative group",
                   isActive(link.href)
                     ? "text-orange"
                     : "text-foreground/80 hover:text-orange"
@@ -116,7 +117,8 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-2">
+          {/* Desktop right side - only on xl (1280px+) */}
+          <div className="hidden xl:flex items-center gap-2">
             {session ? (
               <>
                 <NotificationBell />
@@ -124,20 +126,20 @@ export function Navbar() {
                   <Link href="/admin/dashboard">
                     <Button variant="outline" size="sm" className="text-orange border-orange/30 bg-orange/10 hover:bg-orange/20 px-2">
                       <Shield className="w-4 h-4" />
-                      <span className="hidden xl:inline ml-1.5">Admin</span>
+                      <span className="hidden 2xl:inline ml-1.5">Admin</span>
                     </Button>
                   </Link>
                 )}
                 <Link href="/membership">
                   <Button variant={isMember ? "ghost" : "outline"} size="sm" className={cn("px-2", isMember ? "text-orange border-orange/30 bg-orange/10 hover:bg-orange/20" : "")}>
                     <Crown className="w-4 h-4" />
-                    <span className="hidden xl:inline ml-1.5">{isMember ? "Member" : "Membership"}</span>
+                    <span className="hidden 2xl:inline ml-1.5">{isMember ? "Member" : "Membership"}</span>
                   </Button>
                 </Link>
                 <div ref={userMenuRef} className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-surface-light transition-colors"
+                    className="flex items-center gap-1 px-2 py-1.5 rounded-sm hover:bg-surface-light transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-orange flex items-center justify-center text-white text-xs font-bold relative">
                       {session.user?.image ? (
@@ -151,10 +153,7 @@ export function Navbar() {
                         </div>
                       )}
                     </div>
-                    <div className="text-left hidden xl:block">
-                      <p className="text-sm font-medium text-foreground leading-tight">{userInitials}</p>
-                    </div>
-                    <ChevronDown className={cn("w-4 h-4 text-muted transition-transform", userMenuOpen && "rotate-180")} />
+                    <ChevronDown className={cn("w-3 h-3 text-muted transition-transform", userMenuOpen && "rotate-180")} />
                   </button>
 
                   <AnimatePresence>
@@ -238,16 +237,14 @@ export function Navbar() {
               </>
             )}
             <Link href="/rides">
-              <Button size="sm" className="whitespace-nowrap px-3">
-                <span className="hidden xl:inline">Book a Ride</span>
-                <span className="xl:hidden">Book</span>
-              </Button>
+              <Button size="sm" className="whitespace-nowrap px-3">Book a Ride</Button>
             </Link>
           </div>
 
+          {/* Hamburger toggle - shows below xl (1280px) */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 text-foreground hover:text-orange transition-colors"
+            className="xl:hidden p-2 text-foreground hover:text-orange transition-colors"
           >
             {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -261,7 +258,7 @@ export function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
-            className="lg:hidden overflow-y-auto max-h-[calc(100vh-4rem)] bg-surface border-t border-border"
+            className="xl:hidden overflow-y-auto max-h-[calc(100vh-4rem)] bg-surface border-t border-border"
           >
             <div className="px-4 py-4 space-y-1">
               {navLinks.map((link, i) => (
