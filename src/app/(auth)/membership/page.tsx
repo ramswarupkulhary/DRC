@@ -41,6 +41,7 @@ export default function MembershipJoinPage() {
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [qrCode, setQrCode] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login?redirect=/membership");
@@ -50,7 +51,16 @@ export default function MembershipJoinPage() {
     if (status === "authenticated") {
       fetch("/api/membership/status")
         .then((r) => r.json())
-        .then((d) => { setData(d); setLoading(false); })
+        .then((d) => {
+          setData(d);
+          setLoading(false);
+          if (d?.plan) {
+            fetch(`/api/upi-qr?amount=${d.plan.price}&note=DRC+Membership`)
+              .then((r) => r.json())
+              .then((q) => q.qrDataUrl && setQrCode(q.qrDataUrl))
+              .catch(() => {});
+          }
+        })
         .catch(() => setLoading(false));
     }
   }, [status]);
@@ -233,15 +243,25 @@ export default function MembershipJoinPage() {
 
               <div className="border-t border-border pt-5">
                 <label className="text-sm font-medium text-foreground block mb-3">Pay via UPI</label>
-                <div className="bg-background border border-border rounded-sm p-4">
-                  <p className="text-xs text-muted mb-1">UPI ID</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-orange font-mono text-lg font-bold flex-1">{data.plan.upiId}</code>
-                    <button onClick={copyUpi} className="p-2 hover:bg-surface-light rounded-sm transition-colors" title="Copy UPI ID">
-                      {copied ? <CheckCircle2 className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4 text-muted" />}
-                    </button>
-                  </div>
-                  <p className="text-xs text-muted mt-2">Pay ₹{data.plan.price.toLocaleString("en-IN")} using any UPI app (GPay, PhonePe, Paytm, etc.)</p>
+                <div className="bg-background border border-border rounded-sm p-4 text-center">
+                  {qrCode ? (
+                    <div className="space-y-3">
+                      <img src={qrCode} alt="UPI QR Code" className="w-48 h-48 mx-auto rounded-sm" />
+                      <p className="text-xs text-muted">Scan with any UPI app (GPay, PhonePe, Paytm, etc.)</p>
+                      <p className="text-xs text-muted">Amount: <strong className="text-orange">₹{data.plan.price.toLocaleString("en-IN")}</strong></p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted mb-1">UPI ID</p>
+                      <div className="flex items-center justify-center gap-2">
+                        <code className="text-orange font-mono text-lg font-bold">{data.plan.upiId}</code>
+                        <button onClick={copyUpi} className="p-2 hover:bg-surface-light rounded-sm transition-colors" title="Copy UPI ID">
+                          {copied ? <CheckCircle2 className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4 text-muted" />}
+                        </button>
+                      </div>
+                      <p className="text-xs text-muted">Pay ₹{data.plan.price.toLocaleString("en-IN")} using any UPI app</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

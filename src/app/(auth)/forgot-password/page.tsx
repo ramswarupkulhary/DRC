@@ -49,6 +49,23 @@ export default function ForgotPasswordPage() {
       setError("Please enter the 6-digit code");
       return;
     }
+    setLoading(true);
+    setError("");
+
+    const res = await fetch("/api/auth/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
+
+    const data = await res.json();
+    setLoading(false);
+
+    if (!res.ok) {
+      setError(data.error || "Invalid code");
+      return;
+    }
+
     setStep(3);
   }
 
@@ -158,7 +175,7 @@ export default function ForgotPasswordPage() {
                   className="text-center text-2xl tracking-[0.5em] font-mono"
                   required
                 />
-                <Button type="submit" size="md" className="w-full">
+                <Button type="submit" size="md" className="w-full" loading={loading}>
                   Verify Code
                 </Button>
                 <button type="button" onClick={() => setStep(1)} className="w-full text-center text-sm text-muted hover:text-orange">
