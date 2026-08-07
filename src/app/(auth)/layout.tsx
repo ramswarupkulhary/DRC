@@ -26,7 +26,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <Navbar />
-      <div className="pt-16 sm:pt-20 flex min-h-screen">
+      <div className="pt-16 sm:pt-20 min-h-screen md:flex">
         <AccountSidebar />
         <main className="flex-1 min-w-0">{children}</main>
       </div>

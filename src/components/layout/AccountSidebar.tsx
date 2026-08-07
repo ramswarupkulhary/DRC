@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -15,6 +16,8 @@ import {
   Images,
   Gift,
   Shield,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +38,8 @@ const sidebarLinks = [
 
 export function AccountSidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const currentPage = sidebarLinks.find((l) => l.href === pathname);
 
   return (
     <>
@@ -65,28 +70,42 @@ export function AccountSidebar() {
         </nav>
       </aside>
 
-      {/* Mobile horizontal nav */}
-      <div className="md:hidden overflow-x-auto border-b border-border bg-surface/50 px-4 py-2 sticky top-16 z-30">
-        <div className="flex gap-1 min-w-max">
-          {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-2.5 text-xs rounded-sm whitespace-nowrap transition-colors",
-                  isActive
-                    ? "bg-orange/10 text-orange font-medium"
-                    : "text-foreground/70 hover:text-foreground hover:bg-surface-light"
-                )}
-              >
-                <link.icon className="w-3.5 h-3.5" />
-                {link.label}
-              </Link>
-            );
-          })}
-        </div>
+      {/* Mobile collapsible nav */}
+      <div className="md:hidden sticky top-16 z-30">
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="w-full flex items-center justify-between px-4 py-3 bg-surface border-b border-border text-sm"
+        >
+          <span className="flex items-center gap-2 text-foreground/80">
+            {currentPage && <currentPage.icon className="w-4 h-4 text-orange" />}
+            <span className="font-medium">{currentPage?.label || "Account"}</span>
+          </span>
+          {mobileOpen ? <X className="w-4 h-4 text-muted" /> : <Menu className="w-4 h-4 text-muted" />}
+        </button>
+
+        {mobileOpen && (
+          <nav className="bg-surface border-b border-border px-2 py-2 grid grid-cols-2 gap-1">
+            {sidebarLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2.5 rounded-sm text-xs transition-colors",
+                    isActive
+                      ? "bg-orange/10 text-orange font-medium"
+                      : "text-foreground/70 hover:bg-surface-light hover:text-orange"
+                  )}
+                >
+                  <link.icon className={cn("w-3.5 h-3.5 shrink-0", isActive && "text-orange")} />
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
       </div>
     </>
   );

@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LayoutDashboard, Bike, GraduationCap, Users, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown, ShoppingBag, History } from "lucide-react";
+import { AdminMobileNav } from "@/components/admin/AdminMobileNav";
 
 const sidebarLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -82,24 +83,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <span className="text-foreground">C</span>
             <span className="text-xs text-muted ml-2">Admin</span>
           </span>
-          <Link href="/" className="text-sm text-muted hover:text-orange">
-            Site
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-sm text-muted hover:text-orange">
+              Site
+            </Link>
+          </div>
         </header>
 
-        {/* Mobile nav */}
-        <nav className="lg:hidden bg-surface border-b border-border px-2 py-1 flex gap-1 overflow-x-auto">
-          {sidebarLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-sm text-xs text-foreground/70 hover:bg-surface-light hover:text-orange transition-colors whitespace-nowrap"
-            >
-              <link.icon className="w-3.5 h-3.5" />
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        {/* Mobile nav - collapsible grid */}
+        <AdminMobileNav links={sidebarLinks} />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">{children}</main>
       </div>
