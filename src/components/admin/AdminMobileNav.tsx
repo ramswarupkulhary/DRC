@@ -3,17 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LayoutDashboard, Bike, GraduationCap, Users, Settings, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown, ShoppingBag, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
-interface NavLink {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-}
+const sidebarLinks: { href: string; label: string; icon: LucideIcon }[] = [
+  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/rides", label: "Rides", icon: Bike },
+  { href: "/admin/past-rides", label: "Past Rides", icon: History },
+  { href: "/admin/trainings", label: "Trainings", icon: GraduationCap },
+  { href: "/admin/events", label: "Events", icon: Trophy },
+  { href: "/admin/blog", label: "Blog", icon: FileText },
+  { href: "/admin/riders", label: "Riders", icon: Users },
+  { href: "/admin/memberships", label: "Memberships", icon: Crown },
+  { href: "/admin/instructors", label: "Instructors", icon: UserCheck },
+  { href: "/admin/reviews", label: "Reviews", icon: Star },
+  { href: "/admin/gallery", label: "Gallery", icon: ImageIcon },
+  { href: "/admin/messages", label: "Messages", icon: Mail },
+  { href: "/admin/corporate", label: "Corporate", icon: Building2 },
+  { href: "/admin/coupons", label: "Coupons", icon: Tag },
+  { href: "/admin/store", label: "Store", icon: ShoppingBag },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
+];
 
-export function AdminMobileNav({ links }: { links: NavLink[] }) {
+export function AdminMobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -29,7 +42,7 @@ export function AdminMobileNav({ links }: { links: NavLink[] }) {
 
       {open && (
         <nav className="bg-surface border-b border-border px-2 py-2 grid grid-cols-2 gap-1">
-          {links.map((link) => {
+          {sidebarLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link

@@ -91,7 +91,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </header>
 
         {/* Mobile nav - collapsible grid */}
-        <AdminMobileNav links={sidebarLinks} />
+        <AdminMobileNav />
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">{children}</main>
       </div>
