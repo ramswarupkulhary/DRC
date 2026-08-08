@@ -29,7 +29,7 @@ export async function GET(req: Request) {
       color: { dark: "#000000", light: "#ffffff" },
     });
 
-    return NextResponse.json({ qrDataUrl, upiId, upiName, amount: Number(amount) });
+    return NextResponse.json({ qrDataUrl, upiId, upiName, upiUrl, amount: Number(amount) });
   } catch {
     return NextResponse.json({ error: "Failed to generate QR code" }, { status: 500 });
   }

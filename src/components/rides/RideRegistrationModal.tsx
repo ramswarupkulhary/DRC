@@ -39,6 +39,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
 
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [upiId, setUpiId] = useState("");
+  const [upiUrl, setUpiUrl] = useState("");
   const [qrLoading, setQrLoading] = useState(true);
 
   const [emergencyName, setEmergencyName] = useState("");
@@ -66,6 +67,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
         if (data.qrDataUrl) {
           setQrDataUrl(data.qrDataUrl);
           setUpiId(data.upiId);
+          setUpiUrl(data.upiUrl || "");
         }
       })
       .catch(() => {})
@@ -265,7 +267,35 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                 <h5 className="font-heading text-sm font-semibold uppercase tracking-wider text-muted">Payment</h5>
 
                 <div className="bg-background border border-border rounded-sm p-4 space-y-4">
-                  <p className="text-sm text-muted">Scan the QR code to pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> via UPI, then upload the screenshot below.</p>
+                  <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> via UPI, then upload the screenshot below.</p>
+
+                  {upiUrl && (
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-muted uppercase tracking-wider">Pay directly via app</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <a href={upiUrl} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="GPay" className="w-5 h-5 object-contain" />
+                          Google Pay
+                        </a>
+                        <a href={upiUrl} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" className="w-5 h-5 object-contain" />
+                          Paytm
+                        </a>
+                        <a href={upiUrl} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="PhonePe" className="w-5 h-5 object-contain" />
+                          PhonePe
+                        </a>
+                        <a href={upiUrl} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/512px-UPI-Logo-vector.svg.png" alt="UPI" className="w-5 h-5 object-contain" />
+                          Other UPI
+                        </a>
+                      </div>
+                      <p className="text-[10px] text-muted text-center">Tap a button above to open the app directly on mobile</p>
+                    </div>
+                  )}
+
+                  <div className="border-t border-border pt-4">
+                    <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">Or scan QR code</p>
 
                   {qrLoading ? (
                     <div className="flex justify-center py-6">
@@ -279,6 +309,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                       <p className="text-xs text-muted">Scan with any UPI app (GPay, PhonePe, Paytm, etc.)</p>
                     </div>
                   ) : null}
+                  </div>
 
                   <div className="flex items-center gap-2 pt-2 border-t border-border">
                     <span className="text-xs text-muted">UPI ID:</span>
