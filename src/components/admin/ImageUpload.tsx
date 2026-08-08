@@ -48,7 +48,7 @@ export default function ImageUpload({ value, onChange, label = "Cover Image" }: 
 
       {value ? (
         <div className="relative rounded-sm overflow-hidden border border-border">
-          <img src={value} alt="Cover" className="w-full h-48 object-cover" />
+          <img src={value} alt="Cover" className="w-full h-auto block" />
           <button
             type="button"
             onClick={() => onChange(null)}

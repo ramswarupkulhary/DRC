@@ -66,11 +66,13 @@ export default async function TrainingDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="mt-8 h-64 sm:h-80 bg-surface border border-border rounded-sm flex items-center justify-center">
+      <div className="mt-8 bg-surface border border-border rounded-sm overflow-hidden">
         {training.coverImage ? (
-          <img src={training.coverImage} alt={training.title} className="w-full h-full object-cover rounded-sm" />
+          <img src={training.coverImage} alt={training.title} className="w-full h-auto block rounded-sm" />
         ) : (
-          <BarChart3 className="w-24 h-24 text-muted/20" />
+          <div className="h-64 sm:h-80 flex items-center justify-center">
+            <BarChart3 className="w-24 h-24 text-muted/20" />
+          </div>
         )}
       </div>
 

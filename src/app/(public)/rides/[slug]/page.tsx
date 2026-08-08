@@ -88,12 +88,14 @@ export default async function RideDetailPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Cover image placeholder */}
-      <div className="mt-8 h-64 sm:h-96 bg-surface border border-border rounded-sm flex items-center justify-center">
+      {/* Cover image */}
+      <div className="mt-8 bg-surface border border-border rounded-sm overflow-hidden">
         {ride.coverImage ? (
-          <img src={ride.coverImage} alt={ride.title} className="w-full h-full object-cover rounded-sm" />
+          <img src={ride.coverImage} alt={ride.title} className="w-full h-auto block rounded-sm" />
         ) : (
-          <Mountain className="w-24 h-24 text-muted/20" />
+          <div className="h-64 sm:h-96 flex items-center justify-center">
+            <Mountain className="w-24 h-24 text-muted/20" />
+          </div>
         )}
       </div>
 

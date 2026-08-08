@@ -68,7 +68,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         {post.coverImage && (
           <div className="mt-8 rounded-sm overflow-hidden border border-border">
-            <img src={post.coverImage} alt={post.title} className="w-full aspect-[2/1] object-cover" />
+            <img src={post.coverImage} alt={post.title} className="w-full h-auto block" />
           </div>
         )}
 

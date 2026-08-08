@@ -38,9 +38,9 @@ export default async function BlogPage() {
             <Link key={post.id} href={`/blog/${post.slug}`} className="block group">
               <HoverCard>
                 <div className="bg-surface border border-border rounded-sm overflow-hidden grid grid-cols-1 lg:grid-cols-2">
-                  <div className="aspect-[16/9] lg:aspect-auto bg-surface-light flex items-center justify-center min-h-[250px]">
+                  <div className="bg-surface-light overflow-hidden">
                     {post.coverImage ? (
-                      <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+                      <img src={post.coverImage} alt={post.title} className="w-full h-auto block" />
                     ) : (
                       <span className="font-heading text-6xl text-orange/20">DRC</span>
                     )}
@@ -83,9 +83,9 @@ export default async function BlogPage() {
               <HoverCard>
                 <Link href={`/blog/${post.slug}`} className="block group h-full">
                   <div className="bg-surface border border-border rounded-sm overflow-hidden h-full flex flex-col">
-                    <div className="aspect-[16/9] bg-surface-light flex items-center justify-center">
+                    <div className="bg-surface-light overflow-hidden">
                       {post.coverImage ? (
-                        <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+                        <img src={post.coverImage} alt={post.title} className="w-full h-auto block" />
                       ) : (
                         <span className="font-heading text-4xl text-orange/20">DRC</span>
                       )}
