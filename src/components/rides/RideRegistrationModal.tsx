@@ -40,6 +40,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [upiId, setUpiId] = useState("");
   const [upiUrl, setUpiUrl] = useState("");
+  const [appUrls, setAppUrls] = useState<Record<string, string>>({});
   const [qrLoading, setQrLoading] = useState(true);
 
   const [emergencyName, setEmergencyName] = useState("");
@@ -68,6 +69,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
           setQrDataUrl(data.qrDataUrl);
           setUpiId(data.upiId);
           setUpiUrl(data.upiUrl || "");
+          setAppUrls(data.appUrls || {});
         }
       })
       .catch(() => {})
@@ -269,28 +271,28 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                 <div className="bg-background border border-border rounded-sm p-4 space-y-4">
                   <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> via UPI, then upload the screenshot below.</p>
 
-                  {upiUrl && (
+                  {appUrls.gpay && (
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-muted uppercase tracking-wider">Pay directly via app</p>
                       <div className="grid grid-cols-2 gap-2">
-                        <a href={upiUrl} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="GPay" className="w-5 h-5 object-contain" />
+                        <a href={appUrls.gpay} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <span className="w-5 h-5 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[10px] font-bold shrink-0">G</span>
                           Google Pay
                         </a>
-                        <a href={upiUrl} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" className="w-5 h-5 object-contain" />
-                          Paytm
-                        </a>
-                        <a href={upiUrl} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="PhonePe" className="w-5 h-5 object-contain" />
+                        <a href={appUrls.phonepe} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <span className="w-5 h-5 rounded-full bg-[#5F259F] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pe</span>
                           PhonePe
                         </a>
-                        <a href={upiUrl} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/512px-UPI-Logo-vector.svg.png" alt="UPI" className="w-5 h-5 object-contain" />
+                        <a href={appUrls.paytm} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <span className="w-5 h-5 rounded-full bg-[#00B9F5] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pt</span>
+                          Paytm
+                        </a>
+                        <a href={appUrls.generic} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <span className="w-5 h-5 rounded-full bg-[#4CAF50] flex items-center justify-center text-white text-[10px] font-bold shrink-0">₹</span>
                           Other UPI
                         </a>
                       </div>
-                      <p className="text-[10px] text-muted text-center">Tap a button above to open the app directly on mobile</p>
+                      <p className="text-[10px] text-muted text-center">Tap a button to open the app directly on mobile</p>
                     </div>
                   )}
 

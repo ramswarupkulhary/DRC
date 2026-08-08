@@ -20,7 +20,15 @@ export async function GET(req: Request) {
   const upiId = map.upi_id || "ramswarup.kulhary@ybl";
   const upiName = map.upi_name || "Dirt Ride Camp";
 
-  const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR`;
+  const upiParams = `pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${amount}&cu=INR`;
+  const upiUrl = `upi://pay?${upiParams}`;
+
+  const appUrls = {
+    gpay: `tez://upi/pay?${upiParams}`,
+    phonepe: `phonepe://pay?${upiParams}`,
+    paytm: `paytmmp://pay?${upiParams}`,
+    generic: upiUrl,
+  };
 
   try {
     const qrDataUrl = await QRCode.toDataURL(upiUrl, {
@@ -29,7 +37,7 @@ export async function GET(req: Request) {
       color: { dark: "#000000", light: "#ffffff" },
     });
 
-    return NextResponse.json({ qrDataUrl, upiId, upiName, upiUrl, amount: Number(amount) });
+    return NextResponse.json({ qrDataUrl, upiId, upiName, upiUrl, appUrls, amount: Number(amount) });
   } catch {
     return NextResponse.json({ error: "Failed to generate QR code" }, { status: 500 });
   }
