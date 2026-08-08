@@ -29,11 +29,11 @@ export function TrainingCard({
   return (
     <Link href={`/trainings/${slug}`} className="group block">
       <div className="relative bg-surface border border-border rounded-sm overflow-hidden hover:border-orange/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-orange/5 h-full flex flex-col">
-        <div className="relative h-48 bg-surface-light overflow-hidden">
+        <div className="relative bg-surface-light overflow-hidden">
           {coverImage ? (
-            <img src={coverImage} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src={coverImage} alt={title} className="w-full h-auto block group-hover:scale-105 transition-transform duration-500" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted">
+            <div className="w-full h-48 flex items-center justify-center text-muted">
               <BarChart3 className="w-16 h-16 opacity-20" />
             </div>
           )}
