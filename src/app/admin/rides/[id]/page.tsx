@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-import { ChevronLeft, Eye, Check, X, Edit, ChevronDown, ChevronUp, MessageCircle, Image as ImageIcon, Link as LinkIcon, Trash2, Copy, ClipboardList, Award } from "lucide-react";
+import { ChevronLeft, Eye, Check, X, Edit, ChevronDown, ChevronUp, MessageCircle, Image as ImageIcon, Link as LinkIcon, Trash2, Copy, ClipboardList, Award, Send } from "lucide-react";
 import Link from "next/link";
+import { NotifyRidersModal } from "@/components/admin/NotifyRidersModal";
 
 interface Registration {
   id: string;
@@ -77,6 +78,7 @@ export default function AdminRideDetailPage() {
   const [linksSaved, setLinksSaved] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showNotifyModal, setShowNotifyModal] = useState(false);
 
   const fetchData = useCallback(() => {
     Promise.all([
@@ -175,7 +177,10 @@ export default function AdminRideDetailPage() {
               {ride.memberDiscount > 0 && <span className="text-success">Members: {ride.memberDiscount}% off</span>}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setShowNotifyModal(true)}>
+              <Send className="w-4 h-4 mr-1" /> Notify Riders
+            </Button>
             <Button size="sm" variant="outline" onClick={async () => {
               const res = await fetch(`/api/admin/rides/${rideId}/duplicate`, { method: "POST" });
               const data = await res.json();
@@ -394,6 +399,14 @@ export default function AdminRideDetailPage() {
           </table>
         </div>
       </div>
+
+      {showNotifyModal && (
+        <NotifyRidersModal
+          rideId={ride.id}
+          rideTitle={ride.title}
+          onClose={() => setShowNotifyModal(false)}
+        />
+      )}
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
