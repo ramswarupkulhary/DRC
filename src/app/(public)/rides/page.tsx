@@ -68,6 +68,8 @@ export default async function RidesPage() {
                   startDate={ride.startDate?.toISOString()}
                   endDate={ride.endDate?.toISOString()}
                   price={ride.price}
+                  earlyBirdPrice={ride.earlyBirdPrice}
+                  earlyBirdDeadline={ride.earlyBirdDeadline?.toISOString()}
                   totalSlots={ride.totalSlots}
                   bookedSlots={ride.registrations.length}
                   difficulty={ride.difficulty}
@@ -108,6 +110,8 @@ export default async function RidesPage() {
                   startDate={ride.startDate?.toISOString()}
                   endDate={ride.endDate?.toISOString()}
                   price={ride.price}
+                  earlyBirdPrice={ride.earlyBirdPrice}
+                  earlyBirdDeadline={ride.earlyBirdDeadline?.toISOString()}
                   totalSlots={ride.totalSlots}
                   bookedSlots={ride.registrations.length}
                   difficulty={ride.difficulty}
