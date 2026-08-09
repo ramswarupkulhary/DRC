@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Crown, Save, IndianRupee, QrCode } from "lucide-react";
+import { Crown, Save, IndianRupee, QrCode, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 interface PlanData {
@@ -32,6 +32,11 @@ export default function AdminSettingsPage() {
   const [savingUpi, setSavingUpi] = useState(false);
   const [upiSaved, setUpiSaved] = useState(false);
 
+  const [razorpayKeyId, setRazorpayKeyId] = useState("");
+  const [razorpayKeySecret, setRazorpayKeySecret] = useState("");
+  const [savingRazorpay, setSavingRazorpay] = useState(false);
+  const [razorpaySaved, setRazorpaySaved] = useState(false);
+
   useEffect(() => {
     fetch("/api/admin/membership-plan")
       .then((r) => r.json())
@@ -56,6 +61,8 @@ export default function AdminSettingsPage() {
       .then((d) => {
         setPayUpiId(d.upi_id || "");
         setPayUpiName(d.upi_name || "");
+        setRazorpayKeyId(d.razorpay_key_id || "");
+        setRazorpayKeySecret(d.razorpay_key_secret || "");
       })
       .catch(() => {});
   }, []);
@@ -109,6 +116,26 @@ export default function AdminSettingsPage() {
       setSavingUpi(false);
     }
   }, [payUpiId, payUpiName]);
+
+  const saveRazorpaySettings = useCallback(async () => {
+    setSavingRazorpay(true);
+    setRazorpaySaved(false);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ razorpay_key_id: razorpayKeyId, razorpay_key_secret: razorpayKeySecret }),
+      });
+      if (res.ok) {
+        setRazorpaySaved(true);
+        setTimeout(() => setRazorpaySaved(false), 3000);
+      }
+    } catch {
+      alert("Failed to save Razorpay settings.");
+    } finally {
+      setSavingRazorpay(false);
+    }
+  }, [razorpayKeyId, razorpayKeySecret]);
 
   return (
     <div className="space-y-6">
@@ -210,11 +237,35 @@ export default function AdminSettingsPage() {
         <p className="text-xs text-error">Change this password before going to production!</p>
       </div>
 
-      <div className="bg-surface border border-border rounded-sm p-6 space-y-4">
-        <h3 className="font-heading text-lg font-semibold text-tan">Payment Gateway</h3>
-        <p className="text-sm text-muted">
-          Razorpay integration is prepared. Add your <code className="text-orange">RAZORPAY_KEY_ID</code> and <code className="text-orange">RAZORPAY_KEY_SECRET</code> to the <code>.env</code> file to enable payments.
-        </p>
+      {/* Razorpay Payment Gateway */}
+      <div className="bg-surface border border-orange/30 rounded-sm overflow-hidden">
+        <div className="bg-gradient-to-br from-orange/10 to-transparent px-6 py-4 border-b border-border flex items-center gap-3">
+          <CreditCard className="w-5 h-5 text-orange" />
+          <h3 className="font-heading text-lg font-semibold">Razorpay Payment Gateway</h3>
+        </div>
+        <div className="p-6 space-y-5">
+          <p className="text-sm text-muted">Enable automatic payment verification. Get your keys from <a href="https://dashboard.razorpay.com/app/keys" target="_blank" rel="noopener noreferrer" className="text-orange hover:underline">dashboard.razorpay.com → Settings → API Keys</a>.</p>
+          <div className="grid grid-cols-1 gap-5">
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Key ID</label>
+              <input type="text" value={razorpayKeyId} onChange={(e) => setRazorpayKeyId(e.target.value)} placeholder="rzp_live_xxxxxxxxxxxx" className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none font-mono" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Key Secret</label>
+              <input type="password" value={razorpayKeySecret} onChange={(e) => setRazorpayKeySecret(e.target.value)} placeholder="••••••••••••••••••••" className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none font-mono" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button onClick={saveRazorpaySettings} loading={savingRazorpay} disabled={savingRazorpay}>
+              <Save className="w-4 h-4 mr-2" />
+              Save Razorpay Settings
+            </Button>
+            {razorpaySaved && <span className="text-sm text-success">Saved!</span>}
+          </div>
+          {razorpayKeyId && (
+            <p className="text-xs text-success">Razorpay is configured and active.</p>
+          )}
+        </div>
       </div>
 
       <div className="bg-surface border border-border rounded-sm p-6 space-y-4">

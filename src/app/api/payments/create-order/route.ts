@@ -4,15 +4,30 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Razorpay from "razorpay";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "placeholder_secret",
-});
+async function getRazorpayInstance() {
+  const settings = await prisma.siteSetting.findMany({
+    where: { key: { in: ["razorpay_key_id", "razorpay_key_secret"] } },
+  });
+  const map: Record<string, string> = {};
+  settings.forEach((s) => { map[s.key] = s.value; });
+
+  const keyId = map.razorpay_key_id || process.env.RAZORPAY_KEY_ID || "";
+  const keySecret = map.razorpay_key_secret || process.env.RAZORPAY_KEY_SECRET || "";
+
+  if (!keyId || !keySecret) return null;
+
+  return { instance: new Razorpay({ key_id: keyId, key_secret: keySecret }), keyId };
+}
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rz = await getRazorpayInstance();
+  if (!rz) {
+    return NextResponse.json({ error: "Razorpay is not configured. Ask admin to add keys in Settings." }, { status: 500 });
   }
 
   const { type, itemId, amount, couponCode } = await req.json();
@@ -41,7 +56,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const order = await razorpay.orders.create({
+    const order = await rz.instance.orders.create({
       amount: finalAmount * 100,
       currency: "INR",
       receipt: `${type}_${itemId}_${Date.now()}`,
@@ -57,7 +72,7 @@ export async function POST(req: Request) {
       orderId: order.id,
       amount: finalAmount,
       currency: "INR",
-      key: process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder",
+      key: rz.keyId,
     });
   } catch {
     return NextResponse.json({ error: "Failed to create payment order" }, { status: 500 });

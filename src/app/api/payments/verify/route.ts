@@ -4,6 +4,11 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 
+async function getRazorpaySecret() {
+  const setting = await prisma.siteSetting.findUnique({ where: { key: "razorpay_key_secret" } });
+  return setting?.value || process.env.RAZORPAY_KEY_SECRET || "";
+}
+
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
@@ -12,8 +17,13 @@ export async function POST(req: Request) {
 
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type, itemId, couponCode, metadata } = await req.json();
 
+  const secret = await getRazorpaySecret();
+  if (!secret) {
+    return NextResponse.json({ error: "Razorpay not configured" }, { status: 500 });
+  }
+
   const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || "placeholder_secret")
+    .createHmac("sha256", secret)
     .update(`${razorpay_order_id}|${razorpay_payment_id}`)
     .digest("hex");
 
