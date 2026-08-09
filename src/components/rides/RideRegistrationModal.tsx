@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { X, CheckCircle2 } from "lucide-react";
+import { X, Upload, CheckCircle2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
 interface Props {
@@ -40,6 +40,12 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const [razorpayEnabled, setRazorpayEnabled] = useState<boolean | null>(null);
+  const [upiIntentUrls, setUpiIntentUrls] = useState<Record<string, string>>({});
+  const [paymentProof, setPaymentProof] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   const [emergencyName, setEmergencyName] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
@@ -58,7 +64,17 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
       })
       .catch(() => setError("Failed to load profile"))
       .finally(() => setLoading(false));
-  }, []);
+
+    fetch(`/api/payment-config?amount=${ridePrice}`)
+      .then((r) => r.json())
+      .then((data) => {
+        setRazorpayEnabled(data.razorpayEnabled);
+        if (!data.razorpayEnabled && data.upiIntentUrls) {
+          setUpiIntentUrls(data.upiIntentUrls);
+        }
+      })
+      .catch(() => setRazorpayEnabled(false));
+  }, [ridePrice]);
 
   async function saveEmergencyContact() {
     if (!emergencyName.trim() || !emergencyPhone.trim()) {
@@ -95,7 +111,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
     }
   }
 
-  const handlePay = useCallback(async () => {
+  const handleRazorpay = useCallback(async () => {
     setPaying(true);
     setError("");
 
@@ -138,7 +154,6 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
         description: rideTitle,
         order_id: orderId,
         theme: { color: "#E8622C" },
-        method: { upi: true, card: true, netbanking: true, wallet: true },
         handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
           const verifyRes = await fetch("/api/payments/verify", {
             method: "POST",
@@ -179,6 +194,43 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
     }
   }, [rideId, rideTitle, ridePrice, isTraining, name, phone, profile, onClose, router]);
 
+  const uploadProof = useCallback(async (file: File) => {
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!res.ok) throw new Error();
+      const { url } = await res.json();
+      setPaymentProof(url);
+    } catch {
+      setError("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  }, []);
+
+  async function handleManualSubmit() {
+    setSubmitting(true);
+    setError("");
+    const res = await fetch("/api/registrations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(isTraining ? { trainingId: rideId, paymentProof } : { rideId, paymentProof }),
+    });
+    const data = await res.json();
+    setSubmitting(false);
+    if (!res.ok) {
+      setError(data.error || "Registration failed");
+      return;
+    }
+    setSuccess(true);
+    setTimeout(() => {
+      onClose();
+      router.push("/my-registrations");
+    }, 1500);
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-surface border border-border rounded-sm w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -195,8 +247,8 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
           {!loading && success && (
             <div className="text-center space-y-3 py-6">
               <CheckCircle2 className="w-16 h-16 text-success mx-auto" />
-              <h4 className="font-heading text-xl font-bold">Payment Successful!</h4>
-              <p className="text-sm text-muted">Your registration is confirmed. Redirecting...</p>
+              <h4 className="font-heading text-xl font-bold">{razorpayEnabled ? "Payment Successful!" : "Registered Successfully!"}</h4>
+              <p className="text-sm text-muted">{razorpayEnabled ? "Your registration is confirmed." : "Admin will verify your payment."} Redirecting...</p>
             </div>
           )}
 
@@ -210,29 +262,11 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
               {error && <div className="bg-error/10 border border-error/30 text-error text-sm p-3 rounded-sm">{error}</div>}
 
               <div className="space-y-3">
-                <Input
-                  id="emergName"
-                  label="Emergency Contact Name"
-                  value={emergencyName}
-                  onChange={(e) => setEmergencyName(e.target.value)}
-                  required
-                  placeholder="Full name"
-                />
-                <Input
-                  id="emergPhone"
-                  label="Emergency Contact Phone"
-                  value={emergencyPhone}
-                  onChange={(e) => setEmergencyPhone(e.target.value)}
-                  required
-                  placeholder="Phone number"
-                />
+                <Input id="emergName" label="Emergency Contact Name" value={emergencyName} onChange={(e) => setEmergencyName(e.target.value)} required placeholder="Full name" />
+                <Input id="emergPhone" label="Emergency Contact Phone" value={emergencyPhone} onChange={(e) => setEmergencyPhone(e.target.value)} required placeholder="Phone number" />
                 <div>
                   <label className="text-sm font-medium text-foreground block mb-1.5">Blood Group</label>
-                  <select
-                    value={bloodGroup}
-                    onChange={(e) => setBloodGroup(e.target.value)}
-                    className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none"
-                  >
+                  <select value={bloodGroup} onChange={(e) => setBloodGroup(e.target.value)} className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none">
                     <option value="">Select blood group</option>
                     {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((g) => (
                       <option key={g} value={g}>{g}</option>
@@ -289,30 +323,83 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
               <div className="space-y-3">
                 <h5 className="font-heading text-sm font-semibold uppercase tracking-wider text-muted">Payment</h5>
                 <div className="bg-background border border-border rounded-sm p-4 space-y-4">
-                  <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> securely via Razorpay. You can use GPay, PhonePe, Paytm, cards, or netbanking.</p>
+                  {razorpayEnabled ? (
+                    <>
+                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards, netbanking all supported.</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                          <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>
+                          Google Pay
+                        </button>
+                        <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                          <span className="w-6 h-6 rounded-full bg-[#5F259F] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pe</span>
+                          PhonePe
+                        </button>
+                        <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                          <span className="w-6 h-6 rounded-full bg-[#00B9F5] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pt</span>
+                          Paytm
+                        </button>
+                        <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                          <span className="w-6 h-6 rounded-full bg-[#333] flex items-center justify-center text-white text-[10px] font-bold shrink-0">₹</span>
+                          Card / UPI
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-muted text-center">Payments verified instantly via Razorpay. No manual approval needed.</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> via UPI app, then upload screenshot below.</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <a href={upiIntentUrls.gpay || "#"} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>
+                          Google Pay
+                        </a>
+                        <a href={upiIntentUrls.phonepe || "#"} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <span className="w-6 h-6 rounded-full bg-[#5F259F] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pe</span>
+                          PhonePe
+                        </a>
+                        <a href={upiIntentUrls.paytm || "#"} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <span className="w-6 h-6 rounded-full bg-[#00B9F5] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pt</span>
+                          Paytm
+                        </a>
+                        <a href={upiIntentUrls.generic || "#"} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
+                          <span className="w-6 h-6 rounded-full bg-[#4CAF50] flex items-center justify-center text-white text-[10px] font-bold shrink-0">₹</span>
+                          Other UPI
+                        </a>
+                      </div>
+                      <p className="text-[10px] text-muted text-center">Tap a button to open the app on mobile</p>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <button onClick={handlePay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
-                      <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>
-                      Google Pay
-                    </button>
-                    <button onClick={handlePay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
-                      <span className="w-6 h-6 rounded-full bg-[#5F259F] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pe</span>
-                      PhonePe
-                    </button>
-                    <button onClick={handlePay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
-                      <span className="w-6 h-6 rounded-full bg-[#00B9F5] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pt</span>
-                      Paytm
-                    </button>
-                    <button onClick={handlePay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
-                      <span className="w-6 h-6 rounded-full bg-[#333] flex items-center justify-center text-white text-[10px] font-bold shrink-0">₹</span>
-                      Card / UPI
-                    </button>
-                  </div>
-
-                  <p className="text-[10px] text-muted text-center">All payments are processed securely via Razorpay. Auto-verified instantly.</p>
+                      <div className="border-t border-border pt-4">
+                        <label className="text-sm font-medium text-foreground block mb-2">Upload Payment Screenshot <span className="text-error">*</span></label>
+                        {paymentProof ? (
+                          <div className="space-y-2">
+                            <img src={paymentProof} alt="Payment proof" className="w-full max-h-48 object-contain rounded-sm border border-border" />
+                            <button onClick={() => setPaymentProof(null)} className="text-xs text-orange hover:underline">Change</button>
+                          </div>
+                        ) : (
+                          <label className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-sm cursor-pointer transition-colors ${uploading ? "border-orange/50 bg-orange/5" : "border-border hover:border-orange/50 hover:bg-surface-lighter"}`}>
+                            <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadProof(e.target.files[0])} disabled={uploading} />
+                            {uploading ? (
+                              <span className="text-xs text-muted">Uploading...</span>
+                            ) : (
+                              <>
+                                <Upload className="w-8 h-8 text-muted" />
+                                <span className="text-xs text-muted mt-1">Click to upload payment screenshot</span>
+                              </>
+                            )}
+                          </label>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
+
+              {!razorpayEnabled && (
+                <Button onClick={handleManualSubmit} loading={submitting} disabled={!paymentProof} className="w-full" size="lg">
+                  Confirm Registration
+                </Button>
+              )}
             </>
           )}
         </div>
