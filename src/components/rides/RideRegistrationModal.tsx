@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { X, Upload, Copy, Check, CheckCircle2 } from "lucide-react";
+import { X, CheckCircle2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
 interface Props {
@@ -24,24 +24,21 @@ interface Profile {
   bloodGroup: string | null;
 }
 
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
+
 export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, isTraining }: Props) {
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [paymentProof, setPaymentProof] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [upiId, setUpiId] = useState("");
-  const [upiUrl, setUpiUrl] = useState("");
-  const [appUrls, setAppUrls] = useState<Record<string, string>>({});
-  const [qrLoading, setQrLoading] = useState(true);
 
   const [emergencyName, setEmergencyName] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
@@ -61,41 +58,6 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
       })
       .catch(() => setError("Failed to load profile"))
       .finally(() => setLoading(false));
-
-    fetch(`/api/upi-qr?amount=${ridePrice}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.qrDataUrl) {
-          setQrDataUrl(data.qrDataUrl);
-          setUpiId(data.upiId);
-          setUpiUrl(data.upiUrl || "");
-          setAppUrls(data.appUrls || {});
-        }
-      })
-      .catch(() => {})
-      .finally(() => setQrLoading(false));
-  }, [ridePrice]);
-
-  const copyUpi = useCallback(() => {
-    navigator.clipboard.writeText(upiId);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [upiId]);
-
-  const uploadProof = useCallback(async (file: File) => {
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (!res.ok) throw new Error();
-      const { url } = await res.json();
-      setPaymentProof(url);
-    } catch {
-      setError("Upload failed. Please try again.");
-    } finally {
-      setUploading(false);
-    }
   }, []);
 
   async function saveEmergencyContact() {
@@ -133,30 +95,89 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
     }
   }
 
-  async function handleSubmit() {
-    setSubmitting(true);
+  const handlePay = useCallback(async () => {
+    setPaying(true);
     setError("");
 
-    const res = await fetch("/api/registrations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isTraining ? { trainingId: rideId, paymentProof } : { rideId, paymentProof }),
-    });
+    try {
+      const orderRes = await fetch("/api/payments/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: isTraining ? "training" : "ride",
+          itemId: rideId,
+          amount: ridePrice,
+        }),
+      });
 
-    const data = await res.json();
-    setSubmitting(false);
+      if (!orderRes.ok) {
+        const err = await orderRes.json();
+        setError(err.error || "Failed to create payment order");
+        setPaying(false);
+        return;
+      }
 
-    if (!res.ok) {
-      setError(data.error || "Registration failed");
-      return;
+      const { orderId, amount: finalAmount, key } = await orderRes.json();
+
+      if (!window.Razorpay) {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+      }
+
+      const options = {
+        key,
+        amount: finalAmount * 100,
+        currency: "INR",
+        name: "Dirt Ride Camp",
+        description: rideTitle,
+        order_id: orderId,
+        theme: { color: "#E8622C" },
+        method: { upi: true, card: true, netbanking: true, wallet: true },
+        handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+          const verifyRes = await fetch("/api/payments/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...response,
+              type: isTraining ? "training" : "ride",
+              itemId: rideId,
+            }),
+          });
+
+          if (verifyRes.ok) {
+            setSuccess(true);
+            setTimeout(() => {
+              onClose();
+              router.push("/my-registrations");
+            }, 1500);
+          } else {
+            setError("Payment verification failed. Contact support.");
+          }
+        },
+        prefill: {
+          name: name || profile?.name || "",
+          email: profile?.email || "",
+          contact: phone || profile?.phone || "",
+        },
+        notes: { type: isTraining ? "training" : "ride", itemId: rideId },
+        modal: {
+          ondismiss: () => setPaying(false),
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch {
+      setError("Payment failed. Please try again.");
+      setPaying(false);
     }
-
-    setSuccess(true);
-    setTimeout(() => {
-      onClose();
-      router.push("/my-registrations");
-    }, 1500);
-  }
+  }, [rideId, rideTitle, ridePrice, isTraining, name, phone, profile, onClose, router]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={onClose}>
@@ -174,8 +195,8 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
           {!loading && success && (
             <div className="text-center space-y-3 py-6">
               <CheckCircle2 className="w-16 h-16 text-success mx-auto" />
-              <h4 className="font-heading text-xl font-bold">Registered Successfully!</h4>
-              <p className="text-sm text-muted">Redirecting to your registrations...</p>
+              <h4 className="font-heading text-xl font-bold">Payment Successful!</h4>
+              <p className="text-sm text-muted">Your registration is confirmed. Redirecting...</p>
             </div>
           )}
 
@@ -267,93 +288,31 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
 
               <div className="space-y-3">
                 <h5 className="font-heading text-sm font-semibold uppercase tracking-wider text-muted">Payment</h5>
-
                 <div className="bg-background border border-border rounded-sm p-4 space-y-4">
-                  <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> via UPI, then upload the screenshot below.</p>
+                  <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> securely via Razorpay. You can use GPay, PhonePe, Paytm, cards, or netbanking.</p>
 
-                  {appUrls.gpay && (
-                    <div className="space-y-2">
-                      <p className="text-xs font-semibold text-muted uppercase tracking-wider">Pay directly via app</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <a href={appUrls.gpay} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
-                          <span className="w-5 h-5 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[10px] font-bold shrink-0">G</span>
-                          Google Pay
-                        </a>
-                        <a href={appUrls.phonepe} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
-                          <span className="w-5 h-5 rounded-full bg-[#5F259F] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pe</span>
-                          PhonePe
-                        </a>
-                        <a href={appUrls.paytm} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
-                          <span className="w-5 h-5 rounded-full bg-[#00B9F5] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pt</span>
-                          Paytm
-                        </a>
-                        <a href={appUrls.generic} className="flex items-center justify-center gap-2 px-3 py-2.5 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
-                          <span className="w-5 h-5 rounded-full bg-[#4CAF50] flex items-center justify-center text-white text-[10px] font-bold shrink-0">₹</span>
-                          Other UPI
-                        </a>
-                      </div>
-                      <p className="text-[10px] text-muted text-center">Tap a button to open the app directly on mobile</p>
-                    </div>
-                  )}
-
-                  <div className="border-t border-border pt-4">
-                    <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-3">Or scan QR code</p>
-
-                  {qrLoading ? (
-                    <div className="flex justify-center py-6">
-                      <div className="w-[200px] h-[200px] bg-surface-lighter animate-pulse rounded-sm" />
-                    </div>
-                  ) : qrDataUrl ? (
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="bg-white p-3 rounded-lg">
-                        <img src={qrDataUrl} alt="UPI QR Code" className="w-[220px] h-[220px]" />
-                      </div>
-                      <p className="text-xs text-muted">Scan with any UPI app (GPay, PhonePe, Paytm, etc.)</p>
-                    </div>
-                  ) : null}
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-2 border-t border-border">
-                    <span className="text-xs text-muted">UPI ID:</span>
-                    <code className="text-orange font-mono text-sm font-bold flex-1">{upiId || "ramswarup.kulhary@ybl"}</code>
-                    <button onClick={copyUpi} className="p-2 text-muted hover:text-orange transition-colors" title="Copy UPI ID">
-                      {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
+                  <div className="grid grid-cols-2 gap-2">
+                    <button onClick={handlePay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                      <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>
+                      Google Pay
+                    </button>
+                    <button onClick={handlePay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                      <span className="w-6 h-6 rounded-full bg-[#5F259F] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pe</span>
+                      PhonePe
+                    </button>
+                    <button onClick={handlePay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                      <span className="w-6 h-6 rounded-full bg-[#00B9F5] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pt</span>
+                      Paytm
+                    </button>
+                    <button onClick={handlePay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                      <span className="w-6 h-6 rounded-full bg-[#333] flex items-center justify-center text-white text-[10px] font-bold shrink-0">₹</span>
+                      Card / UPI
                     </button>
                   </div>
-                </div>
 
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-2">Upload Payment Screenshot <span className="text-error">*</span></label>
-                  {paymentProof ? (
-                    <div className="space-y-2">
-                      <img src={paymentProof} alt="Payment proof" className="w-full max-h-48 object-contain rounded-sm border border-border" />
-                      <button onClick={() => setPaymentProof(null)} className="text-xs text-orange hover:underline">Change</button>
-                    </div>
-                  ) : (
-                    <label className={`flex flex-col items-center justify-center w-full h-28 border-2 border-dashed rounded-sm cursor-pointer transition-colors ${uploading ? "border-orange/50 bg-orange/5" : "border-border hover:border-orange/50 hover:bg-surface-lighter"}`}>
-                      <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && uploadProof(e.target.files[0])} disabled={uploading} />
-                      {uploading ? (
-                        <span className="text-xs text-muted">Uploading...</span>
-                      ) : (
-                        <>
-                          <Upload className="w-8 h-8 text-muted" />
-                          <span className="text-xs text-muted mt-1">Click to upload payment screenshot</span>
-                        </>
-                      )}
-                    </label>
-                  )}
+                  <p className="text-[10px] text-muted text-center">All payments are processed securely via Razorpay. Auto-verified instantly.</p>
                 </div>
               </div>
-
-              <Button
-                onClick={handleSubmit}
-                loading={submitting}
-                disabled={!paymentProof}
-                className="w-full"
-                size="lg"
-              >
-                Confirm Registration
-              </Button>
             </>
           )}
         </div>
