@@ -31,6 +31,8 @@ export async function POST(req: Request) {
       inclusions,
       coverImage: body.coverImage || null,
       images: body.images || null,
+      earlyBirdPrice: body.earlyBirdPrice ? parseInt(body.earlyBirdPrice) : null,
+      earlyBirdDeadline: body.earlyBirdDeadline ? new Date(body.earlyBirdDeadline) : null,
       whatsappGroupLink: body.whatsappGroupLink || null,
       photosLink: body.photosLink || null,
     },

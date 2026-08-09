@@ -36,6 +36,8 @@ export async function PUT(req: Request, { params }: Props) {
       coverImage: body.coverImage || null,
       images: body.images || null,
       memberDiscount: body.memberDiscount ?? 0,
+      earlyBirdPrice: body.earlyBirdPrice ? parseInt(body.earlyBirdPrice) : null,
+      earlyBirdDeadline: body.earlyBirdDeadline ? new Date(body.earlyBirdDeadline) : null,
       whatsappGroupLink: body.whatsappGroupLink || null,
       photosLink: body.photosLink || null,
     },
