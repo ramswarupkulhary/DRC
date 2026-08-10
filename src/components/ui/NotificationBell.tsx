@@ -49,7 +49,7 @@ export function NotificationBell() {
       const res = await fetch("/api/notifications");
       if (res.ok) {
         const data = await res.json();
-        setNotifications(data);
+        setNotifications(data.map((n: Notification) => ({ ...n, read: true })));
       }
     } finally {
       setLoading(false);
@@ -63,7 +63,13 @@ export function NotificationBell() {
   }
 
   function toggle() {
-    if (!open) fetchNotifications();
+    if (!open) {
+      fetchNotifications();
+      if (unreadCount > 0) {
+        fetch("/api/notifications", { method: "PATCH" });
+        setUnreadCount(0);
+      }
+    }
     setOpen(!open);
   }
 
