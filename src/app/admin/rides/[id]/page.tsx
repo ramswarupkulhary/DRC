@@ -17,6 +17,7 @@ interface Registration {
   status: string;
   paymentStatus: string;
   paymentProof: string | null;
+  paymentId: string | null;
   notes: string | null;
   createdAt: string;
   user: { id: string; name: string | null; email: string; phone: string | null };
@@ -79,6 +80,7 @@ export default function AdminRideDetailPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showNotifyModal, setShowNotifyModal] = useState(false);
+  const [refunding, setRefunding] = useState("");
 
   const fetchData = useCallback(() => {
     Promise.all([
@@ -123,6 +125,25 @@ export default function AdminRideDetailPage() {
       prev.map((r) => (r.id === id ? { ...r, paymentStatus } : r))
     );
     setSubmitting("");
+  }
+
+  async function initiateRefund(id: string) {
+    if (!confirm("Are you sure you want to refund this rider? The amount will be credited back to their account.")) return;
+    setRefunding(id);
+    try {
+      const res = await fetch(`/api/admin/registrations/${id}/refund`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Refund failed");
+      } else {
+        alert(`Refund initiated! Refund ID: ${data.refundId}`);
+        fetchData();
+      }
+    } catch {
+      alert("Refund failed. Please try again.");
+    } finally {
+      setRefunding("");
+    }
   }
 
   async function loadRiderHistory(userId: string) {
@@ -265,7 +286,7 @@ export default function AdminRideDetailPage() {
                 <th className="px-5 py-3">Phone</th>
                 <th className="px-5 py-3">Status</th>
                 <th className="px-5 py-3">Payment</th>
-                <th className="px-5 py-3">Proof</th>
+                <th className="px-5 py-3">Transaction</th>
                 <th className="px-5 py-3">Date</th>
                 <th className="px-5 py-3">Actions</th>
               </tr>
@@ -308,7 +329,9 @@ export default function AdminRideDetailPage() {
                       </Badge>
                     </td>
                     <td className="px-5 py-3">
-                      {reg.paymentProof ? (
+                      {reg.paymentId ? (
+                        <span className="text-xs font-mono text-success">{reg.paymentId}</span>
+                      ) : reg.paymentProof ? (
                         <a href={reg.paymentProof} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-orange hover:underline text-xs">
                           <Eye className="w-3.5 h-3.5" /> View
                         </a>
@@ -332,6 +355,11 @@ export default function AdminRideDetailPage() {
                         {(reg.status === "confirmed" || reg.status === "checked_in") && (
                           <Button size="sm" variant="outline" onClick={() => setCancelId(reg.id)}>
                             Cancel
+                          </Button>
+                        )}
+                        {(reg.status === "confirmed" || reg.status === "checked_in") && reg.paymentId && reg.paymentStatus !== "refunded" && (
+                          <Button size="sm" variant="outline" loading={refunding === reg.id} onClick={() => initiateRefund(reg.id)}>
+                            Refund
                           </Button>
                         )}
                         {reg.paymentStatus !== "paid" && reg.status !== "rejected" && reg.status !== "cancelled" && (

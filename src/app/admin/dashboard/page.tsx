@@ -13,9 +13,9 @@ export default async function AdminDashboard() {
       prisma.ride.count({ where: { status: "published" } }),
       prisma.training.count({ where: { status: "published" } }),
       prisma.user.count({ where: { role: "rider" } }),
-      prisma.registration.findMany({ where: { paymentStatus: "paid" }, select: { amount: true, createdAt: true, rideId: true, trainingId: true } }),
+      prisma.registration.findMany({ where: { paymentStatus: "paid", paymentId: { not: null } }, select: { amount: true, createdAt: true, rideId: true, trainingId: true } }),
       prisma.membership.findMany({ where: { status: "active" }, select: { createdAt: true, plan: { select: { price: true } } } }),
-      prisma.order.findMany({ where: { status: "completed" }, select: { total: true, createdAt: true } }),
+      prisma.order.findMany({ where: { status: "completed", paymentId: { not: null } }, select: { total: true, createdAt: true } }),
       prisma.registration.findMany({
         orderBy: { createdAt: "desc" },
         take: 10,
@@ -28,7 +28,7 @@ export default async function AdminDashboard() {
     ]);
 
   const totalRevenue = registrations.reduce((sum, r) => sum + r.amount, 0);
-  const membershipRevenue = memberships.reduce((sum, m) => sum + m.plan.price, 0);
+  const membershipRevenue = 0;
   const storeRevenue = orders.reduce((sum, o) => sum + o.total, 0);
   const rideRevenue = registrations.filter((r) => r.rideId).reduce((sum, r) => sum + r.amount, 0);
   const trainingRevenue = registrations.filter((r) => r.trainingId).reduce((sum, r) => sum + r.amount, 0);
@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
       label,
       rides: registrations.filter((r) => r.rideId && r.createdAt >= month && r.createdAt < nextMonth).reduce((s, r) => s + r.amount, 0),
       trainings: registrations.filter((r) => r.trainingId && r.createdAt >= month && r.createdAt < nextMonth).reduce((s, r) => s + r.amount, 0),
-      memberships: memberships.filter((m) => m.createdAt >= month && m.createdAt < nextMonth).reduce((s, m) => s + m.plan.price, 0),
+      memberships: 0,
       store: orders.filter((o) => o.createdAt >= month && o.createdAt < nextMonth).reduce((s, o) => s + o.total, 0),
     });
   }
