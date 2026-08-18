@@ -267,3 +267,31 @@ export function AnimatedTrainingsSection({ children }: { children: React.ReactNo
 export function AnimatedCard({ children }: { children: React.ReactNode }) {
   return <StaggerItem>{children}</StaggerItem>;
 }
+
+export function AnimatedFAQ({ faqs }: { faqs: { question: string; answer: string }[] }) {
+  return (
+    <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+      <FadeIn>
+        <div className="text-center mb-12">
+          <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">Got questions?</span>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mt-2">Frequently Asked Questions</h2>
+        </div>
+      </FadeIn>
+      <StaggerContainer className="space-y-4">
+        {faqs.map((faq, i) => (
+          <StaggerItem key={i}>
+            <details className="group bg-surface border border-border rounded-sm overflow-hidden">
+              <summary className="flex items-center justify-between p-5 cursor-pointer font-heading font-semibold text-lg hover:text-orange transition-colors">
+                {faq.question}
+                <ChevronRight className="w-5 h-5 text-muted group-open:rotate-90 transition-transform" />
+              </summary>
+              <div className="px-5 pb-5 text-muted leading-relaxed">
+                {faq.answer}
+              </div>
+            </details>
+          </StaggerItem>
+        ))}
+      </StaggerContainer>
+    </section>
+  );
+}

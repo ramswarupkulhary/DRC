@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { RideCard } from "@/components/rides/RideCard";
 import { TrainingCard } from "@/components/training/TrainingCard";
 import { prisma } from "@/lib/prisma";
-import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
+import { OrganizationJsonLd, WebSiteJsonLd, FAQJsonLd, AggregateRatingJsonLd } from "@/components/seo/JsonLd";
 import {
   AnimatedHero,
   AnimatedStats,
@@ -12,6 +12,7 @@ import {
   AnimatedRidesSection,
   AnimatedTrainingsSection,
   AnimatedCard,
+  AnimatedFAQ,
 } from "@/components/home/AnimatedSections";
 
 async function getHomeData() {
@@ -47,10 +48,41 @@ export default async function HomePage() {
     rating: r.rating,
   }));
 
+  const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 4.8;
+
+  const homeFaqs = [
+    {
+      question: "What is DRC — Dirt Ride Camp?",
+      answer: "DRC (Dirt Ride Camp) is Bangalore's premier off-road riding community. We organize curated off-road motorcycle rides, professional dirt bike training programs, adventure camping trips, and trail riding experiences across Karnataka and India. Founded by passionate riders, DRC offers limited-slot rides to ensure quality, safety, and a personal touch.",
+    },
+    {
+      question: "What off-road training programs does DRC offer in Bangalore?",
+      answer: "DRC offers structured off-road training programs for all skill levels in Bangalore — from beginner courses covering basic dirt bike handling and body positioning, to advanced enduro techniques including hill climbs, water crossings, and rock gardens. Our professional instructors provide hands-on coaching with a maximum 6:1 rider-to-instructor ratio.",
+    },
+    {
+      question: "Do I need an off-road bike to join DRC rides?",
+      answer: "No! DRC welcomes all motorcycle types. While dedicated off-road/adventure bikes are ideal for technical trails, many of our rides are suitable for standard motorcycles. We categorize rides by difficulty — from easy gravel paths suitable for any bike, to challenging terrain requiring off-road-specific motorcycles. Check each ride's difficulty rating before registering.",
+    },
+    {
+      question: "How do I register for a DRC ride or training?",
+      answer: "Simply create an account on dirtridecamp.com, browse upcoming rides or training programs, and click 'Register'. Slots are limited and fill up fast — typically 10-15 riders per ride. Payment is required to confirm your spot. You'll receive ride details, WhatsApp group link, and route information after confirmation.",
+    },
+    {
+      question: "What areas does DRC cover for off-road rides near Bangalore?",
+      answer: "DRC organizes off-road rides across Karnataka including Kanakapura trails, Ramanagara rocky terrains, Sakleshpur coffee estate trails, Coorg forest paths, Chikkamagaluru dirt tracks, and Krishnagiri off-road circuits. We also run multi-day expedition rides to Hampi, Goa coastal trails, and Ladakh/Spiti adventure tours.",
+    },
+    {
+      question: "Is off-road riding safe? What safety measures does DRC follow?",
+      answer: "Safety is DRC's top priority. Every ride includes: experienced ride leads and sweep riders, mandatory riding gear checks (helmet, boots, gloves, knee guards), first-aid trained marshals, support vehicle with tools and spares, GPS tracking, and emergency evacuation plans. We maintain a maximum group size of 15 riders for better safety management.",
+    },
+  ];
+
   return (
     <>
       <OrganizationJsonLd />
       <WebSiteJsonLd />
+      <FAQJsonLd faqs={homeFaqs} />
+      {reviews.length > 0 && <AggregateRatingJsonLd ratingValue={Math.round(avgRating * 10) / 10} reviewCount={reviews.length} />}
       <AnimatedHero />
       <AnimatedStats />
 
@@ -100,6 +132,7 @@ export default async function HomePage() {
       )}
 
       <AnimatedTestimonials reviews={reviewsForDisplay} />
+      <AnimatedFAQ faqs={homeFaqs} />
       <AnimatedCTA />
     </>
   );

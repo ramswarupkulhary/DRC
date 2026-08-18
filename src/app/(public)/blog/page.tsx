@@ -8,8 +8,13 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Blog",
-  description: "Ride stories, trail guides, gear reviews, and tips from the DRC crew.",
+  title: "Off-Road Riding Blog — Trail Guides, Gear Reviews & Tips | DRC",
+  description: "Explore ride stories, trail guides near Bangalore, off-road gear reviews, bike maintenance tips & adventure motorcycle guides from Dirt Ride Camp riders.",
+  keywords: ["off road riding tips", "trail guide bangalore", "adventure motorcycle blog", "dirt bike gear review", "off road routes karnataka"],
+  openGraph: {
+    title: "Off-Road Riding Blog | Dirt Ride Camp",
+    description: "Trail guides, gear reviews, and adventure stories from Bangalore's off-road community.",
+  },
 };
 
 export default async function BlogPage() {
