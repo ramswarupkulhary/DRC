@@ -6,8 +6,14 @@ import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection } f
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Training Programs",
-  description: "Off-road riding training programs for all skill levels. From beginner basics to advanced trail mastery.",
+  title: "Off-Road Training Programs in Bangalore | DRC Dirt Ride Camp",
+  description:
+    "Professional off-road motorcycle training in Bangalore. Beginner to advanced dirt bike courses — trail riding, enduro techniques & off-road skills. Join Dirt Ride Camp.",
+  keywords: ["off road training", "off road training bangalore", "dirt bike training", "motorcycle training course", "enduro training india"],
+  openGraph: {
+    title: "Off-Road Training Programs | Dirt Ride Camp Bangalore",
+    description: "Professional off-road motorcycle training. Beginner to advanced dirt bike courses.",
+  },
 };
 
 export default async function TrainingsPage() {

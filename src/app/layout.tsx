@@ -16,21 +16,79 @@ const oswald = Oswald({
   weight: ["400", "500", "600", "700"],
 });
 
+const BASE_URL = "https://www.dirtridecamp.com";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: {
-    default: "DRC — Dirt Ride Camp | Ride · Explore · Connect",
+    default: "DRC — Dirt Ride Camp | Off-Road Training & Adventure Rides in Bangalore",
     template: "%s | DRC Dirt Ride Camp",
   },
   description:
-    "Off-road adventure rides, camping trips & dirt riding training. Join limited-slot rides across India.",
+    "Bangalore's premier off-road riding group. Off-road training, dirt bike rides, adventure camping & trail riding. Join DRC — Dirt Ride Camp for limited-slot rides across Karnataka & India.",
   keywords: [
+    "off road training",
+    "off road training bangalore",
     "dirt ride camp",
-    "off-road riding",
-    "adventure motorcycle",
-    "camping rides",
-    "dirt bike training",
     "DRC",
+    "dirtridecamp",
+    "bangalore riding group",
+    "off-road riding",
+    "off-road bike",
+    "adventure motorcycle bangalore",
+    "dirt bike training",
+    "camping rides bangalore",
+    "trail riding karnataka",
+    "adventure riding india",
+    "motorcycle camping",
+    "off-road motorcycle training",
+    "bike riding group bangalore",
+    "weekend rides bangalore",
+    "dirt biking india",
+    "enduro training",
+    "adventure bike trips",
   ],
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    url: BASE_URL,
+    siteName: "Dirt Ride Camp (DRC)",
+    title: "DRC — Dirt Ride Camp | Off-Road Training & Adventure Rides in Bangalore",
+    description:
+      "Bangalore's premier off-road riding group. Off-road training, dirt bike rides, adventure camping & trail riding.",
+    images: [
+      {
+        url: `${BASE_URL}/images/og-cover.jpg`,
+        width: 1200,
+        height: 630,
+        alt: "Dirt Ride Camp — Off-Road Adventure Rides",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DRC — Dirt Ride Camp | Off-Road Training & Adventure Rides",
+    description:
+      "Bangalore's premier off-road riding group. Off-road training, dirt bike rides, adventure camping.",
+    images: [`${BASE_URL}/images/og-cover.jpg`],
+  },
+  alternates: {
+    canonical: BASE_URL,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+  },
 };
 
 export default function RootLayout({

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://dirtridecamp.com";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.dirtridecamp.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [rides, trainings, events, posts] = await Promise.all([

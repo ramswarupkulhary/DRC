@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { RideCard } from "@/components/rides/RideCard";
 import { TrainingCard } from "@/components/training/TrainingCard";
 import { prisma } from "@/lib/prisma";
-import { OrganizationJsonLd } from "@/components/seo/JsonLd";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 import {
   AnimatedHero,
   AnimatedStats,
@@ -50,6 +50,7 @@ export default async function HomePage() {
   return (
     <>
       <OrganizationJsonLd />
+      <WebSiteJsonLd />
       <AnimatedHero />
       <AnimatedStats />
 

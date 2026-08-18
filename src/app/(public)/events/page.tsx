@@ -7,7 +7,10 @@ import { Calendar, MapPin, Trophy } from "lucide-react";
 import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection, HoverCard } from "@/components/ui/AnimatedPage";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Events & Races" };
+export const metadata: Metadata = {
+  title: "Off-Road Events & Motorcycle Races | DRC Bangalore",
+  description: "Upcoming off-road events, enduro races & motorcycle meets in Bangalore. Compete, spectate or volunteer with Dirt Ride Camp.",
+};
 
 export default async function EventsPage() {
   const upcoming = await prisma.event.findMany({

@@ -1,20 +1,32 @@
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://dirtridecamp.com";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.dirtridecamp.com";
 
 export function OrganizationJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": ["Organization", "SportsActivityLocation"],
     name: "Dirt Ride Camp",
-    alternateName: "DRC",
+    alternateName: ["DRC", "DirtRideCamp"],
     url: BASE_URL,
     logo: `${BASE_URL}/images/logo.png`,
-    description: "Off-road adventure rides, camping trips & dirt riding training across India.",
+    image: `${BASE_URL}/images/og-cover.jpg`,
+    description:
+      "Bangalore's premier off-road riding group offering dirt bike training, adventure motorcycle rides, camping trips & trail riding across Karnataka and India.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Bangalore",
       addressRegion: "Karnataka",
       addressCountry: "IN",
     },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 12.9716,
+      longitude: 77.5946,
+    },
+    areaServed: [
+      { "@type": "City", name: "Bangalore" },
+      { "@type": "State", name: "Karnataka" },
+      { "@type": "Country", name: "India" },
+    ],
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+91-94148-70102",
@@ -22,6 +34,66 @@ export function OrganizationJsonLd() {
       availableLanguage: ["English", "Hindi"],
     },
     sameAs: ["https://instagram.com/dirtridecamp", "https://wa.me/919414870102"],
+    priceRange: "₹₹",
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Saturday", "Sunday"],
+      opens: "06:00",
+      closes: "18:00",
+    },
+    keywords:
+      "off road training, off road training bangalore, dirt ride camp, DRC, dirtridecamp, bangalore riding group, off-road bike, adventure motorcycle, camping rides, trail riding",
+  };
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;
+}
+
+export function WebSiteJsonLd() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Dirt Ride Camp",
+    alternateName: "DRC",
+    url: BASE_URL,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${BASE_URL}/rides?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;
+}
+
+export function CourseJsonLd({ training }: { training: { title: string; slug: string; description: string; level: string; price: number; duration?: string | null } }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: training.title,
+    description: training.description.slice(0, 300),
+    url: `${BASE_URL}/trainings/${training.slug}`,
+    provider: {
+      "@type": "Organization",
+      name: "Dirt Ride Camp",
+      url: BASE_URL,
+    },
+    courseMode: "onsite",
+    educationalLevel: training.level,
+    locationCreated: {
+      "@type": "Place",
+      name: "Bangalore",
+      address: { "@type": "PostalAddress", addressLocality: "Bangalore", addressRegion: "Karnataka", addressCountry: "IN" },
+    },
+    offers: {
+      "@type": "Offer",
+      price: training.price,
+      priceCurrency: "INR",
+      availability: "https://schema.org/InStock",
+    },
+    ...(training.duration && { timeRequired: training.duration }),
   };
 
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;

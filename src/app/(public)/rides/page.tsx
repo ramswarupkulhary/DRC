@@ -6,8 +6,14 @@ import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection } f
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Rides & Events",
-  description: "Explore upcoming off-road rides, overnighters, and multi-day expeditions with DRC.",
+  title: "Off-Road Rides & Adventure Events in Bangalore | DRC",
+  description:
+    "Join Bangalore's best off-road riding group for dirt bike rides, overnight camping trips & multi-day expeditions across Karnataka. Limited slots — book now at Dirt Ride Camp.",
+  keywords: ["off-road rides bangalore", "adventure bike rides", "weekend rides bangalore", "dirt bike events", "motorcycle camping karnataka"],
+  openGraph: {
+    title: "Off-Road Rides & Adventure Events | Dirt Ride Camp",
+    description: "Dirt bike rides, overnight camping trips & multi-day expeditions across Karnataka.",
+  },
 };
 
 export default async function RidesPage() {
