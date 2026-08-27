@@ -53,11 +53,11 @@ export default async function HomePage() {
   const homeFaqs = [
     {
       question: "What is DRC — Dirt Ride Camp?",
-      answer: "DRC (Dirt Ride Camp) is Bangalore's premier off-road riding community. We organize curated off-road motorcycle rides, professional dirt bike training programs, adventure camping trips, and trail riding experiences across Karnataka and India. Founded by passionate riders, DRC offers limited-slot rides to ensure quality, safety, and a personal touch.",
+      answer: "DRC (Dirt Ride Camp) is Bangalore's premier off-road academy and adventure riding community. We organize curated off-road bike trips, professional dirt bike training classes, adventure camping trips, and trail riding experiences across Karnataka and India. Founded by passionate riders, DRC offers limited-slot adventure rides to ensure quality, safety, and a personal touch.",
     },
     {
-      question: "What off-road training programs does DRC offer in Bangalore?",
-      answer: "DRC offers structured off-road training programs for all skill levels in Bangalore — from beginner courses covering basic dirt bike handling and body positioning, to advanced enduro techniques including hill climbs, water crossings, and rock gardens. Our professional instructors provide hands-on coaching with a maximum 6:1 rider-to-instructor ratio.",
+      question: "What off-road training classes does DRC's academy offer in Bangalore?",
+      answer: "DRC's off-road academy offers structured training classes for all skill levels in Bangalore — from beginner courses covering basic dirt bike handling and body positioning, to advanced enduro techniques including hill climbs, water crossings, and rock gardens. Our professional instructors provide hands-on coaching with a maximum 6:1 rider-to-instructor ratio.",
     },
     {
       question: "Do I need an off-road bike to join DRC rides?",
@@ -68,8 +68,8 @@ export default async function HomePage() {
       answer: "Simply create an account on dirtridecamp.com, browse upcoming rides or training programs, and click 'Register'. Slots are limited and fill up fast — typically 10-15 riders per ride. Payment is required to confirm your spot. You'll receive ride details, WhatsApp group link, and route information after confirmation.",
     },
     {
-      question: "What areas does DRC cover for off-road rides near Bangalore?",
-      answer: "DRC organizes off-road rides across Karnataka including Kanakapura trails, Ramanagara rocky terrains, Sakleshpur coffee estate trails, Coorg forest paths, Chikkamagaluru dirt tracks, and Krishnagiri off-road circuits. We also run multi-day expedition rides to Hampi, Goa coastal trails, and Ladakh/Spiti adventure tours.",
+      question: "What areas does DRC cover for bike trips & adventure rides near Bangalore?",
+      answer: "DRC organizes adventure bike trips across Karnataka including Kanakapura trails, Ramanagara rocky terrains, Sakleshpur coffee estate trails, Coorg forest paths, Chikkamagaluru dirt tracks, and Krishnagiri off-road circuits. We also run multi-day camping trips and expedition rides to Hampi, Goa coastal trails, and Ladakh/Spiti adventure tours.",
     },
     {
       question: "Is off-road riding safe? What safety measures does DRC follow?",

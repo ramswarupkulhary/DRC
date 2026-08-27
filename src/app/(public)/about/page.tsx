@@ -4,11 +4,12 @@ import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection, An
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About DRC — Bangalore's Off-Road Riding Community",
-  description: "Dirt Ride Camp (DRC) is Bangalore's premier off-road riding group. Built by riders, for riders — adventure motorcycle rides, camping trips & off-road training since day one.",
+  title: "About DRC — Bangalore's Off-Road Academy & Adventure Riding Community",
+  description: "Dirt Ride Camp (DRC) is Bangalore's premier off-road academy & riding group. Built by riders, for riders — adventure bike trips, camping rides, off-road training classes & motorcycle tours since day one.",
+  keywords: ["off road academy bangalore", "about dirt ride camp", "bangalore riding community", "adventure bike group bangalore", "motorcycle camping community", "off road riding group india"],
   openGraph: {
-    title: "About Dirt Ride Camp — Bangalore Riding Group",
-    description: "Built by riders, for riders. Adventure motorcycle rides, camping & off-road training.",
+    title: "About Dirt Ride Camp — Off-Road Academy Bangalore",
+    description: "Bangalore's off-road academy. Adventure bike trips, camping rides & off-road training classes.",
   },
 };
 

@@ -7,8 +7,8 @@ import { Trophy, Medal, Award, Star } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Rider Leaderboard",
-  description: "Top riders ranked by XP, badges, and ride completions.",
+  title: "Rider Leaderboard — Top Adventure Riders | DRC Bangalore",
+  description: "Top DRC riders ranked by XP, badges, and ride completions. Join Bangalore's off-road riding community and climb the leaderboard.",
 };
 
 export default async function LeaderboardPage() {

@@ -7,13 +7,13 @@ import { BreadcrumbJsonLd, FAQJsonLd } from "@/components/seo/JsonLd";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Off-Road Training Programs in Bangalore | DRC Dirt Ride Camp",
+  title: "Off-Road Academy & Training Programs in Bangalore | DRC Dirt Ride Camp",
   description:
-    "Professional off-road motorcycle training in Bangalore. Beginner to advanced dirt bike courses — trail riding, enduro techniques & off-road skills. Join Dirt Ride Camp.",
-  keywords: ["off road training", "off road training bangalore", "dirt bike training", "motorcycle training course", "enduro training india", "off road riding course", "adventure bike training", "dirt bike classes bangalore"],
+    "Bangalore's off-road academy — professional motorcycle training by Dirt Ride Camp. Beginner to advanced dirt bike courses — trail riding, enduro techniques & off-road skills.",
+  keywords: ["off road academy", "off road academy bangalore", "off road training", "off road training bangalore", "dirt bike training", "motorcycle training course", "enduro training india", "off road riding course", "adventure bike training", "dirt bike classes bangalore", "motorcycle academy bangalore", "off road riding academy"],
   openGraph: {
-    title: "Off-Road Training Programs | Dirt Ride Camp Bangalore",
-    description: "Professional off-road motorcycle training. Beginner to advanced dirt bike courses.",
+    title: "Off-Road Academy & Training Programs | Dirt Ride Camp Bangalore",
+    description: "Bangalore's off-road academy — professional motorcycle training. Beginner to advanced dirt bike courses.",
   },
 };
 

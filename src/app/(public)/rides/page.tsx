@@ -7,13 +7,13 @@ import { BreadcrumbJsonLd, FAQJsonLd } from "@/components/seo/JsonLd";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Off-Road Rides & Adventure Events in Bangalore | DRC",
+  title: "Bike Trips, Adventure Rides & Camping near Bangalore | DRC",
   description:
-    "Join Bangalore's best off-road riding group for dirt bike rides, overnight camping trips & multi-day expeditions across Karnataka. Limited slots — book now at Dirt Ride Camp.",
-  keywords: ["off-road rides bangalore", "adventure bike rides", "weekend rides bangalore", "dirt bike events", "motorcycle camping karnataka", "off road group rides", "bangalore biking group", "weekend motorcycle trips"],
+    "Join Bangalore's best off-road riding group for adventure bike trips, overnight camping rides & multi-day motorcycle expeditions across Karnataka. Limited slots — book now at Dirt Ride Camp.",
+  keywords: ["bike trip bangalore", "bike trip near bangalore", "adventure bike trip", "off-road rides bangalore", "adventure bike rides", "weekend rides bangalore", "weekend bike trip", "motorcycle trip karnataka", "overnight bike trip", "camping trip bangalore", "bike camping near bangalore", "motorcycle camping karnataka", "off road group rides", "bangalore biking group", "weekend motorcycle trips", "adventure rides near bangalore", "motorcycle tour karnataka"],
   openGraph: {
-    title: "Off-Road Rides & Adventure Events | Dirt Ride Camp",
-    description: "Dirt bike rides, overnight camping trips & multi-day expeditions across Karnataka.",
+    title: "Bike Trips, Adventure Rides & Camping | Dirt Ride Camp Bangalore",
+    description: "Adventure bike trips, overnight camping rides & multi-day motorcycle expeditions across Karnataka.",
   },
 };
 

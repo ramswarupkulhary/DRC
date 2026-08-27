@@ -7,7 +7,10 @@ import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Store" };
+export const metadata: Metadata = {
+  title: "Off-Road Riding Gear & Merchandise | DRC Store",
+  description: "Shop off-road riding gear, DRC merchandise & adventure accessories. Quality motorcycle gear for dirt bike trips & trail riding from Dirt Ride Camp Bangalore.",
+};
 
 export default async function StorePage() {
   const products = await prisma.product.findMany({

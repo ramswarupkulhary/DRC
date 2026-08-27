@@ -6,7 +6,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Calendar" };
+export const metadata: Metadata = {
+  title: "Upcoming Bike Trips, Rides & Training Schedule | DRC Bangalore",
+  description: "View the DRC calendar for upcoming adventure bike trips, off-road rides, camping weekends & training classes near Bangalore.",
+  keywords: ["upcoming bike trips bangalore", "weekend rides schedule", "adventure ride calendar", "off road training schedule bangalore"],
+};
 
 export default async function CalendarPage() {
   const rides = await prisma.ride.findMany({

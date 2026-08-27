@@ -8,8 +8,9 @@ import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection, Ho
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Off-Road Events & Motorcycle Races | DRC Bangalore",
-  description: "Upcoming off-road events, enduro races & motorcycle meets in Bangalore. Compete, spectate or volunteer with Dirt Ride Camp.",
+  title: "Off-Road Events, Bike Meets & Adventure Rallies | DRC Bangalore",
+  description: "Upcoming off-road events, adventure bike rallies, enduro races & motorcycle meets in Bangalore. Compete, spectate or volunteer with Dirt Ride Camp.",
+  keywords: ["off road events bangalore", "motorcycle events bangalore", "bike meet bangalore", "adventure rally karnataka", "enduro race india", "motorcycle meetup bangalore"],
 };
 
 export default async function EventsPage() {

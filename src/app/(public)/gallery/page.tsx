@@ -7,8 +7,9 @@ import { AnimatedPageHeader } from "@/components/ui/AnimatedPage";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Gallery — Off-Road Riding Photos | DRC Bangalore",
-  description: "Photos from DRC dirt bike rides, off-road training camps & adventure camping trips across Karnataka and India.",
+  title: "Gallery — Bike Trip & Adventure Ride Photos | DRC Bangalore",
+  description: "Photos from DRC bike trips, adventure rides, off-road training camps & camping trips across Karnataka and India.",
+  keywords: ["bike trip photos bangalore", "adventure ride photos", "off road riding gallery", "motorcycle camping photos karnataka"],
 };
 
 export default async function GalleryPage() {

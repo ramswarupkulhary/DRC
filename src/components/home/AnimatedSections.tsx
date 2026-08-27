@@ -65,7 +65,7 @@ export function AnimatedHero() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          Off-road adventures, camping rides & dirt riding training across India.
+          Bangalore&apos;s off-road academy — adventure bike trips, camping rides & dirt riding classes across India.
           <br />
           <span className="text-orange font-semibold">Ride &middot; Explore &middot; Connect</span>
         </motion.p>

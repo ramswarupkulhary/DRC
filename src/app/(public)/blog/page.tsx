@@ -8,12 +8,12 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Off-Road Riding Blog — Trail Guides, Gear Reviews & Tips | DRC",
-  description: "Explore ride stories, trail guides near Bangalore, off-road gear reviews, bike maintenance tips & adventure motorcycle guides from Dirt Ride Camp riders.",
-  keywords: ["off road riding tips", "trail guide bangalore", "adventure motorcycle blog", "dirt bike gear review", "off road routes karnataka"],
+  title: "Adventure Bike Blog — Trail Guides, Trip Stories & Riding Tips | DRC",
+  description: "Explore bike trip stories, trail guides near Bangalore, off-road gear reviews, camping tips & adventure motorcycle guides from Dirt Ride Camp riders.",
+  keywords: ["off road riding tips", "trail guide bangalore", "adventure motorcycle blog", "dirt bike gear review", "off road routes karnataka", "bike trip blog", "adventure bike trip stories", "camping ride stories", "motorcycle trip guide karnataka", "weekend bike trip ideas bangalore"],
   openGraph: {
-    title: "Off-Road Riding Blog | Dirt Ride Camp",
-    description: "Trail guides, gear reviews, and adventure stories from Bangalore's off-road community.",
+    title: "Adventure Bike Blog | Dirt Ride Camp",
+    description: "Bike trip stories, trail guides, gear reviews & camping tips from Bangalore's off-road community.",
   },
 };
 

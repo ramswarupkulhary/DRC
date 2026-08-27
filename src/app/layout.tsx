@@ -21,12 +21,14 @@ const BASE_URL = "https://www.dirtridecamp.com";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "DRC — Dirt Ride Camp | Off-Road Training & Adventure Rides in Bangalore",
+    default: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides in Bangalore",
     template: "%s | DRC Dirt Ride Camp",
   },
   description:
-    "Bangalore's premier off-road riding group. Off-road training, dirt bike rides, adventure camping & trail riding. Join DRC — Dirt Ride Camp for limited-slot rides across Karnataka & India.",
+    "Bangalore's premier off-road academy & riding group. Off-road training classes, adventure bike trips, camping rides & trail riding. Join DRC — Dirt Ride Camp for limited-slot adventure trips across Karnataka & India.",
   keywords: [
+    "off road academy",
+    "off road academy bangalore",
     "off road training",
     "off road training bangalore",
     "dirt ride camp",
@@ -47,15 +49,37 @@ export const metadata: Metadata = {
     "dirt biking india",
     "enduro training",
     "adventure bike trips",
+    "off road riding academy",
+    "motorcycle academy bangalore",
+    "bike trip bangalore",
+    "bike trip near bangalore",
+    "adventure bike trip",
+    "motorcycle trip bangalore",
+    "weekend bike trip",
+    "camping trip bangalore",
+    "adventure camping bangalore",
+    "motorcycle camping trip",
+    "bike camping near bangalore",
+    "off road classes bangalore",
+    "dirt bike classes",
+    "riding classes bangalore",
+    "motorcycle adventure india",
+    "adventure rides near bangalore",
+    "bike ride group bangalore",
+    "overnight bike trip",
+    "motorcycle tour karnataka",
+    "adventure biking bangalore",
+    "off road camping",
+    "bike adventure trip india",
   ],
   openGraph: {
     type: "website",
     locale: "en_IN",
     url: BASE_URL,
     siteName: "Dirt Ride Camp (DRC)",
-    title: "DRC — Dirt Ride Camp | Off-Road Training & Adventure Rides in Bangalore",
+    title: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides in Bangalore",
     description:
-      "Bangalore's premier off-road riding group. Off-road training, dirt bike rides, adventure camping & trail riding.",
+      "Bangalore's premier off-road academy & riding group. Off-road training, dirt bike rides, adventure camping & trail riding.",
     images: [
       {
         url: `${BASE_URL}/images/og-cover.jpg`,
@@ -67,9 +91,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "DRC — Dirt Ride Camp | Off-Road Training & Adventure Rides",
+    title: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides",
     description:
-      "Bangalore's premier off-road riding group. Off-road training, dirt bike rides, adventure camping.",
+      "Bangalore's premier off-road academy & riding group. Off-road training, dirt bike rides, adventure camping.",
     images: [`${BASE_URL}/images/og-cover.jpg`],
   },
   alternates: {

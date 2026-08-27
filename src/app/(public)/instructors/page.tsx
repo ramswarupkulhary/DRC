@@ -6,7 +6,11 @@ import { Star } from "lucide-react";
 import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, HoverCard } from "@/components/ui/AnimatedPage";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = { title: "Our Instructors" };
+export const metadata: Metadata = {
+  title: "Off-Road Riding Instructors & Trainers | DRC Bangalore",
+  description: "Meet DRC's certified off-road riding instructors. Professional dirt bike trainers in Bangalore offering beginner to advanced motorcycle classes.",
+  keywords: ["off road riding instructor bangalore", "dirt bike trainer", "motorcycle riding classes", "off road coaching"],
+};
 
 export default async function InstructorsPage() {
   const instructors = await prisma.instructor.findMany({
