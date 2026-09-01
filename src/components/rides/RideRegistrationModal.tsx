@@ -45,6 +45,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
   const [paymentProof, setPaymentProof] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [effectiveAmount, setEffectiveAmount] = useState(ridePrice);
 
   const [emergencyName, setEmergencyName] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
@@ -65,16 +66,27 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
       .catch(() => setError("Failed to load profile"))
       .finally(() => setLoading(false));
 
-    fetch(`/api/payment-config?amount=${ridePrice}`)
+    // Get the authoritative price (early-bird + member discount) for this user,
+    // then load the payment config with that exact amount for UPI intents.
+    const type = isTraining ? "training" : "ride";
+    fetch(`/api/payments/quote?type=${type}&itemId=${rideId}`)
       .then((r) => r.json())
+      .then((q) => {
+        const amt = typeof q.finalAmount === "number" ? q.finalAmount : ridePrice;
+        setEffectiveAmount(amt);
+        return fetch(`/api/payment-config?amount=${amt}`);
+      })
+      .catch(() => fetch(`/api/payment-config?amount=${ridePrice}`))
+      .then((r) => r?.json())
       .then((data) => {
+        if (!data) return;
         setRazorpayEnabled(data.razorpayEnabled);
         if (!data.razorpayEnabled && data.upiIntentUrls) {
           setUpiIntentUrls(data.upiIntentUrls);
         }
       })
       .catch(() => setRazorpayEnabled(false));
-  }, [ridePrice]);
+  }, [ridePrice, rideId, isTraining]);
 
   async function saveEmergencyContact() {
     if (!emergencyName.trim() || !emergencyPhone.trim()) {
@@ -288,7 +300,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
               <div className="bg-background border border-border rounded-sm p-4">
                 <p className="text-xs text-muted uppercase tracking-wider mb-1">{isTraining ? "Training" : "Ride"}</p>
                 <h4 className="font-heading text-lg font-bold text-foreground">{rideTitle}</h4>
-                <p className="text-orange font-heading text-2xl font-bold mt-1">{formatPrice(ridePrice)}</p>
+                <p className="text-orange font-heading text-2xl font-bold mt-1">{formatPrice(effectiveAmount)}</p>
               </div>
 
               <div className="space-y-3">
@@ -325,7 +337,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                 <div className="bg-background border border-border rounded-sm p-4 space-y-4">
                   {razorpayEnabled ? (
                     <>
-                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards, netbanking all supported.</p>
+                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(effectiveAmount)}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards, netbanking all supported.</p>
                       <div className="grid grid-cols-2 gap-2">
                         <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
                           <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>
@@ -348,7 +360,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                     </>
                   ) : (
                     <>
-                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(ridePrice)}</span> via UPI app, then upload screenshot below.</p>
+                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(effectiveAmount)}</span> via UPI app, then upload screenshot below.</p>
                       <div className="grid grid-cols-2 gap-2">
                         <a href={upiIntentUrls.gpay || "#"} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
                           <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>

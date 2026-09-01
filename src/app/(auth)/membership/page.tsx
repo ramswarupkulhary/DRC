@@ -12,6 +12,12 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/Animation
 
 const SIZES = ["S", "M", "L", "XL", "XXL"] as const;
 
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
+
 interface MembershipData {
   membership: {
     id: string;
@@ -42,6 +48,9 @@ export default function MembershipJoinPage() {
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
+  const [razorpayEnabled, setRazorpayEnabled] = useState<boolean | null>(null);
+  const [paying, setPaying] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login?redirect=/membership");
@@ -55,10 +64,18 @@ export default function MembershipJoinPage() {
           setData(d);
           setLoading(false);
           if (d?.plan) {
-            fetch(`/api/upi-qr?amount=${d.plan.price}&note=DRC+Membership`)
+            fetch(`/api/payment-config?amount=${d.plan.price}`)
               .then((r) => r.json())
-              .then((q) => q.qrDataUrl && setQrCode(q.qrDataUrl))
-              .catch(() => {});
+              .then((c) => {
+                setRazorpayEnabled(c.razorpayEnabled);
+                if (!c.razorpayEnabled) {
+                  fetch(`/api/upi-qr?amount=${d.plan.price}&note=DRC+Membership`)
+                    .then((r) => r.json())
+                    .then((q) => q.qrDataUrl && setQrCode(q.qrDataUrl))
+                    .catch(() => { });
+                }
+              })
+              .catch(() => setRazorpayEnabled(false));
           }
         })
         .catch(() => setLoading(false));
@@ -111,6 +128,75 @@ export default function MembershipJoinPage() {
       setSubmitting(false);
     }
   }, [data, selectedSize, paymentProof, router]);
+
+  const handleRazorpayJoin = useCallback(async () => {
+    if (!data?.plan || !selectedSize) {
+      setError("Please select a T-shirt size first.");
+      return;
+    }
+    setPaying(true);
+    setError("");
+    try {
+      const orderRes = await fetch("/api/payments/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "membership", itemId: data.plan.id }),
+      });
+      if (!orderRes.ok) {
+        const err = await orderRes.json();
+        setError(err.error || "Failed to start payment");
+        setPaying(false);
+        return;
+      }
+      const { orderId, amount: finalAmount, key } = await orderRes.json();
+
+      if (!window.Razorpay) {
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+      }
+
+      const options = {
+        key,
+        amount: finalAmount * 100,
+        currency: "INR",
+        name: "Dirt Ride Camp",
+        description: `${data.plan.name} Membership`,
+        order_id: orderId,
+        theme: { color: "#E8622C" },
+        handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+          const verifyRes = await fetch("/api/payments/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...response,
+              type: "membership",
+              itemId: data.plan!.id,
+              metadata: { tshirtSize: selectedSize },
+            }),
+          });
+          if (verifyRes.ok) {
+            window.location.reload();
+          } else {
+            setError("Payment verification failed. Contact support.");
+            setPaying(false);
+          }
+        },
+        modal: { ondismiss: () => setPaying(false) },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch {
+      setError("Payment failed. Please try again.");
+      setPaying(false);
+    }
+  }, [data, selectedSize]);
 
   if (loading || !data) {
     return <div className="min-h-[60vh] flex items-center justify-center text-muted">Loading...</div>;
@@ -241,60 +327,76 @@ export default function MembershipJoinPage() {
                 </div>
               </div>
 
-              <div className="border-t border-border pt-5">
-                <label className="text-sm font-medium text-foreground block mb-3">Pay via UPI</label>
-                <div className="bg-background border border-border rounded-sm p-4 text-center">
-                  {qrCode ? (
-                    <div className="space-y-3">
-                      <img src={qrCode} alt="UPI QR Code" className="w-48 h-48 mx-auto rounded-sm" />
-                      <p className="text-xs text-muted">Scan with any UPI app (GPay, PhonePe, Paytm, etc.)</p>
-                      <p className="text-xs text-muted">Amount: <strong className="text-orange">₹{data.plan.price.toLocaleString("en-IN")}</strong></p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-xs text-muted mb-1">UPI ID</p>
-                      <div className="flex items-center justify-center gap-2">
-                        <code className="text-orange font-mono text-lg font-bold">{data.plan.upiId}</code>
-                        <button onClick={copyUpi} className="p-2 hover:bg-surface-light rounded-sm transition-colors" title="Copy UPI ID">
-                          {copied ? <CheckCircle2 className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4 text-muted" />}
-                        </button>
-                      </div>
-                      <p className="text-xs text-muted">Pay ₹{data.plan.price.toLocaleString("en-IN")} using any UPI app</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              {error && <div className="bg-error/10 border border-error/30 text-error text-sm p-3 rounded-sm">{error}</div>}
 
-              <div className="border-t border-border pt-5">
-                <label className="text-sm font-medium text-foreground block mb-3">Upload Payment Proof <span className="text-error">*</span></label>
-                {paymentProof ? (
-                  <div className="relative">
-                    <img src={paymentProof} alt="Payment proof" className="w-full rounded-sm border border-border" />
-                    <button onClick={() => setPaymentProof(null)} className="absolute top-2 right-2 p-1 bg-black/70 rounded-full text-white text-xs px-2">Remove</button>
+              {razorpayEnabled ? (
+                <div className="border-t border-border pt-5 space-y-4">
+                  <p className="text-sm text-muted text-center">
+                    Pay <span className="text-orange font-bold">&#8377;{data.plan.price.toLocaleString("en-IN")}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards & netbanking supported. Membership activates instantly.
+                  </p>
+                  <Button className="w-full" size="lg" disabled={!selectedSize || paying} loading={paying} onClick={handleRazorpayJoin}>
+                    Pay &amp; Join Now
+                  </Button>
+                  <p className="text-xs text-center text-muted">Instant activation. Welcome kit dispatched within 7 working days.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="border-t border-border pt-5">
+                    <label className="text-sm font-medium text-foreground block mb-3">Pay via UPI</label>
+                    <div className="bg-background border border-border rounded-sm p-4 text-center">
+                      {qrCode ? (
+                        <div className="space-y-3">
+                          <img src={qrCode} alt="UPI QR Code" className="w-48 h-48 mx-auto rounded-sm" />
+                          <p className="text-xs text-muted">Scan with any UPI app (GPay, PhonePe, Paytm, etc.)</p>
+                          <p className="text-xs text-muted">Amount: <strong className="text-orange">₹{data.plan.price.toLocaleString("en-IN")}</strong></p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <p className="text-xs text-muted mb-1">UPI ID</p>
+                          <div className="flex items-center justify-center gap-2">
+                            <code className="text-orange font-mono text-lg font-bold">{data.plan.upiId}</code>
+                            <button onClick={copyUpi} className="p-2 hover:bg-surface-light rounded-sm transition-colors" title="Copy UPI ID">
+                              {copied ? <CheckCircle2 className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4 text-muted" />}
+                            </button>
+                          </div>
+                          <p className="text-xs text-muted">Pay ₹{data.plan.price.toLocaleString("en-IN")} using any UPI app</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border hover:border-orange/50 rounded-sm cursor-pointer transition-colors">
-                    <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadProof(e.target.files[0])} className="hidden" />
-                    {uploading ? (
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="w-6 h-6 border-2 border-orange border-t-transparent rounded-full animate-spin" />
-                        <span className="text-xs text-muted">Uploading...</span>
+
+                  <div className="border-t border-border pt-5">
+                    <label className="text-sm font-medium text-foreground block mb-3">Upload Payment Proof <span className="text-error">*</span></label>
+                    {paymentProof ? (
+                      <div className="relative">
+                        <img src={paymentProof} alt="Payment proof" className="w-full rounded-sm border border-border" />
+                        <button onClick={() => setPaymentProof(null)} className="absolute top-2 right-2 p-1 bg-black/70 rounded-full text-white text-xs px-2">Remove</button>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center gap-2 text-muted">
-                        <Upload className="w-8 h-8" />
-                        <span className="text-xs">Upload payment screenshot</span>
-                      </div>
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border hover:border-orange/50 rounded-sm cursor-pointer transition-colors">
+                        <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadProof(e.target.files[0])} className="hidden" />
+                        {uploading ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="w-6 h-6 border-2 border-orange border-t-transparent rounded-full animate-spin" />
+                            <span className="text-xs text-muted">Uploading...</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 text-muted">
+                            <Upload className="w-8 h-8" />
+                            <span className="text-xs">Upload payment screenshot</span>
+                          </div>
+                        )}
+                      </label>
                     )}
-                  </label>
-                )}
-              </div>
+                  </div>
 
-              <Button className="w-full" size="lg" disabled={!selectedSize || !paymentProof || submitting} loading={submitting} onClick={submitRequest}>
-                Submit Membership Request
-              </Button>
+                  <Button className="w-full" size="lg" disabled={!selectedSize || !paymentProof || submitting} loading={submitting} onClick={submitRequest}>
+                    Submit Membership Request
+                  </Button>
 
-              <p className="text-xs text-center text-muted">Your request will be verified and approved within 24 hours. Welcome kit dispatched within 7 working days.</p>
+                  <p className="text-xs text-center text-muted">Your request will be verified and approved within 24 hours. Welcome kit dispatched within 7 working days.</p>
+                </>
+              )}
             </div>
           </FadeIn>
         </div>

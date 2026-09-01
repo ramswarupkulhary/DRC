@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { computeQuote, type PurchaseType } from "@/lib/pricing";
 import Razorpay from "razorpay";
 
 async function getRazorpayInstance() {
@@ -30,29 +31,27 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Razorpay is not configured. Ask admin to add keys in Settings." }, { status: 500 });
   }
 
-  const { type, itemId, amount, couponCode } = await req.json();
+  const { type, itemId, couponCode } = await req.json();
 
-  if (!type || !itemId || !amount) {
+  if (!type || !itemId) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  let finalAmount = amount;
+  const userId = (session.user as { id: string }).id;
 
-  if (couponCode) {
-    const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
-    if (coupon && coupon.active && (!coupon.validUntil || coupon.validUntil > new Date())) {
-      if (coupon.minAmount && amount < coupon.minAmount) {
-        return NextResponse.json({ error: `Minimum amount ₹${coupon.minAmount} required` }, { status: 400 });
-      }
-      if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
-        return NextResponse.json({ error: "Coupon usage limit reached" }, { status: 400 });
-      }
-      if (coupon.type === "percentage") {
-        finalAmount = Math.round(amount * (1 - coupon.value / 100));
-      } else {
-        finalAmount = Math.max(0, amount - coupon.value);
-      }
-    }
+  // Price is computed server-side from the database (early-bird + member
+  // discount + coupon). The client-supplied amount is never trusted.
+  const quote = await computeQuote(type as PurchaseType, itemId, userId, couponCode);
+  if (!quote) {
+    return NextResponse.json({ error: "Item not found" }, { status: 404 });
+  }
+  if (quote.error) {
+    return NextResponse.json({ error: quote.error }, { status: 400 });
+  }
+
+  const finalAmount = quote.finalAmount;
+  if (finalAmount < 1) {
+    return NextResponse.json({ error: "Invalid payment amount" }, { status: 400 });
   }
 
   try {
@@ -63,7 +62,7 @@ export async function POST(req: Request) {
       notes: {
         type,
         itemId,
-        userId: (session.user as { id: string }).id,
+        userId,
         couponCode: couponCode || "",
       },
     });

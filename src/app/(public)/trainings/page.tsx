@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { TrainingCard } from "@/components/training/TrainingCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection } from "@/components/ui/AnimatedPage";
-import { BreadcrumbJsonLd, FAQJsonLd } from "@/components/seo/JsonLd";
+import { BreadcrumbJsonLd, FAQJsonLd, ItemListJsonLd } from "@/components/seo/JsonLd";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -62,6 +62,9 @@ export default async function TrainingsPage() {
         { name: "Home", url: "https://www.dirtridecamp.com" },
         { name: "Training Programs", url: "https://www.dirtridecamp.com/trainings" },
       ]} />
+      {trainings.length > 0 && (
+        <ItemListJsonLd name="Off-Road Training Programs" items={trainings.map((t) => ({ name: t.title, url: `/trainings/${t.slug}` }))} />
+      )}
       <FAQJsonLd faqs={trainingFaqs} />
       <AnimatedPageHeader>
         <SectionHeader

@@ -7,8 +7,8 @@ export function OrganizationJsonLd() {
     name: "Dirt Ride Camp",
     alternateName: ["DRC", "DirtRideCamp", "Off Road Academy Bangalore"],
     url: BASE_URL,
-    logo: `${BASE_URL}/images/logo.png`,
-    image: `${BASE_URL}/images/og-cover.jpg`,
+    logo: `${BASE_URL}/opengraph-image`,
+    image: `${BASE_URL}/opengraph-image`,
     description:
       "Bangalore's premier off-road academy offering adventure bike trips, dirt bike training classes, motorcycle camping trips & trail riding across Karnataka and India.",
     address: {
@@ -172,7 +172,7 @@ export function AggregateRatingJsonLd({ ratingValue, reviewCount }: { ratingValu
     "@type": "LocalBusiness",
     name: "Dirt Ride Camp",
     url: BASE_URL,
-    image: `${BASE_URL}/images/og-cover.jpg`,
+    image: `${BASE_URL}/opengraph-image`,
     address: {
       "@type": "PostalAddress",
       addressLocality: "Bangalore",
@@ -209,6 +209,23 @@ export function BlogPostJsonLd({ post }: { post: { title: string; slug: string; 
       url: BASE_URL,
     },
     ...(post.coverImage && { image: post.coverImage }),
+  };
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;
+}
+
+export function ItemListJsonLd({ name, items }: { name: string; items: { name: string; url: string }[] }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    numberOfItems: items.length,
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.name,
+      url: item.url.startsWith("http") ? item.url : `${BASE_URL}${item.url}`,
+    })),
   };
 
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;

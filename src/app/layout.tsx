@@ -80,21 +80,12 @@ export const metadata: Metadata = {
     title: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides in Bangalore",
     description:
       "Bangalore's premier off-road academy & riding group. Off-road training, dirt bike rides, adventure camping & trail riding.",
-    images: [
-      {
-        url: `${BASE_URL}/images/og-cover.jpg`,
-        width: 1200,
-        height: 630,
-        alt: "Dirt Ride Camp — Off-Road Adventure Rides",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides",
     description:
       "Bangalore's premier off-road academy & riding group. Off-road training, dirt bike rides, adventure camping.",
-    images: [`${BASE_URL}/images/og-cover.jpg`],
   },
   alternates: {
     canonical: BASE_URL,

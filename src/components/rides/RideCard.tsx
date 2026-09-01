@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Calendar, Users, Mountain, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -42,9 +43,12 @@ export function RideCard({
         {/* Image */}
         <div className="relative bg-surface-light overflow-hidden">
           {coverImage ? (
-            <img
+            <Image
               src={coverImage}
               alt={title}
+              width={640}
+              height={420}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="w-full h-auto block group-hover:scale-105 transition-transform duration-500"
             />
           ) : (
@@ -87,10 +91,10 @@ export function RideCard({
               <span className="line-clamp-1">{location}</span>
             </div>
             {startDate && (
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-orange shrink-0" />
-              <span>{formatDateRange(startDate, endDate || startDate)}</span>
-            </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-orange shrink-0" />
+                <span>{formatDateRange(startDate, endDate || startDate)}</span>
+              </div>
             )}
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-orange shrink-0" />

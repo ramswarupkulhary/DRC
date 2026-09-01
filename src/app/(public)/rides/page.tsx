@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { RideCard } from "@/components/rides/RideCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection } from "@/components/ui/AnimatedPage";
-import { BreadcrumbJsonLd, FAQJsonLd } from "@/components/seo/JsonLd";
+import { BreadcrumbJsonLd, FAQJsonLd, ItemListJsonLd } from "@/components/seo/JsonLd";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -73,6 +73,9 @@ export default async function RidesPage() {
         { name: "Home", url: "https://www.dirtridecamp.com" },
         { name: "Rides & Events", url: "https://www.dirtridecamp.com/rides" },
       ]} />
+      {upcoming.length > 0 && (
+        <ItemListJsonLd name="Upcoming Rides & Adventure Trips" items={upcoming.map((r) => ({ name: r.title, url: `/rides/${r.slug}` }))} />
+      )}
       <FAQJsonLd faqs={ridesFaqs} />
       <AnimatedPageHeader>
         <SectionHeader

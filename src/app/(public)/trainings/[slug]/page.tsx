@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/Button";
 import { MediaGallery } from "@/components/ui/MediaGallery";
 import { formatPrice } from "@/lib/utils";
 import { TrainingRegisterButton } from "@/components/rides/TrainingRegisterButton";
+import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -16,7 +18,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const training = await prisma.training.findUnique({ where: { slug } });
   if (!training) return { title: "Training Not Found" };
-  return { title: training.title, description: training.shortDesc || training.description.slice(0, 160) };
+  const description = training.shortDesc || training.description.slice(0, 160);
+  const images: { url: string }[] = training.images ? JSON.parse(training.images) : [];
+  return {
+    title: training.title,
+    description,
+    alternates: { canonical: `/trainings/${training.slug}` },
+    openGraph: {
+      type: "website",
+      title: training.title,
+      description,
+      url: `/trainings/${training.slug}`,
+      ...(images[0]?.url && { images: [images[0].url] }),
+    },
+  };
 }
 
 export default async function TrainingDetailPage({ params }: Props) {
@@ -36,6 +51,12 @@ export default async function TrainingDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <CourseJsonLd training={{ title: training.title, slug: training.slug, description: training.description, level: training.level, price: training.price, duration: training.duration }} />
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "https://www.dirtridecamp.com" },
+        { name: "Training", url: "https://www.dirtridecamp.com/trainings" },
+        { name: training.title, url: `https://www.dirtridecamp.com/trainings/${training.slug}` },
+      ]} />
       <Link href="/trainings" className="inline-flex items-center gap-1 text-sm text-muted hover:text-orange mb-6 transition-colors">
         <ChevronLeft className="w-4 h-4" /> Back to Training
       </Link>
@@ -68,7 +89,7 @@ export default async function TrainingDetailPage({ params }: Props) {
 
       <div className="mt-8 bg-surface border border-border rounded-sm overflow-hidden">
         {training.coverImage ? (
-          <img src={training.coverImage} alt={training.title} className="w-full h-auto block rounded-sm" />
+          <Image src={training.coverImage} alt={training.title} width={1200} height={800} priority sizes="(max-width: 1024px) 100vw, 1024px" className="w-full h-auto block rounded-sm" />
         ) : (
           <div className="h-64 sm:h-80 flex items-center justify-center">
             <BarChart3 className="w-24 h-24 text-muted/20" />

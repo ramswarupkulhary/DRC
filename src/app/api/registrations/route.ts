@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { computeBaseAmount } from "@/lib/pricing";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -41,7 +42,7 @@ export async function POST(req: Request) {
     });
     if (existing) return NextResponse.json({ error: "You are already registered for this ride" }, { status: 409 });
 
-    amount = ride.price;
+    amount = (await computeBaseAmount("ride", rideId, user.id)) ?? ride.price;
     eventTitle = ride.title;
     const bookedSlots = ride.registrations.length;
 
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
     });
     if (existing) return NextResponse.json({ error: "You are already registered for this training" }, { status: 409 });
 
-    amount = training.price;
+    amount = (await computeBaseAmount("training", trainingId, user.id)) ?? training.price;
     eventTitle = training.title;
   }
 

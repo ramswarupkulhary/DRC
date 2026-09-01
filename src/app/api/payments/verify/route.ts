@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { computeQuote, type PurchaseType } from "@/lib/pricing";
 import crypto from "crypto";
 
 async function getRazorpaySecret() {
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
 
   try {
     if (type === "ride" || type === "training") {
+      const quote = await computeQuote(type as PurchaseType, itemId, userId, couponCode);
       await prisma.registration.create({
         data: {
           userId,
@@ -42,7 +44,9 @@ export async function POST(req: Request) {
           status: "confirmed",
           paymentStatus: "paid",
           paymentId: razorpay_payment_id,
-          amount: 0,
+          amount: quote?.finalAmount ?? 0,
+          discount: quote?.discount ?? 0,
+          couponId: quote?.coupon?.id ?? null,
         },
       });
     } else if (type === "membership") {
@@ -50,7 +54,8 @@ export async function POST(req: Request) {
       if (plan) {
         const startDate = new Date();
         const endDate = new Date();
-        endDate.setMonth(endDate.getMonth() + plan.duration);
+        // Membership duration is stored in days.
+        endDate.setDate(endDate.getDate() + plan.duration);
 
         await prisma.membership.create({
           data: {
@@ -59,6 +64,7 @@ export async function POST(req: Request) {
             endDate,
             status: "active",
             tshirtSize: metadata?.tshirtSize || null,
+            paymentProof: `razorpay:${razorpay_payment_id}`,
             users: { connect: { id: userId } },
           },
         });

@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { Calendar, User, ChevronLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { BlogPostJsonLd } from "@/components/seo/JsonLd";
+import { BlogPostJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -14,7 +15,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = await prisma.blogPost.findUnique({ where: { slug } });
   if (!post) return { title: "Post Not Found" };
-  return { title: post.title, description: post.excerpt || post.content.slice(0, 160) };
+  const description = post.excerpt || post.content.slice(0, 160);
+  return {
+    title: post.title,
+    description,
+    alternates: { canonical: `/blog/${post.slug}` },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description,
+      url: `/blog/${post.slug}`,
+      publishedTime: post.publishedAt?.toISOString(),
+      ...(post.coverImage && { images: [post.coverImage] }),
+    },
+  };
 }
 
 export default async function BlogPostPage({ params }: Props) {
@@ -37,6 +51,11 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <BlogPostJsonLd post={{ title: post.title, slug: post.slug, excerpt: post.excerpt, content: post.content, publishedAt: post.publishedAt?.toISOString(), author: post.author?.name, coverImage: post.coverImage }} />
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "https://www.dirtridecamp.com" },
+        { name: "Blog", url: "https://www.dirtridecamp.com/blog" },
+        { name: post.title, url: `https://www.dirtridecamp.com/blog/${post.slug}` },
+      ]} />
       <Link href="/blog" className="inline-flex items-center gap-1 text-sm text-muted hover:text-orange mb-6 transition-colors">
         <ChevronLeft className="w-4 h-4" /> Back to Blog
       </Link>
@@ -68,7 +87,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         {post.coverImage && (
           <div className="mt-8 rounded-sm overflow-hidden border border-border">
-            <img src={post.coverImage} alt={post.title} className="w-full h-auto block" />
+            <Image src={post.coverImage} alt={post.title} width={1200} height={675} priority sizes="(max-width: 768px) 100vw, 768px" className="w-full h-auto block" />
           </div>
         )}
 

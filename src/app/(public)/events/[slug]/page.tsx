@@ -4,13 +4,26 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { Calendar, MapPin, Users, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import Link from "next/link";
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const event = await prisma.event.findUnique({ where: { slug } });
-  return { title: event?.title || "Event" };
+  if (!event) return { title: "Event Not Found" };
+  const description = event.description?.slice(0, 160) || `${event.title} — an off-road event by Dirt Ride Camp (DRC) in Bangalore.`;
+  return {
+    title: event.title,
+    description,
+    alternates: { canonical: `/events/${event.slug}` },
+    openGraph: {
+      type: "website",
+      title: event.title,
+      description,
+      url: `/events/${event.slug}`,
+    },
+  };
 }
 
 export default async function EventDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -23,6 +36,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "https://www.dirtridecamp.com" },
+        { name: "Events", url: "https://www.dirtridecamp.com/events" },
+        { name: event.title, url: `https://www.dirtridecamp.com/events/${event.slug}` },
+      ]} />
       <div className="flex items-center gap-3 mb-4">
         <Badge variant="orange">{event.type}</Badge>
         <Badge variant={event.status === "upcoming" ? "success" : "muted"}>{event.status}</Badge>

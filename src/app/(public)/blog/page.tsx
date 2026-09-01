@@ -4,6 +4,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, HoverCard } from "@/components/ui/AnimatedPage";
 import { Calendar, ArrowRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -45,7 +46,7 @@ export default async function BlogPage() {
                 <div className="bg-surface border border-border rounded-sm overflow-hidden grid grid-cols-1 lg:grid-cols-2">
                   <div className="bg-surface-light overflow-hidden">
                     {post.coverImage ? (
-                      <img src={post.coverImage} alt={post.title} className="w-full h-auto block" />
+                      <Image src={post.coverImage} alt={post.title} width={800} height={500} sizes="(max-width: 1024px) 100vw, 50vw" className="w-full h-auto block" />
                     ) : (
                       <span className="font-heading text-6xl text-orange/20">DRC</span>
                     )}
@@ -90,7 +91,7 @@ export default async function BlogPage() {
                   <div className="bg-surface border border-border rounded-sm overflow-hidden h-full flex flex-col">
                     <div className="bg-surface-light overflow-hidden">
                       {post.coverImage ? (
-                        <img src={post.coverImage} alt={post.title} className="w-full h-auto block" />
+                        <Image src={post.coverImage} alt={post.title} width={640} height={400} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-auto block" />
                       ) : (
                         <span className="font-heading text-4xl text-orange/20">DRC</span>
                       )}

@@ -8,7 +8,8 @@ import { MediaGallery } from "@/components/ui/MediaGallery";
 import { formatPrice, formatDateRange, getSlotsText } from "@/lib/utils";
 import { TrailMap } from "@/components/rides/TrailMap";
 import { RegisterButton } from "@/components/rides/RegisterButton";
-import { RideEventJsonLd } from "@/components/seo/JsonLd";
+import { RideEventJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -18,7 +19,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const ride = await prisma.ride.findUnique({ where: { slug } });
   if (!ride) return { title: "Ride Not Found" };
-  return { title: ride.title, description: ride.shortDesc || ride.description.slice(0, 160) };
+  const description = ride.shortDesc || ride.description.slice(0, 160);
+  const images: { url: string }[] = ride.images ? JSON.parse(ride.images) : [];
+  return {
+    title: ride.title,
+    description,
+    alternates: { canonical: `/rides/${ride.slug}` },
+    openGraph: {
+      type: "website",
+      title: ride.title,
+      description,
+      url: `/rides/${ride.slug}`,
+      ...(images[0]?.url && { images: [images[0].url] }),
+    },
+  };
 }
 
 export default async function RideDetailPage({ params }: Props) {
@@ -54,6 +68,11 @@ export default async function RideDetailPage({ params }: Props) {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       {ride.startDate && <RideEventJsonLd ride={{ title: ride.title, slug: ride.slug, description: ride.description, location: ride.location, startDate: ride.startDate.toISOString(), endDate: (ride.endDate || ride.startDate).toISOString(), price: ride.price, totalSlots: ride.totalSlots, bookedSlots }} />}
+      <BreadcrumbJsonLd items={[
+        { name: "Home", url: "https://www.dirtridecamp.com" },
+        { name: "Rides & Events", url: "https://www.dirtridecamp.com/rides" },
+        { name: ride.title, url: `https://www.dirtridecamp.com/rides/${ride.slug}` },
+      ]} />
       <Link href="/rides" className="inline-flex items-center gap-1 text-sm text-muted hover:text-orange mb-6 transition-colors">
         <ChevronLeft className="w-4 h-4" /> Back to Rides
       </Link>
@@ -74,10 +93,10 @@ export default async function RideDetailPage({ params }: Props) {
             <span>{ride.location}</span>
           </div>
           {ride.startDate && (
-          <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-orange" />
-            <span>{formatDateRange(ride.startDate.toISOString(), (ride.endDate || ride.startDate).toISOString())}</span>
-          </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-orange" />
+              <span>{formatDateRange(ride.startDate.toISOString(), (ride.endDate || ride.startDate).toISOString())}</span>
+            </div>
           )}
           {ride.startTime && (
             <div className="flex items-center gap-2">
@@ -91,7 +110,7 @@ export default async function RideDetailPage({ params }: Props) {
       {/* Cover image */}
       <div className="mt-8 bg-surface border border-border rounded-sm overflow-hidden">
         {ride.coverImage ? (
-          <img src={ride.coverImage} alt={ride.title} className="w-full h-auto block rounded-sm" />
+          <Image src={ride.coverImage} alt={ride.title} width={1200} height={800} priority sizes="(max-width: 1024px) 100vw, 1024px" className="w-full h-auto block rounded-sm" />
         ) : (
           <div className="h-64 sm:h-96 flex items-center justify-center">
             <Mountain className="w-24 h-24 text-muted/20" />
@@ -214,7 +233,7 @@ export default async function RideDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <RegisterButton rideId={ride.id} rideSlug={ride.slug} rideTitle={ride.title} ridePrice={ride.price} soldOut={soldOut} />
+            <RegisterButton rideId={ride.id} rideSlug={ride.slug} rideTitle={ride.title} ridePrice={displayPrice} soldOut={soldOut} />
 
             <a href="https://wa.me/919414870102" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="md" className="w-full mt-2">
