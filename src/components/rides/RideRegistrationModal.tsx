@@ -131,6 +131,27 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
     setError("");
 
     try {
+      // 100%-off coupon → no payment needed, confirm directly.
+      if (payable === 0) {
+        const res = await fetch("/api/payments/free-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: isTraining ? "training" : "ride", itemId: rideId, couponCode: coupon?.code ?? null }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSuccess(true);
+          setTimeout(() => {
+            onClose();
+            router.push("/my-registrations");
+          }, 1500);
+        } else {
+          setError(data.error || "Could not complete booking.");
+          setPaying(false);
+        }
+        return;
+      }
+
       const orderRes = await fetch("/api/payments/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -209,7 +230,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
       setError("Payment failed. Please try again.");
       setPaying(false);
     }
-  }, [rideId, rideTitle, ridePrice, isTraining, name, phone, profile, coupon, onClose, router]);
+  }, [rideId, rideTitle, ridePrice, isTraining, name, phone, profile, coupon, payable, onClose, router]);
 
   const uploadProof = useCallback(async (file: File) => {
     setUploading(true);
@@ -352,6 +373,14 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                 )}
                 <div className="bg-background border border-border rounded-sm p-4 space-y-4">
                   {razorpayEnabled ? (
+                    payable === 0 ? (
+                      <>
+                        <p className="text-sm text-muted">Your coupon covers the full amount — <span className="text-success font-bold">no payment needed</span>.</p>
+                        <button onClick={handleRazorpay} disabled={paying} className="w-full px-3 py-3 bg-orange text-white rounded-sm text-sm font-semibold hover:bg-orange-dark transition-colors disabled:opacity-50">
+                          Confirm Free Booking
+                        </button>
+                      </>
+                    ) : (
                     <>
                       <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(payable)}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards, netbanking all supported.</p>
                       <div className="grid grid-cols-2 gap-2">
@@ -374,6 +403,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                       </div>
                       <p className="text-[10px] text-muted text-center">Payments verified instantly via Razorpay. No manual approval needed.</p>
                     </>
+                    )
                   ) : (
                     <>
                       <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(payable)}</span> via UPI app, then upload screenshot below.</p>

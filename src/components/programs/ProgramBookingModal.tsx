@@ -80,6 +80,24 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
         setPaying(true);
         setError("");
         try {
+            // 100%-off coupon → no payment needed, book directly.
+            if (payable === 0) {
+                const res = await fetch("/api/programs/free-checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null }),
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    setBookingId(data.bookingId);
+                    setCompanions(buildCompanionRows());
+                } else {
+                    setError(data.error || "Could not complete booking.");
+                }
+                setPaying(false);
+                return;
+            }
+
             const orderRes = await fetch("/api/programs/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -136,7 +154,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
             setError("Payment failed. Please try again.");
             setPaying(false);
         }
-    }, [program, friends, familyOption, lunch, coupon, buildCompanionRows]);
+    }, [program, friends, familyOption, lunch, coupon, payable, buildCompanionRows]);
 
     const saveCompanions = useCallback(async () => {
         if (!bookingId) return;
@@ -258,7 +276,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                             </div>
 
                             <Button size="lg" className="w-full" loading={paying} onClick={handlePay}>
-                                Pay {formatINR(payable)} &amp; Book
+                                {payable === 0 ? "Book for Free" : `Pay ${formatINR(payable)} & Book`}
                             </Button>
                             <p className="text-[11px] text-muted text-center">
                                 Secure payment via Razorpay (GPay, PhonePe, Paytm, cards, UPI). Your booking is confirmed after payment and reviewed by our team.

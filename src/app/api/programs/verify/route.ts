@@ -84,7 +84,7 @@ export async function POST(req: Request) {
 
         // Count coupon usage.
         if (quote.coupon) {
-            await prisma.coupon.update({ where: { id: quote.coupon.id }, data: { usedCount: { increment: 1 } } }).catch(() => {});
+            await prisma.coupon.update({ where: { id: quote.coupon.id }, data: { usedCount: { increment: 1 } } }).catch(() => { });
         }
 
         const admins = await prisma.user.findMany({ where: { role: "admin" }, select: { id: true } });

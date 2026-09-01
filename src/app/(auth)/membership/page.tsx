@@ -139,6 +139,23 @@ export default function MembershipJoinPage() {
     setPaying(true);
     setError("");
     try {
+      // 100%-off coupon → activate membership directly, no payment.
+      if ((coupon?.finalAmount ?? data.plan.price) === 0) {
+        const res = await fetch("/api/payments/free-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "membership", itemId: data.plan.id, couponCode: coupon?.code ?? null, metadata: { tshirtSize: selectedSize } }),
+        });
+        const d = await res.json();
+        if (res.ok) {
+          window.location.reload();
+        } else {
+          setError(d.error || "Could not complete booking.");
+          setPaying(false);
+        }
+        return;
+      }
+
       const orderRes = await fetch("/api/payments/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -340,7 +357,7 @@ export default function MembershipJoinPage() {
                     {coupon && <span className="text-success text-xs ml-1">(saved ₹{coupon.discount.toLocaleString("en-IN")})</span>} securely via Razorpay. GPay, PhonePe, Paytm, cards &amp; netbanking supported. Membership activates instantly.
                   </p>
                   <Button className="w-full" size="lg" disabled={!selectedSize || paying} loading={paying} onClick={handleRazorpayJoin}>
-                    Pay &amp; Join Now
+                    {(coupon?.finalAmount ?? data.plan.price) === 0 ? "Join for Free" : "Pay & Join Now"}
                   </Button>
                   <p className="text-xs text-center text-muted">Instant activation. Welcome kit dispatched within 7 working days.</p>
                 </div>
