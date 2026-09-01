@@ -56,8 +56,12 @@ export function Footer() {
             </h4>
             <ul className="space-y-2">
               {[
+                { href: "/programs", label: "Programs" },
                 { href: "/rides", label: "Upcoming Rides" },
                 { href: "/trainings", label: "Training Programs" },
+                { href: "/off-road-training-bangalore", label: "Off-Road Training Bangalore" },
+                { href: "/dirt-bike-classes-bangalore", label: "Dirt Bike Classes Bangalore" },
+                { href: "/bike-trips-near-bangalore", label: "Bike Trips Near Bangalore" },
                 { href: "/events", label: "Events & Races" },
                 { href: "/calendar", label: "Calendar" },
                 { href: "/store", label: "Merchandise" },

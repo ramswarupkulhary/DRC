@@ -28,6 +28,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/store`, changeFrequency: "weekly" as const, priority: 0.7 },
     { url: `${BASE_URL}/membership`, changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${BASE_URL}/corporate`, changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${BASE_URL}/off-road-training-bangalore`, changeFrequency: "monthly" as const, priority: 0.9 },
+    { url: `${BASE_URL}/dirt-bike-classes-bangalore`, changeFrequency: "monthly" as const, priority: 0.9 },
+    { url: `${BASE_URL}/bike-trips-near-bangalore`, changeFrequency: "monthly" as const, priority: 0.9 },
   ];
 
   const ridePages = rides.map((r) => ({
