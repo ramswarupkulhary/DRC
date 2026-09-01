@@ -160,7 +160,7 @@ export function AnimatedFeatures() {
   );
 }
 
-export function AnimatedTestimonials({ reviews }: { reviews?: { name: string; text: string; location: string; rating: number }[] }) {
+export function AnimatedTestimonials({ reviews }: { reviews?: { name: string; text: string; location: string; rating: number; image?: string | null }[] }) {
   const testimonials = reviews && reviews.length > 0 ? reviews : defaultTestimonials;
   return (
     <section className="bg-surface border-y border-border">
@@ -172,25 +172,34 @@ export function AnimatedTestimonials({ reviews }: { reviews?: { name: string; te
           </div>
         </FadeIn>
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6" staggerDelay={0.2}>
-          {testimonials.map((t) => (
-            <StaggerItem key={t.name}>
-              <motion.div
-                className="bg-background p-6 border border-border rounded-sm"
-                whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-              >
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-orange text-orange" />
-                  ))}
-                </div>
-                <p className="text-sm text-foreground/80 leading-relaxed mb-4 italic">&ldquo;{t.text}&rdquo;</p>
-                <div>
-                  <p className="font-semibold text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted">{t.location}</p>
-                </div>
-              </motion.div>
-            </StaggerItem>
-          ))}
+          {testimonials.map((t) => {
+            const image = (t as { image?: string | null }).image ?? null;
+            const initials = t.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+            return (
+              <StaggerItem key={t.name}>
+                <motion.div
+                  className="bg-background p-6 border border-border rounded-sm flex flex-col items-center text-center"
+                  whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+                >
+                  {image ? (
+                    <img src={image} alt={t.name} className="w-16 h-16 rounded-full object-cover border-2 border-orange/30" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-orange flex items-center justify-center text-white font-heading text-xl font-bold">
+                      {initials}
+                    </div>
+                  )}
+                  <p className="font-semibold text-foreground mt-4">{t.name}</p>
+                  {t.location && <p className="text-xs text-muted">{t.location}</p>}
+                  <div className="flex gap-1 my-3">
+                    {Array.from({ length: t.rating }).map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-orange text-orange" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-foreground/80 leading-relaxed italic">&ldquo;{t.text}&rdquo;</p>
+                </motion.div>
+              </StaggerItem>
+            );
+          })}
         </StaggerContainer>
       </div>
     </section>

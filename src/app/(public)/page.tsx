@@ -32,7 +32,7 @@ async function getHomeData() {
       where: { approved: true },
       orderBy: { createdAt: "desc" },
       take: 6,
-      include: { user: { select: { name: true } } },
+      include: { user: { select: { name: true, image: true } } },
     }),
   ]);
   return { rides, trainings, reviews };
@@ -46,6 +46,7 @@ export default async function HomePage() {
     text: r.comment || "",
     location: "",
     rating: r.rating,
+    image: r.user.image,
   }));
 
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 4.8;
