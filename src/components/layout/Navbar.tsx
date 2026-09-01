@@ -12,6 +12,7 @@ import { NotificationBell } from "@/components/ui/NotificationBell";
 
 const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/programs", label: "Programs" },
   { href: "/rides", label: "Rides" },
   { href: "/trainings", label: "Training" },
   { href: "/events", label: "Events" },
