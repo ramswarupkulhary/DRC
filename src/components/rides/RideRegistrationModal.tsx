@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { X, Upload, CheckCircle2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { CouponInput, type AppliedCoupon } from "@/components/payments/CouponInput";
 
 interface Props {
   rideId: string;
@@ -46,6 +47,8 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [effectiveAmount, setEffectiveAmount] = useState(ridePrice);
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
+  const payable = coupon?.finalAmount ?? effectiveAmount;
 
   const [emergencyName, setEmergencyName] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
@@ -135,6 +138,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
           type: isTraining ? "training" : "ride",
           itemId: rideId,
           amount: ridePrice,
+          couponCode: coupon?.code ?? null,
         }),
       });
 
@@ -174,6 +178,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
               ...response,
               type: isTraining ? "training" : "ride",
               itemId: rideId,
+              couponCode: coupon?.code ?? null,
             }),
           });
 
@@ -204,7 +209,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
       setError("Payment failed. Please try again.");
       setPaying(false);
     }
-  }, [rideId, rideTitle, ridePrice, isTraining, name, phone, profile, onClose, router]);
+  }, [rideId, rideTitle, ridePrice, isTraining, name, phone, profile, coupon, onClose, router]);
 
   const uploadProof = useCallback(async (file: File) => {
     setUploading(true);
@@ -334,10 +339,21 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
 
               <div className="space-y-3">
                 <h5 className="font-heading text-sm font-semibold uppercase tracking-wider text-muted">Payment</h5>
+                {razorpayEnabled && (
+                  <>
+                    <CouponInput amount={effectiveAmount} onChange={setCoupon} />
+                    {coupon && (
+                      <div className="flex items-center justify-between text-sm px-1">
+                        <span className="text-muted">Discount applied</span>
+                        <span className="text-success">− {formatPrice(coupon.discount)}</span>
+                      </div>
+                    )}
+                  </>
+                )}
                 <div className="bg-background border border-border rounded-sm p-4 space-y-4">
                   {razorpayEnabled ? (
                     <>
-                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(effectiveAmount)}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards, netbanking all supported.</p>
+                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(payable)}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards, netbanking all supported.</p>
                       <div className="grid grid-cols-2 gap-2">
                         <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
                           <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>
@@ -360,7 +376,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                     </>
                   ) : (
                     <>
-                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(effectiveAmount)}</span> via UPI app, then upload screenshot below.</p>
+                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(payable)}</span> via UPI app, then upload screenshot below.</p>
                       <div className="grid grid-cols-2 gap-2">
                         <a href={upiIntentUrls.gpay || "#"} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors">
                           <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>

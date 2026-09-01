@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { X, CheckCircle2, Clock3, IdCard, Users } from "lucide-react";
+import { CouponInput, type AppliedCoupon } from "@/components/payments/CouponInput";
 import {
     formatINR,
     computeProgramPrice,
@@ -50,11 +51,13 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
     const [companions, setCompanions] = useState<CompanionRow[]>([]);
     const [savingCompanions, setSavingCompanions] = useState(false);
     const [companionsSaved, setCompanionsSaved] = useState(false);
+    const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
 
     const total = useMemo(
         () => computeProgramPrice(program, { friends, familyOption, lunch }),
         [program, friends, familyOption, lunch]
     );
+    const payable = coupon?.finalAmount ?? total;
 
     const buildCompanionRows = useCallback((): CompanionRow[] => {
         const rows: CompanionRow[] = [];
@@ -80,7 +83,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
             const orderRes = await fetch("/api/programs/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch }),
+                body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null }),
             });
             if (!orderRes.ok) {
                 const err = await orderRes.json();
@@ -113,7 +116,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                     const verifyRes = await fetch("/api/programs/verify", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ...response, programSlug: program.slug, friends, familyOption, lunch }),
+                        body: JSON.stringify({ ...response, programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null }),
                     });
                     if (verifyRes.ok) {
                         const { bookingId: id } = await verifyRes.json();
@@ -133,7 +136,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
             setError("Payment failed. Please try again.");
             setPaying(false);
         }
-    }, [program, friends, familyOption, lunch, buildCompanionRows]);
+    }, [program, friends, familyOption, lunch, coupon, buildCompanionRows]);
 
     const saveCompanions = useCallback(async () => {
         if (!bookingId) return;
@@ -239,13 +242,23 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                                 </label>
                             ) : null}
 
-                            <div className="flex items-center justify-between border-t border-border pt-4">
-                                <span className="text-sm text-muted uppercase tracking-wider">Total</span>
-                                <span className="font-heading text-3xl font-bold text-orange">{formatINR(total)}</span>
+                            <CouponInput amount={total} onChange={setCoupon} />
+
+                            <div className="border-t border-border pt-4 space-y-1">
+                                {coupon && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted">Subtotal</span>
+                                        <span className="text-muted line-through">{formatINR(total)}</span>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-muted uppercase tracking-wider">Total</span>
+                                    <span className="font-heading text-3xl font-bold text-orange">{formatINR(payable)}</span>
+                                </div>
                             </div>
 
                             <Button size="lg" className="w-full" loading={paying} onClick={handlePay}>
-                                Pay {formatINR(total)} &amp; Book
+                                Pay {formatINR(payable)} &amp; Book
                             </Button>
                             <p className="text-[11px] text-muted text-center">
                                 Secure payment via Razorpay (GPay, PhonePe, Paytm, cards, UPI). Your booking is confirmed after payment and reviewed by our team.

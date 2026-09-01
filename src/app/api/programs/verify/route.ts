@@ -7,6 +7,7 @@ import { computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/p
 import { getProgramBySlug } from "@/lib/programsDb";
 import { notifyRider } from "@/lib/notify";
 import { pointsForAmount } from "@/lib/rewards";
+import { applyCoupon } from "@/lib/pricing";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
         friends,
         familyOption,
         lunch,
+        couponCode,
     } = await req.json();
 
     const secret = await getRazorpaySecret();
@@ -49,11 +51,14 @@ export async function POST(req: Request) {
         familyOption && FAMILY_PACKAGES[familyOption as FamilyOption] ? (familyOption as FamilyOption) : null;
     const normalizedFriends = program.supportsCompanions ? Math.max(0, Math.floor(Number(friends) || 0)) : 0;
 
-    const amount = computeProgramPrice(program, {
+    const baseAmount = computeProgramPrice(program, {
         friends: normalizedFriends,
         familyOption: normalizedFamily,
         lunch: !!lunch,
     });
+
+    const quote = await applyCoupon(baseAmount, couponCode);
+    const amount = quote.finalAmount;
 
     try {
         const booking = await prisma.programBooking.create({
@@ -76,6 +81,11 @@ export async function POST(req: Request) {
             where: { id: userId },
             data: { loyaltyPoints: { increment: pointsForAmount(amount) } },
         });
+
+        // Count coupon usage.
+        if (quote.coupon) {
+            await prisma.coupon.update({ where: { id: quote.coupon.id }, data: { usedCount: { increment: 1 } } }).catch(() => {});
+        }
 
         const admins = await prisma.user.findMany({ where: { role: "admin" }, select: { id: true } });
         await Promise.all(

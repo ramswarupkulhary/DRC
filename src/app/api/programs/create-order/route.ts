@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getRazorpay } from "@/lib/razorpay";
 import { computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { applyCoupon } from "@/lib/pricing";
 import { getProgramBySlug } from "@/lib/programsDb";
 
 export async function POST(req: Request) {
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
         );
     }
 
-    const { programSlug, friends, familyOption, lunch } = await req.json();
+    const { programSlug, friends, familyOption, lunch, couponCode } = await req.json();
 
     const program = await getProgramBySlug(programSlug);
     if (!program) {
@@ -31,11 +32,18 @@ export async function POST(req: Request) {
     const normalizedFriends = program.supportsCompanions ? Math.max(0, Math.floor(Number(friends) || 0)) : 0;
 
     // Price is always computed server-side — never trust the client.
-    const amount = computeProgramPrice(program, {
+    const baseAmount = computeProgramPrice(program, {
         friends: normalizedFriends,
         familyOption: normalizedFamily,
         lunch: !!lunch,
     });
+
+    // Apply coupon (server-authoritative).
+    const quote = await applyCoupon(baseAmount, couponCode);
+    if (quote.error) {
+        return NextResponse.json({ error: quote.error }, { status: 400 });
+    }
+    const amount = quote.finalAmount;
 
     if (amount < 1) {
         return NextResponse.json({ error: "Invalid amount." }, { status: 400 });

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Check, Package, Shirt, Award, Calendar, Crown, Copy, Upload, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/Animations";
+import { CouponInput, type AppliedCoupon } from "@/components/payments/CouponInput";
 
 const SIZES = ["S", "M", "L", "XL", "XXL"] as const;
 
@@ -48,6 +49,7 @@ export default function MembershipJoinPage() {
   const [submitting, setSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
+  const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
   const [razorpayEnabled, setRazorpayEnabled] = useState<boolean | null>(null);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
@@ -140,7 +142,7 @@ export default function MembershipJoinPage() {
       const orderRes = await fetch("/api/payments/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "membership", itemId: data.plan.id }),
+        body: JSON.stringify({ type: "membership", itemId: data.plan.id, couponCode: coupon?.code ?? null }),
       });
       if (!orderRes.ok) {
         const err = await orderRes.json();
@@ -178,6 +180,7 @@ export default function MembershipJoinPage() {
               type: "membership",
               itemId: data.plan!.id,
               metadata: { tshirtSize: selectedSize },
+              couponCode: coupon?.code ?? null,
             }),
           });
           if (verifyRes.ok) {
@@ -196,7 +199,7 @@ export default function MembershipJoinPage() {
       setError("Payment failed. Please try again.");
       setPaying(false);
     }
-  }, [data, selectedSize]);
+  }, [data, selectedSize, coupon]);
 
   if (loading || !data) {
     return <div className="min-h-[60vh] flex items-center justify-center text-muted">Loading...</div>;
@@ -331,8 +334,10 @@ export default function MembershipJoinPage() {
 
               {razorpayEnabled ? (
                 <div className="border-t border-border pt-5 space-y-4">
+                  <CouponInput amount={data.plan.price} onChange={setCoupon} />
                   <p className="text-sm text-muted text-center">
-                    Pay <span className="text-orange font-bold">&#8377;{data.plan.price.toLocaleString("en-IN")}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards & netbanking supported. Membership activates instantly.
+                    Pay <span className="text-orange font-bold">&#8377;{(coupon?.finalAmount ?? data.plan.price).toLocaleString("en-IN")}</span>
+                    {coupon && <span className="text-success text-xs ml-1">(saved ₹{coupon.discount.toLocaleString("en-IN")})</span>} securely via Razorpay. GPay, PhonePe, Paytm, cards &amp; netbanking supported. Membership activates instantly.
                   </p>
                   <Button className="w-full" size="lg" disabled={!selectedSize || paying} loading={paying} onClick={handleRazorpayJoin}>
                     Pay &amp; Join Now
