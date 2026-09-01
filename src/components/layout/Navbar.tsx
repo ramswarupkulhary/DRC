@@ -125,6 +125,12 @@ export function Navbar() {
             {session ? (
               <>
                 <NotificationBell />
+                <Link href="/write-review">
+                  <Button variant="outline" size="sm" className="px-2">
+                    <Star className="w-4 h-4" />
+                    <span className="hidden 2xl:inline ml-1.5">Write a Review</span>
+                  </Button>
+                </Link>
                 {userRole === "admin" && (
                   <Link href="/admin/dashboard">
                     <Button variant="outline" size="sm" className="text-orange border-orange/30 bg-orange/10 hover:bg-orange/20 px-2">
