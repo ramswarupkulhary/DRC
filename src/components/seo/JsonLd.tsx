@@ -5,7 +5,7 @@ export function OrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": ["Organization", "SportsActivityLocation"],
     name: "Dirt Ride Camp",
-    alternateName: ["DRC", "DirtRideCamp", "Off Road Academy Bangalore"],
+    alternateName: ["DRC", "DirtRideCamp", "Off Road Academy Bangalore", "Offroad Academy Bangalore", "Offroad Academy India"],
     url: BASE_URL,
     logo: `${BASE_URL}/opengraph-image`,
     image: `${BASE_URL}/opengraph-image`,
@@ -42,7 +42,7 @@ export function OrganizationJsonLd() {
       closes: "18:00",
     },
     keywords:
-      "off road academy, off road academy bangalore, off road training, off road training bangalore, dirt ride camp, DRC, dirtridecamp, bangalore riding group, off-road bike, adventure motorcycle, camping rides, trail riding, motorcycle academy bangalore, bike trip bangalore, bike trip near bangalore, adventure bike trip, camping trip bangalore, off road classes, riding classes bangalore, motorcycle trip karnataka, adventure camping bangalore",
+      "off road academy, off road academy bangalore, offroad academy bangalore, offroad bangalore, offroad india, offroad training bangalore, off road training, off road training bangalore, dirt ride camp, DRC, dirtridecamp, bangalore riding group, off-road bike, offroad bike, adventure motorcycle, camping rides, trail riding, motorcycle academy bangalore, bike trip bangalore, bike trip near bangalore, adventure bike trip, camping trip bangalore, off road classes, riding classes bangalore, motorcycle trip karnataka, adventure camping bangalore",
   };
 
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;

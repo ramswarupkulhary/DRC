@@ -34,6 +34,10 @@ export const landingPages: Record<string, LandingPageData> = {
         keywords: [
             "off road training bangalore",
             "off road academy bangalore",
+            "offroad training bangalore",
+            "offroad academy bangalore",
+            "offroad bangalore",
+            "offroad india",
             "dirt bike training bangalore",
             "off road riding course bangalore",
             "motorcycle training bangalore",

@@ -59,7 +59,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
         fetch("/api/programs/bikes")
             .then((r) => r.json())
             .then((d) => setBikes(d.bikes || []))
-            .catch(() => {});
+            .catch(() => { });
     }, []);
 
     const bikePrice = bikes.find((b) => b.id === bikeId)?.price ?? 0;
