@@ -5,10 +5,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ProgramBookingModal } from "./ProgramBookingModal";
 import {
-    programs,
     categoryMeta,
     formatINR,
-    getProgram,
     type Program,
     type ProgramCategory,
     type FamilyOption,
@@ -232,19 +230,18 @@ function ProgramCard({ program, onView, onBook }: { program: Program; onView: ()
     );
 }
 
-export function ProgramsExplorer() {
+export function ProgramsExplorer({ programs }: { programs: Program[] }) {
     const [detail, setDetail] = useState<Program | null>(null);
     const [booking, setBooking] = useState<{ program: Program; presetFamily: FamilyOption | null } | null>(null);
 
     // Family & Friends cards are add-ons to the Overnighter, so they open the
     // Overnighter booking (which has the companion selectors).
     function openBooking(program: Program) {
+        const over = programs.find((p) => p.slug === "overnighter-trail");
         if (program.slug === "family-overnighter-plan") {
-            const over = getProgram("overnighter-trail");
             if (over) return setBooking({ program: over, presetFamily: "rider_wife" });
         }
         if (program.slug === "friends-plan") {
-            const over = getProgram("overnighter-trail");
             if (over) return setBooking({ program: over, presetFamily: null });
         }
         setBooking({ program, presetFamily: null });

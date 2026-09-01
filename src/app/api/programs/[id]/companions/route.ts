@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getProgram, familyCompanionCount, type FamilyOption } from "@/lib/programs";
+import { familyCompanionCount, type FamilyOption } from "@/lib/programs";
+import { getProgramBySlug } from "@/lib/programsDb";
 
 interface CompanionInput {
     firstName?: string;
@@ -30,7 +31,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         return NextResponse.json({ error: "Invalid companions" }, { status: 400 });
     }
 
-    const program = getProgram(booking.programSlug);
+    const program = await getProgramBySlug(booking.programSlug);
     const maxCompanions =
         booking.friends + familyCompanionCount(booking.familyOption as FamilyOption | null);
     if (!program || maxCompanions === 0) {

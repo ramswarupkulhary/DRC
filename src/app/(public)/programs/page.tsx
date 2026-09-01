@@ -4,14 +4,17 @@ import { ChevronRight, ShieldCheck, ShieldAlert, ArrowDown } from "lucide-react"
 import { ProgramsExplorer } from "@/components/programs/ProgramsExplorer";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import {
-    programs,
     skillProgression,
     customerJourney,
     recommendedProgression,
     riderRequirements,
     safetyDisclaimers,
     formatINR,
+    type Program,
 } from "@/lib/programs";
+import { listPrograms } from "@/lib/programsDb";
+
+export const dynamic = "force-dynamic";
 
 const BASE_URL = "https://www.dirtridecamp.com";
 
@@ -41,7 +44,7 @@ export const metadata: Metadata = {
     },
 };
 
-function programsJsonLd() {
+function programsJsonLd(programs: Program[]) {
     return {
         "@context": "https://schema.org",
         "@type": "ItemList",
@@ -72,10 +75,11 @@ function programsJsonLd() {
     };
 }
 
-export default function ProgramsPage() {
+export default async function ProgramsPage() {
+    const programs = await listPrograms({ activeOnly: true });
     return (
         <div>
-            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(programsJsonLd()) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(programsJsonLd(programs)) }} />
             <BreadcrumbJsonLd
                 items={[
                     { name: "Home", url: BASE_URL },
@@ -140,7 +144,7 @@ export default function ProgramsPage() {
                 </section>
 
                 {/* Program catalog (interactive) */}
-                <ProgramsExplorer />
+                <ProgramsExplorer programs={programs} />
 
                 {/* Customer journey */}
                 <section className="mt-24">

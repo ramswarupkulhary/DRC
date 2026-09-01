@@ -3,7 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getRazorpaySecret } from "@/lib/razorpay";
-import { getProgram, computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { getProgramBySlug } from "@/lib/programsDb";
 import { notifyRider } from "@/lib/notify";
 import { pointsForAmount } from "@/lib/rewards";
 import crypto from "crypto";
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Invalid payment signature" }, { status: 400 });
     }
 
-    const program = getProgram(programSlug);
+    const program = await getProgramBySlug(programSlug);
     if (!program) {
         return NextResponse.json({ error: "Invalid program" }, { status: 400 });
     }

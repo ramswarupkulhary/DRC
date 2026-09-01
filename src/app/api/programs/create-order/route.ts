@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getRazorpay } from "@/lib/razorpay";
-import { getProgram, computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { getProgramBySlug } from "@/lib/programsDb";
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
 
     const { programSlug, friends, familyOption, lunch } = await req.json();
 
-    const program = getProgram(programSlug);
+    const program = await getProgramBySlug(programSlug);
     if (!program) {
         return NextResponse.json({ error: "Invalid program." }, { status: 400 });
     }

@@ -699,6 +699,28 @@ model PushSubscription {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Program {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  category           String
+  name               String
+  price              Int
+  priceUnit          String?
+  duration           String
+  difficulty         String
+  description        String
+  lunch              String?
+  optionalLunch      Int?
+  requiresRiding     Boolean  @default(true)
+  supportsCompanions Boolean  @default(false)
+  active             Boolean  @default(true)
+  featured           Boolean  @default(false)
+  sortOrder          Int      @default(0)
+  content            String? // JSON: priceOptions, included, learn, experience, guidance, bestFor, schedule, days, whatsIncluded, familyExperience, note, priceOptions
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
 model SiteSetting {
   id    String @id @default(cuid())
   key   String @unique
