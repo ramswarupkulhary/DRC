@@ -45,6 +45,7 @@ export interface Program {
     familyExperience?: string[];
     note?: string;
     requiresRiding?: boolean;
+    supportsCompanions?: boolean;
 }
 
 export const categoryMeta: Record<ProgramCategory, { label: string; accent: string; blurb: string }> = {
@@ -420,6 +421,7 @@ export const programs: Program[] = [
         duration: "Evening + Overnight Camping + Morning Trail",
         difficulty: "Beginner to Intermediate (route dependent)",
         requiresRiding: true,
+        supportsCompanions: true,
         description:
             "A premium DRC off-road adventure combining trail riding, camping, community and nature.",
         days: [
@@ -593,4 +595,47 @@ export function getProgram(slug: string): Program | undefined {
 
 export function formatINR(amount: number): string {
     return `₹${amount.toLocaleString("en-IN")}`;
+}
+
+// ─── Companion pricing (Overnighter add-ons) ───
+export const FRIEND_PRICE = 1999;
+
+export type FamilyOption = "rider_wife" | "rider_wife_children";
+
+export const FAMILY_PACKAGES: Record<FamilyOption, { label: string; price: number; note?: string }> = {
+    rider_wife: { label: "Rider + Wife", price: 7999 },
+    rider_wife_children: { label: "Rider + Wife + Children", price: 9999, note: "Max 2 children" },
+};
+
+export interface CompanionSelection {
+    friends?: number;
+    familyOption?: FamilyOption | null;
+    lunch?: boolean;
+}
+
+/** Authoritative price for a program including companion add-ons and optional lunch. */
+export function computeProgramPrice(program: Program, sel?: CompanionSelection): number {
+    const friends = Math.max(0, Math.floor(sel?.friends ?? 0));
+    const familyOption = sel?.familyOption ?? null;
+
+    let base = program.price;
+    if (program.supportsCompanions && familyOption && FAMILY_PACKAGES[familyOption]) {
+        base = FAMILY_PACKAGES[familyOption].price;
+    }
+
+    let total = base;
+    if (program.supportsCompanions) {
+        total += friends * FRIEND_PRICE;
+    }
+    if (program.optionalLunch && sel?.lunch) {
+        total += program.optionalLunch;
+    }
+    return total;
+}
+
+/** Number of family companions implied by a family option (for the companion form). */
+export function familyCompanionCount(familyOption?: FamilyOption | null): number {
+    if (familyOption === "rider_wife") return 1; // wife
+    if (familyOption === "rider_wife_children") return 3; // wife + up to 2 children
+    return 0;
 }

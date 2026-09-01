@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X, User, LogOut, ChevronDown, Crown, Bell, Calendar, Shield } from "lucide-react";
+import { Menu, X, User, LogOut, ChevronDown, Crown, Bell, Calendar, Shield, MapPinned } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,6 +26,7 @@ const navLinks = [
 
 const userMenuLinks = [
   { href: "/profile", label: "My Profile", icon: User },
+  { href: "/my-programs", label: "My Programs", icon: MapPinned },
 ];
 
 export function Navbar() {
@@ -350,6 +351,15 @@ export function Navbar() {
                     >
                       <Crown className="w-4 h-4" />
                       {isMember ? "My Membership" : "Membership"}
+                    </Link>
+
+                    <Link
+                      href="/my-programs"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground/80 hover:text-orange hover:bg-surface-light rounded-sm transition-colors"
+                    >
+                      <MapPinned className="w-4 h-4" />
+                      My Programs
                     </Link>
 
                     <Link

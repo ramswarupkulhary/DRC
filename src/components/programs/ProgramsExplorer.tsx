@@ -8,8 +8,10 @@ import {
     programs,
     categoryMeta,
     formatINR,
+    getProgram,
     type Program,
     type ProgramCategory,
+    type FamilyOption,
 } from "@/lib/programs";
 import {
     X,
@@ -232,7 +234,21 @@ function ProgramCard({ program, onView, onBook }: { program: Program; onView: ()
 
 export function ProgramsExplorer() {
     const [detail, setDetail] = useState<Program | null>(null);
-    const [booking, setBooking] = useState<Program | null>(null);
+    const [booking, setBooking] = useState<{ program: Program; presetFamily: FamilyOption | null } | null>(null);
+
+    // Family & Friends cards are add-ons to the Overnighter, so they open the
+    // Overnighter booking (which has the companion selectors).
+    function openBooking(program: Program) {
+        if (program.slug === "family-overnighter-plan") {
+            const over = getProgram("overnighter-trail");
+            if (over) return setBooking({ program: over, presetFamily: "rider_wife" });
+        }
+        if (program.slug === "friends-plan") {
+            const over = getProgram("overnighter-trail");
+            if (over) return setBooking({ program: over, presetFamily: null });
+        }
+        setBooking({ program, presetFamily: null });
+    }
 
     return (
         <>
@@ -254,7 +270,7 @@ export function ProgramsExplorer() {
                                     key={program.slug}
                                     program={program}
                                     onView={() => setDetail(program)}
-                                    onBook={() => setBooking(program)}
+                                    onBook={() => openBooking(program)}
                                 />
                             ))}
                         </div>
@@ -287,7 +303,7 @@ export function ProgramsExplorer() {
                                 onClick={() => {
                                     const p = detail;
                                     setDetail(null);
-                                    setBooking(p);
+                                    openBooking(p);
                                 }}
                             >
                                 Book Now
@@ -298,7 +314,7 @@ export function ProgramsExplorer() {
             )}
 
             {/* Booking modal */}
-            {booking && <ProgramBookingModal program={booking} onClose={() => setBooking(null)} />}
+            {booking && <ProgramBookingModal program={booking.program} presetFamily={booking.presetFamily} onClose={() => setBooking(null)} />}
         </>
     );
 }

@@ -10,10 +10,10 @@ echo "node_modules/.bin contents:"
 ls node_modules/.bin/prisma node_modules/.bin/next 2>&1 || echo "(not found in node_modules/.bin)"
 
 echo "--- Running prisma db push ---"
-node_modules/.bin/prisma db push --skip-generate 2>&1 || {
+node_modules/.bin/prisma db push 2>&1 || {
   echo "WARNING: prisma db push failed, retrying in 5s..."
   sleep 5
-  node_modules/.bin/prisma db push --skip-generate 2>&1 || {
+  node_modules/.bin/prisma db push 2>&1 || {
     echo "ERROR: prisma db push failed twice, starting anyway..."
   }
 }
