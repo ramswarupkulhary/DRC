@@ -18,7 +18,7 @@ const BASE_URL = "https://www.dirtridecamp.com";
 export const metadata: Metadata = {
     title: "Off-Road Programs — Training, Trails & Adventure Experiences | DRC Bangalore",
     description:
-        "Explore DRC off-road programs: private motorcycle training, guided dirt trails, overnight camping rides & family adventure experiences near Bangalore. Book beginner to technical off-road programs.",
+        "Explore DRC off-road programs: private motorcycle training, guided off-road trails, overnight camping rides & family adventure experiences near Bangalore. Book beginner to technical off-road programs.",
     keywords: [
         "off road programs bangalore",
         "off road training bangalore",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
         type: "website",
         title: "DRC Off-Road Programs — Training, Trails & Adventure Experiences",
         description:
-            "Private off-road training, guided dirt trails, overnight camping rides & family adventures near Bangalore.",
+            "Private off-road training, guided off-road trails, overnight camping rides & family adventures near Bangalore.",
         url: "/programs",
     },
 };
@@ -93,7 +93,7 @@ export default function ProgramsPage() {
                         DRC Programs
                     </h1>
                     <p className="text-foreground/70 text-lg mt-5 max-w-2xl">
-                        Structured off-road training, guided dirt trails and premium adventure experiences — built to take you
+                        Structured off-road training, guided off-road trails and premium adventure experiences — built to take you
                         from your first standing position to confident technical trail riding.
                     </p>
                     <div className="flex flex-wrap gap-3 mt-8">

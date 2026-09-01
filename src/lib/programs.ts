@@ -59,7 +59,7 @@ export const categoryMeta: Record<ProgramCategory, { label: string; accent: stri
         label: "DRC Trails",
         accent: "Explore & ride",
         blurb:
-            "Guided off-road adventures across natural terrain. Built for exploration, community and the pure joy of riding dirt — with ride-leader support.",
+            "Guided off-road adventures across natural terrain. Built for exploration, community and the pure joy of riding off-road — with ride-leader support.",
     },
     special: {
         label: "Special Experiences",
@@ -83,7 +83,7 @@ export const programs: Program[] = [
         optionalLunch: 299,
         requiresRiding: true,
         description:
-            "A personalized off-road training experience designed to help riders build confidence, improve motorcycle control and understand the fundamentals of riding on dirt and natural terrain.",
+            "A personalized off-road training experience designed to help riders build confidence, improve motorcycle control and understand the fundamentals of off-road riding on natural terrain.",
         learn: [
             {
                 title: "Module 1 — Rider & Bike Introduction",
@@ -364,8 +364,8 @@ export const programs: Program[] = [
         difficulty: "Beginner Friendly",
         requiresRiding: true,
         description:
-            "A guided off-road trail experience designed for riders who want to explore dirt trails, natural terrain and adventure riding with the DRC community.",
-        experience: ["Guided trail ride", "Natural terrain", "Dirt sections", "Scenic locations", "Community riding"],
+            "A guided off-road trail experience designed for riders who want to explore off-road trails, natural terrain and adventure riding with the DRC community.",
+        experience: ["Guided trail ride", "Natural terrain", "Off-road sections", "Scenic locations", "Community riding"],
         guidance: [
             "Standing position",
             "Terrain awareness",
@@ -392,10 +392,10 @@ export const programs: Program[] = [
         lunch: "Included",
         requiresRiding: true,
         description:
-            "A complete day of guided off-road exploration across natural terrain, dirt trails and adventure routes.",
+            "A complete day of guided off-road exploration across natural terrain, off-road trails and adventure routes.",
         included: ["Guided trail", "Lunch", "Ride leader support"],
         experience: [
-            "Dirt trails",
+            "Off-road trails",
             "Rocks",
             "Hills",
             "Uneven terrain",

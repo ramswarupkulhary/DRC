@@ -10,7 +10,7 @@ export function OrganizationJsonLd() {
     logo: `${BASE_URL}/opengraph-image`,
     image: `${BASE_URL}/opengraph-image`,
     description:
-      "Bangalore's premier off-road academy offering adventure bike trips, dirt bike training classes, motorcycle camping trips & trail riding across Karnataka and India.",
+      "Bangalore's premier off-road academy offering adventure bike trips, off-road training classes, motorcycle camping trips & trail riding across Karnataka and India.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Bangalore",

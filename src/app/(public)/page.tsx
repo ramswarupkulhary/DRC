@@ -53,7 +53,7 @@ export default async function HomePage() {
   const homeFaqs = [
     {
       question: "What is DRC — Dirt Ride Camp?",
-      answer: "DRC (Dirt Ride Camp) is Bangalore's premier off-road academy and adventure riding community. We organize curated off-road bike trips, professional dirt bike training classes, adventure camping trips, and trail riding experiences across Karnataka and India. Founded by passionate riders, DRC offers limited-slot adventure rides to ensure quality, safety, and a personal touch.",
+      answer: "DRC (Dirt Ride Camp) is Bangalore's premier off-road academy and adventure riding community. We organize curated off-road bike trips, professional off-road training classes, adventure camping trips, and trail riding experiences across Karnataka and India. Founded by passionate riders, DRC offers limited-slot adventure rides to ensure quality, safety, and a personal touch.",
     },
     {
       question: "What off-road training classes does DRC's academy offer in Bangalore?",
