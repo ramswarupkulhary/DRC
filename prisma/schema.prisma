@@ -663,6 +663,8 @@ model ProgramBooking {
   friends       Int      @default(0)
   familyOption  String?
   lunch         Boolean  @default(false)
+  bikeName      String?
+  bikePrice     Int      @default(0)
   amount        Int
   status        String   @default("awaiting_approval")
   paymentId     String?
@@ -719,6 +721,16 @@ model Program {
   content            String? // JSON: priceOptions, included, learn, experience, guidance, bestFor, schedule, days, whatsIncluded, familyExperience, note, priceOptions
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+}
+
+model RentalBike {
+  id        String   @id @default(cuid())
+  name      String
+  price     Int
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model SiteSetting {

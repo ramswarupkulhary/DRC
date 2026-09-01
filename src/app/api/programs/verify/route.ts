@@ -3,11 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getRazorpaySecret } from "@/lib/razorpay";
-import { computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
-import { getProgramBySlug } from "@/lib/programsDb";
+import { computeProgramBreakdown, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { getProgramBySlug, getRentalBike } from "@/lib/programsDb";
 import { notifyRider } from "@/lib/notify";
 import { pointsForAmount } from "@/lib/rewards";
-import { applyCoupon } from "@/lib/pricing";
+import { applyCouponToBase } from "@/lib/pricing";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
         familyOption,
         lunch,
         couponCode,
+        bikeId,
     } = await req.json();
 
     const secret = await getRazorpaySecret();
@@ -51,13 +52,15 @@ export async function POST(req: Request) {
         familyOption && FAMILY_PACKAGES[familyOption as FamilyOption] ? (familyOption as FamilyOption) : null;
     const normalizedFriends = program.supportsCompanions ? Math.max(0, Math.floor(Number(friends) || 0)) : 0;
 
-    const baseAmount = computeProgramPrice(program, {
+    const bike = await getRentalBike(bikeId);
+    const breakdown = computeProgramBreakdown(program, {
         friends: normalizedFriends,
         familyOption: normalizedFamily,
         lunch: !!lunch,
+        bikePrice: bike.price,
     });
 
-    const quote = await applyCoupon(baseAmount, couponCode);
+    const quote = await applyCouponToBase(breakdown.riderBase, breakdown.total, couponCode);
     const amount = quote.finalAmount;
 
     try {
@@ -69,6 +72,8 @@ export async function POST(req: Request) {
                 friends: normalizedFriends,
                 familyOption: normalizedFamily,
                 lunch: !!lunch,
+                bikeName: bike.name,
+                bikePrice: bike.price,
                 amount,
                 status: "awaiting_approval",
                 paymentStatus: "paid",

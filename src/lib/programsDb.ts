@@ -90,3 +90,10 @@ export async function getProgramBySlug(slug: string): Promise<Program | undefine
     if (row) return rowToProgram(row);
     return getStaticProgram(slug);
 }
+/** Resolves an authoritative rental-bike price (own bike → 0). */
+export async function getRentalBike(bikeId?: string | null): Promise<{ name: string | null; price: number }> {
+  if (!bikeId) return { name: null, price: 0 };
+  const bike = await prisma.rentalBike.findUnique({ where: { id: bikeId } });
+  if (!bike || !bike.active) return { name: null, price: 0 };
+  return { name: bike.name, price: bike.price };
+}

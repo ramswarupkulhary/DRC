@@ -89,6 +89,37 @@ export async function applyCoupon(amount: number, couponCode?: string | null): P
     return { baseAmount: amount, finalAmount, discount: amount - finalAmount, coupon: { id: coupon.id, code: coupon.code } };
 }
 
+/**
+ * Applies a coupon whose discount is computed on `discountableBase` only, but
+ * subtracted from `total`. Eligibility (minAmount) is checked against `total`.
+ * Used for programs where family/friends/lunch/bike extras are NOT discountable.
+ */
+export async function applyCouponToBase(
+    discountableBase: number,
+    total: number,
+    couponCode?: string | null
+): Promise<{ finalAmount: number; discount: number; coupon: { id: string; code: string } | null; error?: string }> {
+    if (!couponCode) return { finalAmount: total, discount: 0, coupon: null };
+
+    const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
+    if (!coupon || !coupon.active || (coupon.validUntil && coupon.validUntil < new Date())) {
+        return { finalAmount: total, discount: 0, coupon: null, error: "Invalid or expired coupon" };
+    }
+    if (coupon.minAmount && total < coupon.minAmount) {
+        return { finalAmount: total, discount: 0, coupon: null, error: `Minimum amount ₹${coupon.minAmount} required` };
+    }
+    if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
+        return { finalAmount: total, discount: 0, coupon: null, error: "Coupon usage limit reached" };
+    }
+
+    const discount =
+        coupon.type === "percentage"
+            ? Math.round((discountableBase * coupon.value) / 100)
+            : Math.min(discountableBase, coupon.value);
+
+    return { finalAmount: Math.max(0, total - discount), discount, coupon: { id: coupon.id, code: coupon.code } };
+}
+
 /** Full authoritative quote for a purchase: base price + coupon. */
 export async function computeQuote(
     type: PurchaseType,

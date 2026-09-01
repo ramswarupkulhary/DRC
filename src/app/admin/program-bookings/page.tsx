@@ -19,6 +19,8 @@ interface Booking {
     friends: number;
     familyOption: string | null;
     lunch: boolean;
+    bikeName: string | null;
+    bikePrice: number;
     amount: number;
     status: string;
     paymentId: string | null;
@@ -116,6 +118,7 @@ export default function AdminProgramBookingsPage() {
                                             {b.familyOption ? b.familyOption.replace(/_/g, " ") : ""}{b.friends > 0 ? ` · ${b.friends} friend(s)` : ""}
                                         </p>
                                     )}
+                                    <p className="text-xs text-muted mt-1">Bike: {b.bikeName ? `${b.bikeName} (₹${b.bikePrice.toLocaleString("en-IN")})` : "Own bike"}</p>
                                 </div>
                             </div>
 

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { X, CheckCircle2, Clock3, IdCard, Users } from "lucide-react";
+import { X, CheckCircle2, Clock3, IdCard, Users, Bike } from "lucide-react";
 import { CouponInput, type AppliedCoupon } from "@/components/payments/CouponInput";
 import {
     formatINR,
@@ -52,10 +52,21 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
     const [savingCompanions, setSavingCompanions] = useState(false);
     const [companionsSaved, setCompanionsSaved] = useState(false);
     const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
+    const [bikes, setBikes] = useState<{ id: string; name: string; price: number }[]>([]);
+    const [bikeId, setBikeId] = useState<string | null>(null); // null = own bike
+
+    useEffect(() => {
+        fetch("/api/programs/bikes")
+            .then((r) => r.json())
+            .then((d) => setBikes(d.bikes || []))
+            .catch(() => {});
+    }, []);
+
+    const bikePrice = bikes.find((b) => b.id === bikeId)?.price ?? 0;
 
     const total = useMemo(
-        () => computeProgramPrice(program, { friends, familyOption, lunch }),
-        [program, friends, familyOption, lunch]
+        () => computeProgramPrice(program, { friends, familyOption, lunch, bikePrice }),
+        [program, friends, familyOption, lunch, bikePrice]
     );
     const payable = coupon?.finalAmount ?? total;
 
@@ -85,7 +96,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                 const res = await fetch("/api/programs/free-checkout", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null }),
+                    body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null, bikeId }),
                 });
                 const data = await res.json();
                 if (res.ok) {
@@ -101,7 +112,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
             const orderRes = await fetch("/api/programs/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null }),
+                body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null, bikeId }),
             });
             if (!orderRes.ok) {
                 const err = await orderRes.json();
@@ -134,7 +145,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                     const verifyRes = await fetch("/api/programs/verify", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ...response, programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null }),
+                        body: JSON.stringify({ ...response, programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null, bikeId }),
                     });
                     if (verifyRes.ok) {
                         const { bookingId: id } = await verifyRes.json();
@@ -154,7 +165,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
             setError("Payment failed. Please try again.");
             setPaying(false);
         }
-    }, [program, friends, familyOption, lunch, coupon, payable, buildCompanionRows]);
+    }, [program, friends, familyOption, lunch, coupon, payable, bikeId, buildCompanionRows]);
 
     const saveCompanions = useCallback(async () => {
         if (!bookingId) return;
@@ -260,7 +271,34 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                                 </label>
                             ) : null}
 
-                            <CouponInput amount={total} onChange={setCoupon} />
+                            {program.requiresRiding !== false && (
+                                <div>
+                                    <p className="text-sm font-medium text-tan-light mb-2 flex items-center gap-1.5"><Bike className="w-4 h-4 text-orange" /> Bike</p>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setBikeId(null)}
+                                            className={`flex items-center justify-between px-4 py-3 rounded-sm border text-left transition-colors ${bikeId === null ? "border-orange bg-orange/10" : "border-border bg-background hover:border-orange/40"}`}
+                                        >
+                                            <span className="text-sm text-foreground">I&apos;ll bring my own bike</span>
+                                            <span className="font-heading font-bold text-success">Free</span>
+                                        </button>
+                                        {bikes.map((b) => (
+                                            <button
+                                                key={b.id}
+                                                type="button"
+                                                onClick={() => setBikeId(b.id)}
+                                                className={`flex items-center justify-between px-4 py-3 rounded-sm border text-left transition-colors ${bikeId === b.id ? "border-orange bg-orange/10" : "border-border bg-background hover:border-orange/40"}`}
+                                            >
+                                                <span className="text-sm text-foreground">Rent {b.name}</span>
+                                                <span className="font-heading font-bold text-orange">+{formatINR(b.price)}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <CouponInput amount={total} discountBase={program.price} onChange={setCoupon} />
 
                             <div className="border-t border-border pt-4 space-y-1">
                                 {coupon && (

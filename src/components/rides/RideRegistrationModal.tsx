@@ -381,28 +381,28 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
                         </button>
                       </>
                     ) : (
-                    <>
-                      <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(payable)}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards, netbanking all supported.</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
-                          <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>
-                          Google Pay
-                        </button>
-                        <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
-                          <span className="w-6 h-6 rounded-full bg-[#5F259F] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pe</span>
-                          PhonePe
-                        </button>
-                        <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
-                          <span className="w-6 h-6 rounded-full bg-[#00B9F5] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pt</span>
-                          Paytm
-                        </button>
-                        <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
-                          <span className="w-6 h-6 rounded-full bg-[#333] flex items-center justify-center text-white text-[10px] font-bold shrink-0">₹</span>
-                          Card / UPI
-                        </button>
-                      </div>
-                      <p className="text-[10px] text-muted text-center">Payments verified instantly via Razorpay. No manual approval needed.</p>
-                    </>
+                      <>
+                        <p className="text-sm text-muted">Pay <span className="text-orange font-bold">{formatPrice(payable)}</span> securely via Razorpay. GPay, PhonePe, Paytm, cards, netbanking all supported.</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                            <span className="w-6 h-6 rounded-full bg-[#4285F4] flex items-center justify-center text-white text-[11px] font-bold shrink-0">G</span>
+                            Google Pay
+                          </button>
+                          <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                            <span className="w-6 h-6 rounded-full bg-[#5F259F] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pe</span>
+                            PhonePe
+                          </button>
+                          <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                            <span className="w-6 h-6 rounded-full bg-[#00B9F5] flex items-center justify-center text-white text-[10px] font-bold shrink-0">Pt</span>
+                            Paytm
+                          </button>
+                          <button onClick={handleRazorpay} disabled={paying} className="flex items-center justify-center gap-2 px-3 py-3 bg-surface border border-border rounded-sm text-sm font-medium text-foreground hover:border-orange/50 transition-colors disabled:opacity-50">
+                            <span className="w-6 h-6 rounded-full bg-[#333] flex items-center justify-center text-white text-[10px] font-bold shrink-0">₹</span>
+                            Card / UPI
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-muted text-center">Payments verified instantly via Razorpay. No manual approval needed.</p>
+                      </>
                     )
                   ) : (
                     <>

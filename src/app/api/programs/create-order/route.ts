@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getRazorpay } from "@/lib/razorpay";
-import { computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
-import { applyCoupon } from "@/lib/pricing";
-import { getProgramBySlug } from "@/lib/programsDb";
+import { computeProgramBreakdown, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { applyCouponToBase } from "@/lib/pricing";
+import { getProgramBySlug, getRentalBike } from "@/lib/programsDb";
 
 export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         );
     }
 
-    const { programSlug, friends, familyOption, lunch, couponCode } = await req.json();
+    const { programSlug, friends, familyOption, lunch, couponCode, bikeId } = await req.json();
 
     const program = await getProgramBySlug(programSlug);
     if (!program) {
@@ -31,15 +31,19 @@ export async function POST(req: Request) {
         familyOption && FAMILY_PACKAGES[familyOption as FamilyOption] ? (familyOption as FamilyOption) : null;
     const normalizedFriends = program.supportsCompanions ? Math.max(0, Math.floor(Number(friends) || 0)) : 0;
 
+    // Bike rental price is resolved server-side and is NOT coupon-discountable.
+    const bike = await getRentalBike(bikeId);
+
     // Price is always computed server-side — never trust the client.
-    const baseAmount = computeProgramPrice(program, {
+    const breakdown = computeProgramBreakdown(program, {
         friends: normalizedFriends,
         familyOption: normalizedFamily,
         lunch: !!lunch,
+        bikePrice: bike.price,
     });
 
-    // Apply coupon (server-authoritative).
-    const quote = await applyCoupon(baseAmount, couponCode);
+    // Coupon discounts only the rider's base fare, subtracted from the total.
+    const quote = await applyCouponToBase(breakdown.riderBase, breakdown.total, couponCode);
     if (quote.error) {
         return NextResponse.json({ error: quote.error }, { status: 400 });
     }

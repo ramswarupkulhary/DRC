@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Bike, GraduationCap, Users, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown, ShoppingBag, History, MapPinned, Compass } from "lucide-react";
+import { LayoutDashboard, Bike, GraduationCap, Users, Settings, LogOut, Star, Image as ImageIcon, Mail, Trophy, UserCheck, Building2, Tag, Calendar, FileText, Crown, ShoppingBag, History, MapPinned, Compass, Bike as BikeIcon } from "lucide-react";
 import { AdminMobileNav } from "@/components/admin/AdminMobileNav";
 
 const sidebarLinks = [
@@ -11,6 +11,7 @@ const sidebarLinks = [
   { href: "/admin/past-rides", label: "Past Rides", icon: History },
   { href: "/admin/trainings", label: "Trainings", icon: GraduationCap },
   { href: "/admin/programs", label: "Programs", icon: Compass },
+  { href: "/admin/bikes", label: "Rental Bikes", icon: BikeIcon },
   { href: "/admin/program-bookings", label: "Program Bookings", icon: MapPinned },
   { href: "/admin/events", label: "Events", icon: Trophy },
   { href: "/admin/blog", label: "Blog", icon: FileText },

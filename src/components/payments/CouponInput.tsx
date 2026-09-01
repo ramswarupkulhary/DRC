@@ -23,9 +23,11 @@ export interface AppliedCoupon {
  */
 export function CouponInput({
     amount,
+    discountBase,
     onChange,
 }: {
     amount: number;
+    discountBase?: number; // discount is computed on this (defaults to amount)
     onChange: (applied: AppliedCoupon | null) => void;
 }) {
     const [code, setCode] = useState("");
@@ -33,15 +35,17 @@ export function CouponInput({
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const base = discountBase ?? amount;
+
     const computed = useMemo(() => {
         if (!coupon) return null;
         if (coupon.minAmount && amount < coupon.minAmount) return { invalid: true as const };
         const discount =
             coupon.type === "percentage"
-                ? Math.round((amount * coupon.value) / 100)
-                : Math.min(amount, coupon.value);
+                ? Math.round((base * coupon.value) / 100)
+                : Math.min(base, coupon.value);
         return { invalid: false as const, discount, finalAmount: Math.max(0, amount - discount) };
-    }, [coupon, amount]);
+    }, [coupon, amount, base]);
 
     // Report result to the parent whenever it changes.
     const report = useCallback(onChange, [onChange]);

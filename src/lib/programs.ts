@@ -611,26 +611,40 @@ export interface CompanionSelection {
     friends?: number;
     familyOption?: FamilyOption | null;
     lunch?: boolean;
+    bikePrice?: number;
 }
 
-/** Authoritative price for a program including companion add-ons and optional lunch. */
-export function computeProgramPrice(program: Program, sel?: CompanionSelection): number {
-    const friends = Math.max(0, Math.floor(sel?.friends ?? 0));
+export interface ProgramBreakdown {
+    riderBase: number; // rider's own fare — the only part a coupon discounts
+    familyUpgrade: number;
+    friends: number;
+    lunch: number;
+    bike: number;
+    extras: number; // everything that is NOT coupon-discountable
+    total: number;
+}
+
+/** Full price breakdown; only `riderBase` is coupon-discountable. */
+export function computeProgramBreakdown(program: Program, sel?: CompanionSelection): ProgramBreakdown {
+    const friendsCount = Math.max(0, Math.floor(sel?.friends ?? 0));
     const familyOption = sel?.familyOption ?? null;
 
-    let base = program.price;
-    if (program.supportsCompanions && familyOption && FAMILY_PACKAGES[familyOption]) {
-        base = FAMILY_PACKAGES[familyOption].price;
-    }
+    const riderBase = program.price;
+    const familyUpgrade =
+        program.supportsCompanions && familyOption && FAMILY_PACKAGES[familyOption]
+            ? Math.max(0, FAMILY_PACKAGES[familyOption].price - program.price)
+            : 0;
+    const friends = program.supportsCompanions ? friendsCount * FRIEND_PRICE : 0;
+    const lunch = program.optionalLunch && sel?.lunch ? program.optionalLunch : 0;
+    const bike = Math.max(0, Math.floor(sel?.bikePrice ?? 0));
 
-    let total = base;
-    if (program.supportsCompanions) {
-        total += friends * FRIEND_PRICE;
-    }
-    if (program.optionalLunch && sel?.lunch) {
-        total += program.optionalLunch;
-    }
-    return total;
+    const extras = familyUpgrade + friends + lunch + bike;
+    return { riderBase, familyUpgrade, friends, lunch, bike, extras, total: riderBase + extras };
+}
+
+/** Authoritative total price for a program including all add-ons. */
+export function computeProgramPrice(program: Program, sel?: CompanionSelection): number {
+    return computeProgramBreakdown(program, sel).total;
 }
 
 /** Number of family companions implied by a family option (for the companion form). */
