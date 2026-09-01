@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
+import { refundPayment } from "@/lib/razorpay";
+import { promoteWaitlist } from "@/lib/waitlist";
 
 export async function PATCH(
   req: Request,
@@ -23,6 +25,15 @@ export async function PATCH(
       training: { select: { title: true } },
     },
   });
+
+  // Auto-refund only when an admin rejects a paid registration.
+  // Rider-initiated cancellations are non-refundable.
+  if (body.status === "rejected" && registration.paymentStatus === "paid" && registration.paymentId) {
+    const refunded = await refundPayment(registration.paymentId, registration.amount);
+    if (refunded) {
+      await prisma.registration.update({ where: { id }, data: { paymentStatus: "refunded" } });
+    }
+  }
 
   const eventTitle = registration.ride?.title || registration.training?.title || "event";
   const riderEmail = registration.user.email;
@@ -159,6 +170,15 @@ export async function PATCH(
       }
     } catch (err) {
       console.error("[WAITLIST] Auto-promotion failed:", err);
+    }
+  }
+
+  // Training waitlist promotion (rides handled above) — also pushes web-push/WhatsApp.
+  if (body.status === "cancelled" && registration.trainingId) {
+    try {
+      await promoteWaitlist({ trainingId: registration.trainingId });
+    } catch (err) {
+      console.error("[WAITLIST] Training auto-promotion failed:", err);
     }
   }
 

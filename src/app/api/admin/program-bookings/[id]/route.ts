@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { refundPayment } from "@/lib/razorpay";
+import { notifyRider } from "@/lib/notify";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
@@ -22,23 +24,34 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
+    // Auto-refund the payment when a paid booking is rejected.
+    let refunded = false;
+    if (status === "rejected" && booking.paymentStatus === "paid" && booking.paymentId) {
+        refunded = await refundPayment(booking.paymentId, booking.amount);
+    }
+
     await prisma.programBooking.update({
         where: { id },
-        data: { status, rejectionNote: status === "rejected" ? rejectionNote || null : null },
-    });
-
-    await prisma.notification.create({
         data: {
-            userId: booking.userId,
-            type: "booking",
-            title: status === "approved" ? "Booking Approved" : "Booking Update",
-            message:
-                status === "approved"
-                    ? `You're confirmed for ${booking.programName}. See you on the trail!`
-                    : `Your ${booking.programName} booking was not approved. ${rejectionNote || "Our team will contact you."}`,
-            link: "/my-programs",
+            status,
+            rejectionNote: status === "rejected" ? rejectionNote || null : null,
+            ...(refunded ? { paymentStatus: "refunded" } : {}),
         },
     });
 
-    return NextResponse.json({ success: true });
+    await notifyRider({
+        userId: booking.userId,
+        type: "booking",
+        title: status === "approved" ? "Booking Approved" : "Booking Update",
+        message:
+            status === "approved"
+                ? `You're confirmed for ${booking.programName}. See you on the trail!`
+                : `Your ${booking.programName} booking was not approved.${refunded ? " A full refund has been initiated to your original payment method." : ""} ${rejectionNote || ""}`.trim(),
+        link: "/my-programs",
+        email: true,
+        push: true,
+        whatsapp: true,
+    });
+
+    return NextResponse.json({ success: true, refunded });
 }

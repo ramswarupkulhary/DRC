@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
+import { EnablePushButton } from "@/components/EnablePushButton";
 
 interface Notification {
   id: string;
@@ -40,14 +41,17 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <SectionHeader title="Notifications" align="left" />
-        {unreadCount > 0 && (
-          <button
-            onClick={markAllRead}
-            className="text-sm text-orange hover:underline font-medium"
-          >
-            Mark all as read
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          <EnablePushButton />
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllRead}
+              className="text-sm text-orange hover:underline font-medium"
+            >
+              Mark all as read
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -59,9 +63,8 @@ export default function NotificationsPage() {
           notifications.map((notification) => (
             <div
               key={notification.id}
-              className={`bg-surface border border-border rounded-sm p-4 transition-colors ${
-                !notification.read ? "border-orange/50 bg-orange/5" : ""
-              }`}
+              className={`bg-surface border border-border rounded-sm p-4 transition-colors ${!notification.read ? "border-orange/50 bg-orange/5" : ""
+                }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">

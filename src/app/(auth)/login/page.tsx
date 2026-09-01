@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 export default function LoginPage() {
   return (
@@ -94,6 +95,8 @@ function LoginForm() {
           <Button type="submit" size="md" className="w-full" loading={loading}>
             Log In
           </Button>
+
+          <GoogleSignInButton callbackUrl={redirect} />
         </form>
 
         <p className="text-center text-sm text-muted">

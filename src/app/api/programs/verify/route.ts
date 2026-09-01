@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getRazorpaySecret } from "@/lib/razorpay";
 import { getProgram, computeProgramPrice, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { notifyRider } from "@/lib/notify";
+import { pointsForAmount } from "@/lib/rewards";
 import crypto from "crypto";
 
 export async function POST(req: Request) {
@@ -68,6 +70,12 @@ export async function POST(req: Request) {
             },
         });
 
+        // Award loyalty points for the spend.
+        await prisma.user.update({
+            where: { id: userId },
+            data: { loyaltyPoints: { increment: pointsForAmount(amount) } },
+        });
+
         const admins = await prisma.user.findMany({ where: { role: "admin" }, select: { id: true } });
         await Promise.all(
             admins.map((admin) =>
@@ -83,14 +91,15 @@ export async function POST(req: Request) {
             )
         );
 
-        await prisma.notification.create({
-            data: {
-                userId,
-                title: "Booking Received",
-                message: `Your ${program.name} booking is confirmed and awaiting admin approval.`,
-                type: "booking",
-                link: "/my-programs",
-            },
+        await notifyRider({
+            userId,
+            title: "Booking Received",
+            message: `Your ${program.name} booking is confirmed and awaiting admin approval.`,
+            type: "booking",
+            link: "/my-programs",
+            email: true,
+            push: true,
+            whatsapp: true,
         });
 
         return NextResponse.json({ success: true, bookingId: booking.id });

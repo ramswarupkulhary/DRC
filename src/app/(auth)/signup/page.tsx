@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -81,6 +82,8 @@ export default function SignupPage() {
           <Button type="submit" size="md" className="w-full" loading={loading}>
             Create Account
           </Button>
+
+          <GoogleSignInButton callbackUrl="/profile" />
         </form>
 
         <p className="text-center text-sm text-muted">

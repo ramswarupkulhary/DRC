@@ -22,6 +22,27 @@ export function RegisterButton({ rideId, rideSlug, rideTitle, ridePrice, soldOut
   const [showModal, setShowModal] = useState(false);
   const [regStatus, setRegStatus] = useState<{ status: string | null; notes: string | null; whatsappGroupLink: string | null }>({ status: null, notes: null, whatsappGroupLink: null });
   const [checking, setChecking] = useState(false);
+  const [onWaitlist, setOnWaitlist] = useState(false);
+  const [joiningWaitlist, setJoiningWaitlist] = useState(false);
+
+  async function joinWaitlist() {
+    if (authStatus !== "authenticated") {
+      router.push(`/login?redirect=/rides/${rideSlug}`);
+      return;
+    }
+    setJoiningWaitlist(true);
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rideId }),
+      });
+      // 400 "Already on waitlist" also means they're on it.
+      if (res.ok || res.status === 400) setOnWaitlist(true);
+    } finally {
+      setJoiningWaitlist(false);
+    }
+  }
 
   useEffect(() => {
     if (authStatus === "authenticated") {
@@ -86,14 +107,22 @@ export function RegisterButton({ rideId, rideSlug, rideTitle, ridePrice, soldOut
         </div>
       )}
 
-      <Button
-        size="lg"
-        className="w-full"
-        disabled={soldOut}
-        onClick={handleClick}
-      >
-        {soldOut ? "Sold Out" : "Register Now"}
-      </Button>
+      {soldOut ? (
+        onWaitlist ? (
+          <div className="bg-orange/10 border border-orange/30 rounded-sm p-4 text-center">
+            <p className="text-orange text-sm font-semibold">You&apos;re on the waitlist</p>
+            <p className="text-xs text-muted mt-1">We&apos;ll notify you the moment a slot opens up.</p>
+          </div>
+        ) : (
+          <Button size="lg" variant="outline" className="w-full" loading={joiningWaitlist} onClick={joinWaitlist}>
+            Join Waitlist
+          </Button>
+        )
+      ) : (
+        <Button size="lg" className="w-full" onClick={handleClick}>
+          Register Now
+        </Button>
+      )}
 
       {showModal && (
         <RideRegistrationModal

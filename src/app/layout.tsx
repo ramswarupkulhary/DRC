@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Oswald } from "next/font/google";
 import { Providers } from "@/components/Providers";
+import { PWA } from "@/components/PWA";
+import { Analytics } from "@/components/seo/Analytics";
 import "./globals.css";
 
 const inter = Inter({
@@ -115,6 +117,8 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${oswald.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
         <Providers>{children}</Providers>
+        <PWA />
+        <Analytics />
       </body>
     </html>
   );

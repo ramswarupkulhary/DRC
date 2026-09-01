@@ -1,12 +1,18 @@
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { compareSync } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.dirtridecamp.com";
+const googleEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
 export const authOptions: AuthOptions = {
+  // Adapter is only enabled when Google OAuth is configured, so the existing
+  // credentials-only flow is completely unchanged when it isn't.
+  ...(googleEnabled ? { adapter: PrismaAdapter(prisma) } : {}),
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -39,6 +45,15 @@ export const authOptions: AuthOptions = {
         };
       },
     }),
+    ...(googleEnabled
+      ? [
+        GoogleProvider({
+          clientId: process.env.GOOGLE_CLIENT_ID!,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+          allowDangerousEmailAccountLinking: true,
+        }),
+      ]
+      : []),
   ],
   session: { strategy: "jwt", maxAge: 24 * 60 * 60 },
   pages: {

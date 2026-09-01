@@ -47,6 +47,9 @@ model User {
   referredById   String?
   referralCredits Int     @default(0)
 
+  // Loyalty
+  loyaltyPoints  Int      @default(0)
+
   // Membership
   membershipId   String?
 
@@ -71,6 +74,7 @@ model User {
   giftVouchersPurchased GiftVoucher[] @relation("purchaser")
   giftVouchersRedeemed  GiftVoucher[] @relation("redeemer")
   programBookings ProgramBooking[]
+  pushSubscriptions PushSubscription[]
 }
 
 model Account {
@@ -682,6 +686,17 @@ model ProgramCompanion {
   createdAt DateTime @default(now())
 
   booking ProgramBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SiteSetting {

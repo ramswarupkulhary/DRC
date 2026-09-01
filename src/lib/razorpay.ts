@@ -23,3 +23,21 @@ export async function getRazorpaySecret(): Promise<string> {
     const setting = await prisma.siteSetting.findUnique({ where: { key: "razorpay_key_secret" } });
     return setting?.value || process.env.RAZORPAY_KEY_SECRET || "";
 }
+/**
+ * Refunds a Razorpay payment. Returns true on success, false if not configured/failed.
+ * amount is in rupees; omit for a full refund.
+ */
+export async function refundPayment(paymentId: string | null | undefined, amount?: number): Promise<boolean> {
+    if (!paymentId) return false;
+    const rz = await getRazorpay();
+    if (!rz) return false;
+    try {
+        await rz.instance.payments.refund(paymentId, {
+            ...(amount ? { amount: Math.round(amount * 100) } : {}),
+            speed: "normal",
+        });
+        return true;
+    } catch {
+        return false;
+    }
+}

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { computeQuote, type PurchaseType } from "@/lib/pricing";
+import { pointsForAmount } from "@/lib/rewards";
 import crypto from "crypto";
 
 async function getRazorpaySecret() {
@@ -49,6 +50,12 @@ export async function POST(req: Request) {
           couponId: quote?.coupon?.id ?? null,
         },
       });
+      if (quote?.finalAmount) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { loyaltyPoints: { increment: pointsForAmount(quote.finalAmount) } },
+        });
+      }
     } else if (type === "membership") {
       const plan = await prisma.membershipPlan.findUnique({ where: { id: itemId } });
       if (plan) {
