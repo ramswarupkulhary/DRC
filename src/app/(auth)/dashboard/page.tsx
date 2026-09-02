@@ -42,6 +42,14 @@ export default function DashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [memberPrice, setMemberPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/membership/status")
+      .then((r) => r.json())
+      .then((d) => { if (d?.plan?.price) setMemberPrice(d.plan.price); })
+      .catch(() => { });
+  }, []);
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login?redirect=/dashboard");
@@ -148,7 +156,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <h3 className="font-heading text-lg font-semibold text-foreground">Join DRC Membership</h3>
-                  <p className="text-sm text-muted">Welcome kit, priority booking & more — ₹999/year</p>
+                  <p className="text-sm text-muted">Welcome kit, priority booking & more{memberPrice ? ` — ₹${memberPrice.toLocaleString("en-IN")}/year` : ""}</p>
                 </div>
               </div>
               <ArrowRight className="w-5 h-5 text-orange group-hover:translate-x-1 transition-transform" />

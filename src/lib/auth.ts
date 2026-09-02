@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { compareSync } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
+import { getActiveMembershipPrice } from "@/lib/membership";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.dirtridecamp.com";
 const googleEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
@@ -131,6 +132,7 @@ export const authOptions: AuthOptions = {
       }
 
       try {
+        const memberPrice = await getActiveMembershipPrice();
         await sendEmail({
           to: email,
           subject: "You're logged in to DRC!",
@@ -142,7 +144,7 @@ export const authOptions: AuthOptions = {
               <p style="color: #B9A886; font-size: 14px;">Check out upcoming rides, track your progress, or explore membership benefits.</p>
               <div style="background: #0D0D0D; border: 1px solid #E8622C; border-radius: 4px; padding: 16px; margin: 20px 0; text-align: center;">
                 <p style="color: #F1E9DD; font-size: 14px; margin: 0 0 4px;">DRC Membership</p>
-                <p style="color: #B9A886; font-size: 13px; margin: 0;">Welcome kit, priority booking & member-only rides — <strong style="color: #E8622C;">₹999/year</strong></p>
+                <p style="color: #B9A886; font-size: 13px; margin: 0;">Welcome kit, priority booking & member-only rides — <strong style="color: #E8622C;">₹${memberPrice.toLocaleString("en-IN")}/year</strong></p>
               </div>
               <p style="color: #666; font-size: 12px;">If this wasn't you, please change your password immediately.</p>
             `,
