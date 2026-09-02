@@ -1,6 +1,7 @@
 import type { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import AppleProvider from "next-auth/providers/apple";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { compareSync } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
@@ -8,11 +9,13 @@ import { sendEmail, drcEmailTemplate } from "@/lib/email";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.dirtridecamp.com";
 const googleEnabled = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+const appleEnabled = !!(process.env.APPLE_ID && process.env.APPLE_SECRET);
+const oauthEnabled = googleEnabled || appleEnabled;
 
 export const authOptions: AuthOptions = {
-  // Adapter is only enabled when Google OAuth is configured, so the existing
+  // Adapter is only enabled when an OAuth provider is configured, so the existing
   // credentials-only flow is completely unchanged when it isn't.
-  ...(googleEnabled ? { adapter: PrismaAdapter(prisma) } : {}),
+  ...(oauthEnabled ? { adapter: PrismaAdapter(prisma) } : {}),
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -50,6 +53,15 @@ export const authOptions: AuthOptions = {
         GoogleProvider({
           clientId: process.env.GOOGLE_CLIENT_ID!,
           clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+          allowDangerousEmailAccountLinking: true,
+        }),
+      ]
+      : []),
+    ...(appleEnabled
+      ? [
+        AppleProvider({
+          clientId: process.env.APPLE_ID!,
+          clientSecret: process.env.APPLE_SECRET!,
           allowDangerousEmailAccountLinking: true,
         }),
       ]
