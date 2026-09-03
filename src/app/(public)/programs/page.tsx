@@ -18,12 +18,13 @@ export const metadata: Metadata = {
     description:
         "Bring family and friends to the DRC overnighter — camping, hospitality and the outdoors together near Bangalore. For Off-Road training, Private 1:1 coaching and guided trails, see DRC Training.",
     keywords: [
-        "family camping ride bangalore",
-        "overnight camping ride",
-        "adventure motorcycle experiences",
-        "family off road experience",
-        "friends camping trip bangalore",
-        "dirt ride camp programs",
+        "family camping ride bangalore", "friends camping trip bangalore", "overnight camping ride bangalore",
+        "overnighter ride bangalore", "camping trip near bangalore", "weekend camping bangalore", "group camping bangalore",
+        "family off road experience", "family adventure bangalore", "family outdoor experience bangalore",
+        "adventure motorcycle experiences", "off road camping ride", "motorcycle camping trip karnataka",
+        "family and friends ride", "friends getaway bangalore", "corporate outing bangalore off road",
+        "off road overnighter", "dirt ride camp programs", "dirt ride camp family", "bonfire camping bangalore",
+        "group off road experience", "weekend getaway bangalore off road", "nature camping bangalore",
     ],
     alternates: { canonical: "/programs" },
     openGraph: {

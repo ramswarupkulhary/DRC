@@ -15,7 +15,20 @@ export const metadata: Metadata = {
   title: "Off-Road Training & Trails in Bangalore | Dirt Bike Academy | DRC",
   description:
     "Bangalore's off-road motorcycle academy — Off-Road training, Private 1:1 coaching, guided trails & special trail rides by Dirt Ride Camp. Beginner to advanced dirt bike & enduro courses.",
-  keywords: ["off road training bangalore", "off road academy bangalore", "offroad training bangalore", "offroad academy bangalore", "off road training", "off road academy", "offroad bangalore", "offroad india", "dirt bike training bangalore", "dirt bike classes bangalore", "private off road training", "1 on 1 off road coaching", "enduro training india", "adventure bike training", "off road riding course", "motorcycle academy bangalore", "off road trails bangalore", "guided trail rides bangalore"],
+  keywords: [
+    "off road training bangalore", "off road academy bangalore", "offroad training bangalore", "offroad academy bangalore",
+    "off road training", "off road academy", "off road bangalore", "offroad bangalore", "off road india", "offroad india",
+    "dirt bike training bangalore", "dirt bike classes bangalore", "dirt bike training india", "dirt bike school bangalore",
+    "dirt bike lessons bangalore", "learn dirt bike bangalore", "learn off road riding", "off road riding course",
+    "off road riding classes bangalore", "off road riding academy", "off road motorcycle training",
+    "private off road training", "private 1 on 1 off road coaching", "1 on 1 dirt bike training", "personal off road coaching",
+    "enduro training india", "enduro training bangalore", "adventure bike training", "adventure motorcycle training bangalore",
+    "beginner off road training", "advanced off road training", "off road skills training", "trail riding training",
+    "off road trails bangalore", "guided trail rides bangalore", "off road trail ride karnataka", "weekend off road ride bangalore",
+    "dirt bike track bangalore", "off road bike training near me", "motorcycle training bangalore", "motorcycle academy bangalore",
+    "off road riding school karnataka", "dirt biking bangalore", "off road experience bangalore", "off road bike ride bangalore",
+    "krishnagiri off road", "kanakapura off road trail", "off road training kanakapura", "off road trail krishnagiri",
+  ],
   alternates: { canonical: "/trainings" },
   openGraph: {
     type: "website",
