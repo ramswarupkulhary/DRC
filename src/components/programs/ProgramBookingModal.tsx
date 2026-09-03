@@ -224,7 +224,7 @@ export function ProgramBookingModal({ program, onClose }: Props) {
 
                                     <div className="flex items-center justify-between gap-3 bg-background border border-border rounded-sm p-3">
                                         <div>
-                                            <p className="text-sm text-foreground">Persons (adults)</p>
+                                            <p className="text-sm text-foreground">Persons (adults, above 8 yrs)</p>
                                             <p className="text-xs text-muted">{formatINR(program.personPrice ?? 0)} each</p>
                                         </div>
                                         <div className="flex items-center gap-3">
@@ -236,7 +236,7 @@ export function ProgramBookingModal({ program, onClose }: Props) {
 
                                     <div className="flex items-center justify-between gap-3 bg-background border border-border rounded-sm p-3">
                                         <div>
-                                            <p className="text-sm text-foreground">Kids</p>
+                                            <p className="text-sm text-foreground">Kids (8 yrs &amp; under)</p>
                                             <p className="text-xs text-muted">{formatINR(program.kidPrice ?? 0)} each</p>
                                         </div>
                                         <div className="flex items-center gap-3">

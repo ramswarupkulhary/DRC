@@ -12,13 +12,21 @@ import { skillProgression, customerJourney, recommendedProgression, riderRequire
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Off-Road Academy & Training Programs in Bangalore | DRC Dirt Ride Camp",
+  title: "Off-Road Training & Trails in Bangalore | Dirt Bike Academy | DRC",
   description:
-    "Bangalore's off-road academy — professional motorcycle training by Dirt Ride Camp. Beginner to advanced dirt bike courses — trail riding, enduro techniques & off-road skills.",
-  keywords: ["off road academy", "off road academy bangalore", "off road training", "off road training bangalore", "offroad academy bangalore", "offroad training bangalore", "offroad bangalore", "offroad india", "dirt bike training", "motorcycle training course", "enduro training india", "off road riding course", "adventure bike training", "dirt bike classes bangalore", "motorcycle academy bangalore", "off road riding academy"],
+    "Bangalore's off-road motorcycle academy — Off-Road training, Private 1:1 coaching, guided trails & special trail rides by Dirt Ride Camp. Beginner to advanced dirt bike & enduro courses.",
+  keywords: ["off road training bangalore", "off road academy bangalore", "offroad training bangalore", "offroad academy bangalore", "off road training", "off road academy", "offroad bangalore", "offroad india", "dirt bike training bangalore", "dirt bike classes bangalore", "private off road training", "1 on 1 off road coaching", "enduro training india", "adventure bike training", "off road riding course", "motorcycle academy bangalore", "off road trails bangalore", "guided trail rides bangalore"],
+  alternates: { canonical: "/trainings" },
   openGraph: {
-    title: "Off-Road Academy & Training Programs | Dirt Ride Camp Bangalore",
-    description: "Bangalore's off-road academy — professional motorcycle training. Beginner to advanced dirt bike courses.",
+    type: "website",
+    url: "/trainings",
+    title: "Off-Road Training & Trails in Bangalore | Dirt Ride Camp",
+    description: "Off-Road training, Private 1:1 coaching & guided trails. Beginner to advanced dirt bike courses in Bangalore.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Off-Road Training & Trails in Bangalore | Dirt Ride Camp",
+    description: "Off-Road training, Private 1:1 coaching & guided trails in Bangalore.",
   },
 };
 
@@ -51,12 +59,33 @@ export default async function TrainingsPage() {
   // Admin-managed records: "training" sessions vs location-based "special trails".
   const customTrainings = trainings.filter((t) => t.category === "training");
   const specialTrails = trainings.filter((t) => t.category !== "training");
+  const BASE_URL = "https://www.dirtridecamp.com";
+  // Course structured data for the off-road training + trail programs (rich results).
+  const courseListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "DRC Off-Road Training & Trail Programs",
+    itemListElement: programs
+      .filter((p) => p.category === "training" || p.category === "trails")
+      .map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Course",
+          name: p.name,
+          description: p.description,
+          provider: { "@type": "Organization", name: "Dirt Ride Camp", url: BASE_URL },
+          offers: { "@type": "Offer", price: p.price, priceCurrency: "INR", availability: "https://schema.org/InStock", url: `${BASE_URL}/trainings` },
+        },
+      })),
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseListJsonLd) }} />
       <BreadcrumbJsonLd items={[
         { name: "Home", url: "https://www.dirtridecamp.com" },
-        { name: "Training Programs", url: "https://www.dirtridecamp.com/trainings" },
+        { name: "Off-Road Training & Trails", url: "https://www.dirtridecamp.com/trainings" },
       ]} />
       {trainings.length > 0 && (
         <ItemListJsonLd name="Off-Road Training Programs" items={trainings.map((t) => ({ name: t.title, url: `/trainings/${t.slug}` }))} />
@@ -65,8 +94,8 @@ export default async function TrainingsPage() {
       <AnimatedPageHeader>
         <SectionHeader
           accent="Skill up"
-          title="Training & Trails"
-          subtitle="Structured off-road training, dedicated Private 1:1 coaching and guided special trails to explore new locations."
+          title="Off-Road Training & Trails in Bangalore"
+          subtitle="Structured off-road motorcycle training, dedicated Private 1:1 coaching and guided special trails across Karnataka — beginner to advanced."
         />
       </AnimatedPageHeader>
 

@@ -30,7 +30,7 @@ export async function PUT(
       category: body.category,
       duration: body.duration,
       price: body.price,
-      totalSlots: body.totalSlots,
+      totalSlots: body.totalSlots ?? null,
       location: body.location,
       status: body.status,
       featured: body.featured,

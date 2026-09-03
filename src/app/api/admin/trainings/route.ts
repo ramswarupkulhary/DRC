@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       category: body.category || "special_trail",
       duration: body.duration,
       price: body.price,
-      totalSlots: body.totalSlots,
+      totalSlots: body.totalSlots ?? null,
       location: body.location,
       status: body.status || "draft",
       featured: body.featured || false,

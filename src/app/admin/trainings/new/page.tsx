@@ -40,7 +40,6 @@ export default function NewTrainingPage() {
       category: form.get("category"),
       duration: form.get("duration") || null,
       price: parseInt(form.get("price") as string),
-      totalSlots: parseInt(form.get("totalSlots") as string),
       location: form.get("location") || null,
       status: form.get("status"),
       featured: form.get("featured") === "on",
@@ -84,7 +83,6 @@ export default function NewTrainingPage() {
             <Select name="category" id="category" label="Category" options={categoryOptions} />
             <Input name="duration" id="duration" label="Duration" placeholder="e.g. 1 Day (8 hours)" />
             <Input name="price" id="price" label="Price (INR)" type="number" required />
-            <Input name="totalSlots" id="totalSlots" label="Slots per Batch" type="number" required />
             <Input name="location" id="location" label="Location" placeholder="e.g. Kanakapura, Krishnagiri" />
             <Select name="status" id="status" label="Status" options={statusOptions} />
           </div>

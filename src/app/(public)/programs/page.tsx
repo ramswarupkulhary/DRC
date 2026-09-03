@@ -28,10 +28,15 @@ export const metadata: Metadata = {
     alternates: { canonical: "/programs" },
     openGraph: {
         type: "website",
-        title: "DRC Off-Road Programs — Training, Trails & Adventure Experiences",
+        title: "Family & Friends Overnighter Experiences | Dirt Ride Camp Bangalore",
         description:
-            "Private off-road training, guided off-road trails, overnight camping rides & family adventures near Bangalore.",
+            "Bring family and friends to the DRC off-road overnighter — camping, hospitality and the outdoors together near Bangalore.",
         url: "/programs",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Family & Friends Overnighter Experiences | Dirt Ride Camp",
+        description: "Bring family and friends to the DRC off-road overnighter near Bangalore.",
     },
 };
 

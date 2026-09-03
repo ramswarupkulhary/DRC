@@ -55,7 +55,6 @@ export default function EditTrainingPage() {
       category: form.get("category"),
       duration: form.get("duration") || null,
       price: parseInt(form.get("price") as string),
-      totalSlots: parseInt(form.get("totalSlots") as string),
       location: form.get("location") || null,
       status: form.get("status"),
       featured: form.get("featured") === "on",
@@ -102,7 +101,6 @@ export default function EditTrainingPage() {
             <Select name="category" id="category" label="Category" options={categoryOptions} defaultValue={(training.category as string) || "special_trail"} />
             <Input name="duration" id="duration" label="Duration" defaultValue={(training.duration as string) || ""} />
             <Input name="price" id="price" label="Price (INR)" type="number" required defaultValue={String(training.price)} />
-            <Input name="totalSlots" id="totalSlots" label="Slots per Batch" type="number" required defaultValue={String(training.totalSlots)} />
             <Input name="location" id="location" label="Location" placeholder="e.g. Kanakapura, Krishnagiri" defaultValue={(training.location as string) || ""} />
             <Select name="status" id="status" label="Status" options={statusOptions} defaultValue={training.status as string} />
           </div>

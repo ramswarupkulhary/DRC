@@ -205,7 +205,7 @@ model Training {
   category    String   @default("special_trail") // "training" | "special_trail"
   duration    String?
   price       Int
-  totalSlots  Int
+  totalSlots  Int?
   location    String?
   coverImage  String?
   images      String?

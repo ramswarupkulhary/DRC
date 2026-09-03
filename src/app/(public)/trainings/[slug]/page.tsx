@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { Clock, MapPin, Users, ChevronLeft, CheckCircle2, BarChart3 } from "lucide-react";
+import { Clock, MapPin, ChevronLeft, CheckCircle2, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { MediaGallery } from "@/components/ui/MediaGallery";
@@ -81,10 +81,6 @@ export default async function TrainingDetailPage({ params }: Props) {
             <span>{training.location}</span>
           </div>
         )}
-        <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-orange" />
-          <span>Max {training.totalSlots} riders per batch</span>
-        </div>
       </div>
 
       <div className="mt-8 bg-surface border border-border rounded-sm overflow-hidden">
