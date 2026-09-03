@@ -230,9 +230,10 @@ function ProgramCard({ program, onView, onBook }: { program: Program; onView: ()
     );
 }
 
-export function ProgramsExplorer({ programs }: { programs: Program[] }) {
+export function ProgramsExplorer({ programs, categories }: { programs: Program[]; categories?: ProgramCategory[] }) {
     const [detail, setDetail] = useState<Program | null>(null);
     const [booking, setBooking] = useState<{ program: Program; presetFamily: FamilyOption | null } | null>(null);
+    const visibleCategories = categories ?? order;
 
     // Family & Friends cards are add-ons to the Overnighter, so they open the
     // Overnighter booking (which has the companion selectors).
@@ -249,7 +250,7 @@ export function ProgramsExplorer({ programs }: { programs: Program[] }) {
 
     return (
         <>
-            {order.map((cat) => {
+            {order.filter((c) => visibleCategories.includes(c)).map((cat) => {
                 const meta = categoryMeta[cat];
                 const list = programs.filter((p) => p.category === cat);
                 return (

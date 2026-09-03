@@ -73,9 +73,42 @@ export async function ensureProgramsSeeded(): Promise<void> {
     });
 }
 
+/**
+ * Idempotently reconciles an already-seeded catalog with the current defaults:
+ * renames the legacy "Private Training" programs to "Off-Road Training" (only when the
+ * DB still holds the old default name, so admin edits are preserved) and inserts any
+ * new default programs that don't yet exist by slug.
+ */
+export async function reconcileProgramCatalog(): Promise<void> {
+    const count = await prisma.program.count();
+    if (count === 0) return; // fresh installs are handled by ensureProgramsSeeded
+
+    // Apply the Private → Off-Road rename only if the row still has the old default name.
+    const renames: { slug: string; from: string; to: string }[] = [
+        { slug: "private-training-half-day", from: "Private Training — Half Day", to: "Off-Road Training — Half Day" },
+        { slug: "private-training-full-day", from: "Private Training — Full Day", to: "Off-Road Training — Full Day" },
+    ];
+    for (const r of renames) {
+        await prisma.program.updateMany({ where: { slug: r.slug, name: r.from }, data: { name: r.to } }).catch(() => { });
+    }
+
+    // Insert any default programs missing from the DB (e.g. the new Private 1:1 trainings).
+    const existing = await prisma.program.findMany({ select: { slug: true } });
+    const have = new Set(existing.map((e) => e.slug));
+    const missing = DEFAULT_PROGRAMS.filter((p) => !have.has(p.slug));
+    if (missing.length) {
+        const maxOrder = existing.length + 100;
+        await prisma.program.createMany({
+            data: missing.map((p, i) => ({ ...programToRow(p, maxOrder + i), active: true, featured: false })),
+            skipDuplicates: true,
+        });
+    }
+}
+
 /** All programs (optionally active only), ordered for display. Falls back to static defaults. */
 export async function listPrograms(opts?: { activeOnly?: boolean }): Promise<Program[]> {
     await ensureProgramsSeeded();
+    await reconcileProgramCatalog();
     const rows = await prisma.program.findMany({
         where: opts?.activeOnly ? { active: true } : undefined,
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],

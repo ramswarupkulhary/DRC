@@ -50,10 +50,10 @@ export interface Program {
 
 export const categoryMeta: Record<ProgramCategory, { label: string; accent: string; blurb: string }> = {
     training: {
-        label: "Private Off-Road Training",
+        label: "Off-Road Training",
         accent: "Learn the craft",
         blurb:
-            "Personalised, structured off-road coaching that builds real motorcycle control — from your first standing position to technical trail application.",
+            "Personalised, structured off-road coaching that builds real motorcycle control — from your first standing position to technical trail application. Choose an open Off-Road session or a fully dedicated Private 1:1 with your own coach.",
     },
     trails: {
         label: "DRC Trails",
@@ -74,7 +74,7 @@ export const programs: Program[] = [
     {
         slug: "private-training-half-day",
         category: "training",
-        name: "Private Training — Half Day",
+        name: "Off-Road Training — Half Day",
         price: 2599,
         priceUnit: "per rider",
         duration: "Approx. 4 hours",
@@ -173,7 +173,7 @@ export const programs: Program[] = [
     {
         slug: "private-training-full-day",
         category: "training",
-        name: "Private Training — Full Day",
+        name: "Off-Road Training — Full Day",
         price: 4199,
         priceUnit: "per rider",
         duration: "Approx. 7–8 hours",
@@ -353,245 +353,340 @@ export const programs: Program[] = [
         ],
     },
 
-    // ─────────────── TRAILS ───────────────
+    // ─────────────── PRIVATE 1:1 TRAINING ───────────────
     {
-        slug: "half-day-trail",
-        category: "trails",
-        name: "Half-Day Trail",
-        price: 599,
-        priceUnit: "per rider",
-        duration: "Approx. 3–5 hours",
-        difficulty: "Beginner Friendly",
-        requiresRiding: true,
-        description:
-            "A guided off-road trail experience designed for riders who want to explore off-road trails, natural terrain and adventure riding with the DRC community.",
-        experience: ["Guided trail ride", "Natural terrain", "Off-road sections", "Scenic locations", "Community riding"],
-        guidance: [
-            "Standing position",
-            "Terrain awareness",
-            "Basic line selection",
-            "Group riding etiquette",
-            "Trail safety",
-        ],
-        bestFor: [
-            "Riders new to DRC",
-            "Adventure riders",
-            "Riders exploring off-road riding",
-            "Riders looking for a shorter trail experience",
-        ],
-        note: "Trails are guided adventure experiences, not formal training programs. Ride leaders provide basic guidance only.",
-    },
-    {
-        slug: "full-day-trail",
-        category: "trails",
-        name: "Full-Day Trail",
-        price: 1599,
-        priceUnit: "per rider",
-        duration: "Full Day",
-        difficulty: "Beginner to Intermediate (route dependent)",
-        lunch: "Included",
-        requiresRiding: true,
-        description:
-            "A complete day of guided off-road exploration across natural terrain, off-road trails and adventure routes.",
-        included: ["Guided trail", "Lunch", "Ride leader support"],
-        experience: [
-            "Off-road trails",
-            "Rocks",
-            "Hills",
-            "Uneven terrain",
-            "Water crossings where available and safe",
-            "Scenic locations",
-        ],
-        guidance: [
-            "Standing position",
-            "Terrain awareness",
-            "Line selection",
-            "Controlled hill riding",
-            "Controlled descents",
-            "Momentum management",
-        ],
-        note: "Terrain varies with route and conditions. Guidance is provided by ride leaders, not as formal training.",
-    },
-    {
-        slug: "overnighter-trail",
-        category: "trails",
-        name: "Overnighter Trail",
-        price: 4999,
-        priceUnit: "per rider",
-        duration: "Evening + Overnight Camping + Morning Trail",
-        difficulty: "Beginner to Intermediate (route dependent)",
-        requiresRiding: true,
-        supportsCompanions: true,
-        description:
-            "A premium DRC off-road adventure combining trail riding, camping, community and nature.",
-        days: [
-            {
-                title: "Day 1 — Evening",
-                blocks: [
-                    { title: "Arrival", intro: "Riders arrive at the designated location.", items: [] },
-                    { title: "High Tea", intro: "Included.", items: [] },
-                    {
-                        title: "Evening Trail",
-                        items: [
-                            "Guided evening trail",
-                            "Natural terrain",
-                            "Scenic riding",
-                            "Easy to moderate terrain depending on route",
-                        ],
-                    },
-                    {
-                        title: "Camp Experience",
-                        items: [
-                            "Camping setup",
-                            "Community interaction",
-                            "Outdoor experience",
-                            "Rider discussions",
-                            "Campfire only where legally permitted and safe",
-                        ],
-                    },
-                    { title: "Dinner", intro: "Included.", items: [] },
+        slug: "private-1on1-half-day",
+                category: "training",
+                name: "Private 1:1 Training — Half Day",
+                price: 4999,
+                priceUnit: "per rider (1:1)",
+                duration: "Approx. 4 hours",
+                difficulty: "Beginner to Advanced",
+                lunch: "Optional (+₹299)",
+                optionalLunch: 299,
+                requiresRiding: true,
+                description:
+                    "A fully dedicated one-on-one half-day off-road session — one rider, one coach. 100% personalised attention with a custom drill plan and instant feedback on every run, so you progress faster.",
+                included: [
+                    "Dedicated 1:1 coach for the entire session",
+                    "Fully personalised drill plan",
+                    "Continuous one-on-one feedback",
+                    "Skill assessment and progression guidance",
+                    "Off-road safety briefing",
                 ],
-            },
-            {
-                title: "Day 2 — Morning",
-                blocks: [
-                    { title: "Breakfast", intro: "Included.", items: [] },
+                learn: [
                     {
-                        title: "Morning Trail",
+                        title: "Built Around You",
+                        intro: "Your coach tailors the session to your exact level and goals, covering any of:",
                         items: [
-                            "Guided morning trail",
-                            "Natural terrain",
-                            "Scenic exploration",
-                            "Hills, dirt and technical sections depending on route",
+                            "Standing and body position",
+                            "Clutch and throttle control",
+                            "Braking on loose surfaces",
+                            "Turning and slow-speed control",
+                            "Basic off-road terrain",
                         ],
-                    },
-                    {
-                        title: "Program Ends",
-                        intro: "The program ends after the morning trail. Lunch is not included.",
-                        items: [],
                     },
                 ],
+                note: "Private 1:1 is a single rider with a single dedicated coach — the fastest way to build confidence and correct habits.",
             },
-        ],
-        whatsIncluded: [
-            "High Tea",
-            "Evening Trail",
-            "Camping Experience",
-            "Dinner",
-            "Breakfast",
-            "Morning Trail",
-        ],
-    },
+            {
+                slug: "private-1on1-full-day",
+                category: "training",
+                name: "Private 1:1 Training — Full Day",
+                price: 7999,
+                priceUnit: "per rider (1:1)",
+                duration: "Approx. 7–8 hours",
+                difficulty: "Beginner to Advanced",
+                lunch: "Included",
+                requiresRiding: true,
+                description:
+                    "A complete dedicated one-on-one off-road day — one rider, one coach. Cover fundamentals through technical terrain at your own pace, with a personalised curriculum and guided trail application.",
+                included: [
+                    "Dedicated 1:1 coach for the full day",
+                    "Lunch",
+                    "Fully personalised curriculum",
+                    "Technical terrain and hill/descent training",
+                    "Guided trail application",
+                    "Detailed progression review",
+                ],
+                learn: [
+                    {
+                        title: "Fundamentals to Technical",
+                        intro: "Your coach adapts the full day to your level, covering any of:",
+                        items: [
+                            "Core fundamentals and body position",
+                            "Hill climbing and descending",
+                            "Ruts and uneven terrain",
+                            "Small obstacles",
+                            "Water crossing fundamentals",
+                            "Guided technical trail",
+                        ],
+                    },
+                ],
+                note: "Private 1:1 is a single rider with a single dedicated coach for the entire day.",
+            },
+            {
+                slug: "private-1on1-two-day",
+                category: "training",
+                name: "Private 1:1 Training — Two-Day",
+                price: 12999,
+                priceUnit: "per rider (1:1)",
+                duration: "2 Days",
+                difficulty: "Beginner to Advanced",
+                lunch: "2 Lunches, 1 Dinner, 1 Breakfast",
+                requiresRiding: true,
+                description:
+                    "The most immersive dedicated coaching option — two full days, one rider, one coach. Build strong fundamentals on Day 1 and develop technical off-road confidence on Day 2, entirely at your pace.",
+                included: [
+                    "Dedicated 1:1 coach across both days",
+                    "Stay",
+                    "2 Lunches, 1 Dinner, 1 Breakfast",
+                    "Fully personalised two-day curriculum",
+                    "Technical terrain and trail application",
+                    "Detailed progression plan for what to practise next",
+                ],
+                note: "Private 1:1 is a single rider with a single dedicated coach for the entire program.",
+            },
 
-    // ─────────────── SPECIAL EXPERIENCES ───────────────
-    {
-        slug: "family-overnighter-plan",
-        category: "special",
-        name: "Family Overnighter Plan",
-        price: 7999,
-        priceOptions: [
-            { label: "Rider + Wife", price: 7999 },
-            { label: "Rider + Wife + Children", price: 9999, note: "Max 2 children" },
-        ],
-        duration: "Evening + Overnight Camping + Morning Trail",
-        difficulty: "Family Friendly",
-        requiresRiding: true,
-        description:
-            "Bring your family along to enjoy the DRC overnighter camping and outdoor experience together while you ride the trails.",
-        included: ["Evening Trail (rider)", "Camping", "Dinner", "Breakfast", "Morning Trail (rider)"],
-        familyExperience: [
-            "Outdoor environment",
-            "Camping experience",
-            "High Tea",
-            "Dinner",
-            "Breakfast",
-            "Nature",
-            "Community experience",
-        ],
-        note: "Family members participate in the camping and hospitality experience unless separately registered and approved for riding activities.",
-    },
-    {
-        slug: "friends-plan",
-        category: "special",
-        name: "Friends Plan",
-        price: 1999,
-        priceUnit: "per friend",
-        duration: "Overnighter (non-riding)",
-        difficulty: "Everyone Welcome",
-        requiresRiding: false,
-        description:
-            "Friends can join the DRC Overnighter experience for the camping, hospitality and community — without riding.",
-        included: [
-            "Camping",
-            "High Tea",
-            "Dinner",
-            "Breakfast",
-            "Outdoor experience",
-            "Community experience",
-        ],
-        note: "Friends are not automatically included in motorcycle riding activities unless separately registered and approved.",
-    },
-];
+            // ─────────────── TRAILS ───────────────
+            {
+                slug: "half-day-trail",
+                category: "trails",
+                name: "Half-Day Trail",
+                price: 599,
+                priceUnit: "per rider",
+                duration: "Approx. 3–5 hours",
+                difficulty: "Beginner Friendly",
+                requiresRiding: true,
+                description:
+                    "A guided off-road trail experience designed for riders who want to explore off-road trails, natural terrain and adventure riding with the DRC community.",
+                experience: ["Guided trail ride", "Natural terrain", "Off-road sections", "Scenic locations", "Community riding"],
+                guidance: [
+                    "Standing position",
+                    "Terrain awareness",
+                    "Basic line selection",
+                    "Group riding etiquette",
+                    "Trail safety",
+                ],
+                bestFor: [
+                    "Riders new to DRC",
+                    "Adventure riders",
+                    "Riders exploring off-road riding",
+                    "Riders looking for a shorter trail experience",
+                ],
+                note: "Trails are guided adventure experiences, not formal training programs. Ride leaders provide basic guidance only.",
+            },
+            {
+                slug: "full-day-trail",
+                category: "trails",
+                name: "Full-Day Trail",
+                price: 1599,
+                priceUnit: "per rider",
+                duration: "Full Day",
+                difficulty: "Beginner to Intermediate (route dependent)",
+                lunch: "Included",
+                requiresRiding: true,
+                description:
+                    "A complete day of guided off-road exploration across natural terrain, off-road trails and adventure routes.",
+                included: ["Guided trail", "Lunch", "Ride leader support"],
+                experience: [
+                    "Off-road trails",
+                    "Rocks",
+                    "Hills",
+                    "Uneven terrain",
+                    "Water crossings where available and safe",
+                    "Scenic locations",
+                ],
+                guidance: [
+                    "Standing position",
+                    "Terrain awareness",
+                    "Line selection",
+                    "Controlled hill riding",
+                    "Controlled descents",
+                    "Momentum management",
+                ],
+                note: "Terrain varies with route and conditions. Guidance is provided by ride leaders, not as formal training.",
+            },
+            {
+                slug: "overnighter-trail",
+                category: "trails",
+                name: "Overnighter Trail",
+                price: 4999,
+                priceUnit: "per rider",
+                duration: "Evening + Overnight Camping + Morning Trail",
+                difficulty: "Beginner to Intermediate (route dependent)",
+                requiresRiding: true,
+                supportsCompanions: true,
+                description:
+                    "A premium DRC off-road adventure combining trail riding, camping, community and nature.",
+                days: [
+                    {
+                        title: "Day 1 — Evening",
+                        blocks: [
+                            { title: "Arrival", intro: "Riders arrive at the designated location.", items: [] },
+                            { title: "High Tea", intro: "Included.", items: [] },
+                            {
+                                title: "Evening Trail",
+                                items: [
+                                    "Guided evening trail",
+                                    "Natural terrain",
+                                    "Scenic riding",
+                                    "Easy to moderate terrain depending on route",
+                                ],
+                            },
+                            {
+                                title: "Camp Experience",
+                                items: [
+                                    "Camping setup",
+                                    "Community interaction",
+                                    "Outdoor experience",
+                                    "Rider discussions",
+                                    "Campfire only where legally permitted and safe",
+                                ],
+                            },
+                            { title: "Dinner", intro: "Included.", items: [] },
+                        ],
+                    },
+                    {
+                        title: "Day 2 — Morning",
+                        blocks: [
+                            { title: "Breakfast", intro: "Included.", items: [] },
+                            {
+                                title: "Morning Trail",
+                                items: [
+                                    "Guided morning trail",
+                                    "Natural terrain",
+                                    "Scenic exploration",
+                                    "Hills, dirt and technical sections depending on route",
+                                ],
+                            },
+                            {
+                                title: "Program Ends",
+                                intro: "The program ends after the morning trail. Lunch is not included.",
+                                items: [],
+                            },
+                        ],
+                    },
+                ],
+                whatsIncluded: [
+                    "High Tea",
+                    "Evening Trail",
+                    "Camping Experience",
+                    "Dinner",
+                    "Breakfast",
+                    "Morning Trail",
+                ],
+            },
 
-export const skillProgression = [
-    {
-        level: "Level 1",
-        title: "Control",
-        items: ["Motorcycle controls", "Standing position", "Clutch control", "Throttle control", "Braking"],
-    },
-    {
-        level: "Level 2",
-        title: "Confidence",
-        items: ["Turning", "Balance", "Loose terrain", "Small climbs", "Controlled descents"],
-    },
-    {
-        level: "Level 3",
-        title: "Technical",
-        items: ["Ruts", "Rocks", "Obstacles", "Line selection", "Momentum management"],
-    },
-    {
-        level: "Level 4",
-        title: "Trail Application",
-        items: ["Real terrain", "Terrain reading", "Trail riding", "Skill application"],
-    },
-];
+            // ─────────────── SPECIAL EXPERIENCES ───────────────
+            {
+                slug: "family-overnighter-plan",
+                category: "special",
+                name: "Family Overnighter Plan",
+                price: 7999,
+                priceOptions: [
+                    { label: "Rider + Wife", price: 7999 },
+                    { label: "Rider + Wife + Children", price: 9999, note: "Max 2 children" },
+                ],
+                duration: "Evening + Overnight Camping + Morning Trail",
+                difficulty: "Family Friendly",
+                requiresRiding: true,
+                description:
+                    "Bring your family along to enjoy the DRC overnighter camping and outdoor experience together while you ride the trails.",
+                included: ["Evening Trail (rider)", "Camping", "Dinner", "Breakfast", "Morning Trail (rider)"],
+                familyExperience: [
+                    "Outdoor environment",
+                    "Camping experience",
+                    "High Tea",
+                    "Dinner",
+                    "Breakfast",
+                    "Nature",
+                    "Community experience",
+                ],
+                note: "Family members participate in the camping and hospitality experience unless separately registered and approved for riding activities.",
+            },
+            {
+                slug: "friends-plan",
+                category: "special",
+                name: "Friends Plan",
+                price: 1999,
+                priceUnit: "per friend",
+                duration: "Overnighter (non-riding)",
+                difficulty: "Everyone Welcome",
+                requiresRiding: false,
+                description:
+                    "Friends can join the DRC Overnighter experience for the camping, hospitality and community — without riding.",
+                included: [
+                    "Camping",
+                    "High Tea",
+                    "Dinner",
+                    "Breakfast",
+                    "Outdoor experience",
+                    "Community experience",
+                ],
+                note: "Friends are not automatically included in motorcycle riding activities unless separately registered and approved.",
+            },
+        ];
 
-export const customerJourney = ["Try", "Learn", "Improve", "Explore", "Experience"];
+        export const skillProgression = [
+            {
+                level: "Level 1",
+                title: "Control",
+                items: ["Motorcycle controls", "Standing position", "Clutch control", "Throttle control", "Braking"],
+            },
+            {
+                level: "Level 2",
+                title: "Confidence",
+                items: ["Turning", "Balance", "Loose terrain", "Small climbs", "Controlled descents"],
+            },
+            {
+                level: "Level 3",
+                title: "Technical",
+                items: ["Ruts", "Rocks", "Obstacles", "Line selection", "Momentum management"],
+            },
+            {
+                level: "Level 4",
+                title: "Trail Application",
+                items: ["Real terrain", "Terrain reading", "Trail riding", "Skill application"],
+            },
+        ];
 
-export const recommendedProgression = [
-    "Half-Day Trail",
-    "Private Half-Day Training",
-    "Private Full-Day Training",
-    "Full-Day Trail",
-    "Two-Day Training",
-    "Overnighter Trail",
-];
+        export const customerJourney = ["Try", "Learn", "Improve", "Explore", "Experience"];
 
-export const riderRequirements = {
-    mandatory: [
-        "Certified motorcycle helmet",
-        "Proper riding shoes or boots",
-        "Gloves",
-        "Long pants",
-        "Motorcycle in safe operating condition",
-    ],
-    recommended: [
-        "Knee protection",
-        "Elbow protection",
-        "Chest protection",
-        "Proper off-road boots",
-        "Hydration pack",
-    ],
-};
+        export const recommendedProgression = [
+            "Half-Day Trail",
+            "Private Half-Day Training",
+            "Private Full-Day Training",
+            "Full-Day Trail",
+            "Two-Day Training",
+            "Overnighter Trail",
+        ];
 
-export const safetyDisclaimers = [
-    "Off-road motorcycling involves inherent risks, including falls, collisions, changing terrain and environmental hazards. Participants must ride within their ability and follow instructions from DRC ride leaders and trainers.",
-    "DRC reserves the right to modify routes, training activities, schedules or program activities based on weather, terrain conditions, rider safety or operational requirements.",
-];
+        export const riderRequirements = {
+            mandatory: [
+                "Certified motorcycle helmet",
+                "Proper riding shoes or boots",
+                "Gloves",
+                "Long pants",
+                "Motorcycle in safe operating condition",
+            ],
+            recommended: [
+                "Knee protection",
+                "Elbow protection",
+                "Chest protection",
+                "Proper off-road boots",
+                "Hydration pack",
+            ],
+        };
 
-export function getProgram(slug: string): Program | undefined {
-    return programs.find((p) => p.slug === slug);
-}
+        export const safetyDisclaimers = [
+            "Off-road motorcycling involves inherent risks, including falls, collisions, changing terrain and environmental hazards. Participants must ride within their ability and follow instructions from DRC ride leaders and trainers.",
+            "DRC reserves the right to modify routes, training activities, schedules or program activities based on weather, terrain conditions, rider safety or operational requirements.",
+        ];
+
+        export function getProgram(slug: string): Program | undefined {
+        return programs.find((p) => p.slug === slug);
+    }
 
 export function formatINR(amount: number): string {
     return `₹${amount.toLocaleString("en-IN")}`;

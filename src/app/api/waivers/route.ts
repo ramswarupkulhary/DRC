@@ -54,10 +54,10 @@ export async function POST(req: Request) {
 
   // Mark the related booking as waiver-signed.
   if (body.registrationId) {
-    await prisma.registration.update({ where: { id: body.registrationId }, data: { waiverSigned: true } }).catch(() => {});
+    await prisma.registration.update({ where: { id: body.registrationId }, data: { waiverSigned: true } }).catch(() => { });
   }
   if (body.programBookingId) {
-    await prisma.programBooking.update({ where: { id: body.programBookingId }, data: { waiverSigned: true } }).catch(() => {});
+    await prisma.programBooking.update({ where: { id: body.programBookingId }, data: { waiverSigned: true } }).catch(() => { });
   }
 
   return NextResponse.json(waiver, { status: 201 });
