@@ -222,6 +222,13 @@ export function ProgramBookingModal({ program, onClose }: Props) {
                                 <div className="space-y-4">
                                     <p className="text-sm font-medium text-tan-light">Bring family & friends (optional)</p>
 
+                                    {program.note && (
+                                        <div className="flex items-start gap-2 bg-orange/10 border border-orange/30 rounded-sm p-3 text-xs text-foreground/85">
+                                            <IdCard className="w-4 h-4 text-orange shrink-0 mt-0.5" />
+                                            <span>{program.note}</span>
+                                        </div>
+                                    )}
+
                                     <div className="flex items-center justify-between gap-3 bg-background border border-border rounded-sm p-3">
                                         <div>
                                             <p className="text-sm text-foreground">Persons (adults, above 8 yrs)</p>
