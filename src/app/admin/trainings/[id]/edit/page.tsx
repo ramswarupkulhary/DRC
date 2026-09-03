@@ -9,11 +9,9 @@ import { Select } from "@/components/ui/Select";
 import ImageUpload from "@/components/admin/ImageUpload";
 import MediaGalleryUpload, { MediaItem } from "@/components/admin/MediaGalleryUpload";
 
-const levelOptions = [
-  { value: "beginner", label: "Beginner" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "advanced", label: "Advanced" },
-  { value: "all", label: "All Levels" },
+const categoryOptions = [
+  { value: "training", label: "Training" },
+  { value: "special_trail", label: "Special Trail" },
 ];
 
 const statusOptions = [
@@ -54,7 +52,7 @@ export default function EditTrainingPage() {
       title: form.get("title"),
       description: form.get("description"),
       shortDesc: form.get("shortDesc") || null,
-      level: form.get("level"),
+      category: form.get("category"),
       duration: form.get("duration") || null,
       price: parseInt(form.get("price") as string),
       totalSlots: parseInt(form.get("totalSlots") as string),
@@ -101,11 +99,11 @@ export default function EditTrainingPage() {
         </div>
         <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Select name="level" id="level" label="Level" options={levelOptions} defaultValue={training.level as string} />
+            <Select name="category" id="category" label="Category" options={categoryOptions} defaultValue={(training.category as string) || "special_trail"} />
             <Input name="duration" id="duration" label="Duration" defaultValue={(training.duration as string) || ""} />
             <Input name="price" id="price" label="Price (INR)" type="number" required defaultValue={String(training.price)} />
             <Input name="totalSlots" id="totalSlots" label="Slots per Batch" type="number" required defaultValue={String(training.totalSlots)} />
-            <Input name="location" id="location" label="Location" defaultValue={(training.location as string) || ""} />
+            <Input name="location" id="location" label="Location" placeholder="e.g. Kanakapura, Krishnagiri" defaultValue={(training.location as string) || ""} />
             <Select name="status" id="status" label="Status" options={statusOptions} defaultValue={training.status as string} />
           </div>
           <div className="flex items-center gap-3">

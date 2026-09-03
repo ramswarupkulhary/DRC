@@ -202,6 +202,7 @@ model Training {
   description String
   shortDesc   String?
   level       String   @default("beginner")
+  category    String   @default("special_trail") // "training" | "special_trail"
   duration    String?
   price       Int
   totalSlots  Int

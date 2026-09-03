@@ -13,6 +13,7 @@ export async function POST(req: Request) {
       description: body.description,
       shortDesc: body.shortDesc,
       level: body.level || "beginner",
+      category: body.category || "special_trail",
       duration: body.duration,
       price: body.price,
       totalSlots: body.totalSlots,

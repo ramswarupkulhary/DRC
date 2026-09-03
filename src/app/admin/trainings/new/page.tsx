@@ -9,11 +9,9 @@ import { Select } from "@/components/ui/Select";
 import ImageUpload from "@/components/admin/ImageUpload";
 import MediaGalleryUpload, { MediaItem } from "@/components/admin/MediaGalleryUpload";
 
-const levelOptions = [
-  { value: "beginner", label: "Beginner" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "advanced", label: "Advanced" },
-  { value: "all", label: "All Levels" },
+const categoryOptions = [
+  { value: "training", label: "Training" },
+  { value: "special_trail", label: "Special Trail" },
 ];
 
 const statusOptions = [
@@ -39,7 +37,7 @@ export default function NewTrainingPage() {
       title: form.get("title"),
       description: form.get("description"),
       shortDesc: form.get("shortDesc") || null,
-      level: form.get("level"),
+      category: form.get("category"),
       duration: form.get("duration") || null,
       price: parseInt(form.get("price") as string),
       totalSlots: parseInt(form.get("totalSlots") as string),
@@ -83,11 +81,11 @@ export default function NewTrainingPage() {
         </div>
         <div className="bg-surface border border-border rounded-sm p-6 space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <Select name="level" id="level" label="Level" options={levelOptions} />
+            <Select name="category" id="category" label="Category" options={categoryOptions} />
             <Input name="duration" id="duration" label="Duration" placeholder="e.g. 1 Day (8 hours)" />
             <Input name="price" id="price" label="Price (INR)" type="number" required />
             <Input name="totalSlots" id="totalSlots" label="Slots per Batch" type="number" required />
-            <Input name="location" id="location" label="Location" />
+            <Input name="location" id="location" label="Location" placeholder="e.g. Kanakapura, Krishnagiri" />
             <Select name="status" id="status" label="Status" options={statusOptions} />
           </div>
           <div className="flex items-center gap-3">

@@ -27,6 +27,7 @@ export async function PUT(
       description: body.description,
       shortDesc: body.shortDesc,
       level: body.level,
+      category: body.category,
       duration: body.duration,
       price: body.price,
       totalSlots: body.totalSlots,

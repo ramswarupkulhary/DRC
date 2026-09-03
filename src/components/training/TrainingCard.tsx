@@ -10,6 +10,7 @@ interface TrainingCardProps {
   title: string;
   shortDesc?: string;
   level: string;
+  badge?: string;
   duration?: string;
   price: number;
   location?: string;
@@ -25,7 +26,7 @@ const levelColors: Record<string, "success" | "warning" | "orange" | "error"> = 
 };
 
 export function TrainingCard({
-  slug, title, shortDesc, level, duration, price, location, coverImage, featured,
+  slug, title, shortDesc, level, badge, duration, price, location, coverImage, featured,
 }: TrainingCardProps) {
   return (
     <Link href={`/trainings/${slug}`} className="group block">
@@ -40,7 +41,7 @@ export function TrainingCard({
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute top-3 left-3 flex gap-2">
-            <Badge variant={levelColors[level] || "orange"}>{level}</Badge>
+            <Badge variant={badge ? "orange" : (levelColors[level] || "orange")}>{badge || level}</Badge>
             {featured && <Badge variant="tan">Popular</Badge>}
           </div>
         </div>

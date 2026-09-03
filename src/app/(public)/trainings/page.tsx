@@ -44,23 +44,13 @@ const trainingFaqs = [
 export default async function TrainingsPage() {
   const trainings = await prisma.training.findMany({
     where: { status: "published" },
-    orderBy: [{ featured: "desc" }, { level: "asc" }],
+    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
   });
   const programs = await listPrograms({ activeOnly: true });
 
-  const grouped: Record<string, typeof trainings> = {
-    beginner: trainings.filter((t) => t.level === "beginner"),
-    intermediate: trainings.filter((t) => t.level === "intermediate"),
-    advanced: trainings.filter((t) => t.level === "advanced"),
-    all: trainings.filter((t) => !["beginner", "intermediate", "advanced"].includes(t.level)),
-  };
-
-  const levelLabels: Record<string, string> = {
-    beginner: "Beginner Level",
-    intermediate: "Intermediate Level",
-    advanced: "Advanced Level",
-    all: "All Levels",
-  };
+  // Admin-managed records: "training" sessions vs location-based "special trails".
+  const customTrainings = trainings.filter((t) => t.category === "training");
+  const specialTrails = trainings.filter((t) => t.category !== "training");
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
@@ -75,60 +65,73 @@ export default async function TrainingsPage() {
       <AnimatedPageHeader>
         <SectionHeader
           accent="Skill up"
-          title="Training Programs"
-          subtitle="Structured off-road training to build your confidence and technique, one level at a time."
+          title="Training & Trails"
+          subtitle="Structured off-road training, dedicated Private 1:1 coaching and guided special trails to explore new locations."
         />
       </AnimatedPageHeader>
 
-      {Object.entries(grouped).map(
-        ([level, items]) =>
-          items.length > 0 && (
-            <div key={level} className="mt-14">
-              <AnimatedSection>
-                <h3 className="font-heading text-xl font-semibold text-tan mb-6 uppercase tracking-wider">
-                  {levelLabels[level] || `${level} Level`}
-                </h3>
-              </AnimatedSection>
-              <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {items.map((t) => (
-                  <AnimatedGridItem key={t.id}>
-                    <TrainingCard
-                      slug={t.slug}
-                      title={t.title}
-                      shortDesc={t.shortDesc ?? undefined}
-                      level={t.level}
-                      duration={t.duration ?? undefined}
-                      price={t.price}
-                      location={t.location ?? undefined}
-                      coverImage={t.coverImage ?? undefined}
-                      featured={t.featured}
-                    />
-                  </AnimatedGridItem>
-                ))}
-              </AnimatedGrid>
-            </div>
-          )
-      )}
-
-      {trainings.length === 0 && (
-        <AnimatedSection className="mt-16">
-          <div className="text-center py-16 bg-surface border border-border rounded-sm">
-            <p className="text-muted text-lg">Training programs coming soon!</p>
-          </div>
-        </AnimatedSection>
-      )}
-
-      {/* DRC Off-Road Training & Trails catalog */}
-      <section className="mt-24">
-        <AnimatedSection>
-          <SectionHeader
-            accent="Ride · Learn · Explore"
-            title="Off-Road Training & Trails"
-            subtitle="Open Off-Road training, fully dedicated Private 1:1 coaching and guided off-road trails — book beginner to technical."
-          />
-        </AnimatedSection>
+      {/* Main training programs — Off-Road + Private 1:1, shown directly */}
+      <section className="mt-8">
         <ProgramsExplorer programs={programs} categories={["training", "trails"]} />
       </section>
+
+      {/* Admin-created training sessions */}
+      {customTrainings.length > 0 && (
+        <section className="mt-24">
+          <AnimatedSection>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold">More Training Sessions</h2>
+            <div className="w-16 h-1 bg-orange rounded-full mt-3" />
+          </AnimatedSection>
+          <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+            {customTrainings.map((t) => (
+              <AnimatedGridItem key={t.id}>
+                <TrainingCard
+                  slug={t.slug}
+                  title={t.title}
+                  shortDesc={t.shortDesc ?? undefined}
+                  level={t.level}
+                  badge="Training"
+                  duration={t.duration ?? undefined}
+                  price={t.price}
+                  location={t.location ?? undefined}
+                  coverImage={t.coverImage ?? undefined}
+                  featured={t.featured}
+                />
+              </AnimatedGridItem>
+            ))}
+          </AnimatedGrid>
+        </section>
+      )}
+
+      {/* Special Trails — location-based, added by admin */}
+      {specialTrails.length > 0 && (
+        <section className="mt-24">
+          <AnimatedSection>
+            <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">Explore new ground</span>
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold mt-2">Special Trails</h2>
+            <div className="w-16 h-1 bg-orange rounded-full mt-3" />
+            <p className="text-muted mt-4 max-w-2xl">Guided off-road trails at hand-picked locations. New destinations added regularly.</p>
+          </AnimatedSection>
+          <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+            {specialTrails.map((t) => (
+              <AnimatedGridItem key={t.id}>
+                <TrainingCard
+                  slug={t.slug}
+                  title={t.title}
+                  shortDesc={t.shortDesc ?? undefined}
+                  level={t.level}
+                  badge={t.location || "Special Trail"}
+                  duration={t.duration ?? undefined}
+                  price={t.price}
+                  location={t.location ?? undefined}
+                  coverImage={t.coverImage ?? undefined}
+                  featured={t.featured}
+                />
+              </AnimatedGridItem>
+            ))}
+          </AnimatedGrid>
+        </section>
+      )}
 
       {/* Skill progression */}
       <section className="mt-24">
