@@ -21,7 +21,7 @@ import {
     Info,
 } from "lucide-react";
 
-const order: ProgramCategory[] = ["foundation", "trail", "skill", "adventure", "multiday", "practice", "special"];
+const order: ProgramCategory[] = ["foundation", "skill", "adventure", "multiday", "practice", "special"];
 
 function List({ items }: { items: string[] }) {
     return (

@@ -1,6 +1,5 @@
 export type ProgramCategory =
     | "foundation"
-    | "trail"
     | "skill"
     | "adventure"
     | "multiday"
@@ -63,46 +62,40 @@ export interface Program {
 
 export const categoryMeta: Record<ProgramCategory, { label: string; accent: string; blurb: string }> = {
     foundation: {
-        label: "Foundation Training",
-        accent: "Start on dirt",
+        label: "Foundation",
+        accent: "Start beyond the road",
         blurb:
-            "Build proper off-road fundamentals — riding position, motorcycle control, braking and confidence on loose terrain.",
-    },
-    trail: {
-        label: "Trail Experiences",
-        accent: "Explore & ride",
-        blurb:
-            "Guided off-road trail rides across natural terrain — exploration, community and real-world riding with ride-leader support.",
+            "Build the off-road fundamentals — stand, balance, brake, turn and control your motorcycle when the road disappears.",
     },
     skill: {
         label: "Skill Development",
-        accent: "Level up",
+        accent: "Ride the rough",
         blurb:
-            "Sharpen terrain reading, line selection and technical control as you progress toward advanced off-road riding.",
+            "Two levels of Trail Craft that take you from confident beginner to controlled, precise technical off-road riding.",
     },
     adventure: {
         label: "Adventure Riding",
         accent: "Beyond the road",
         blurb:
-            "Full-day programs that build practical off-road confidence on adventure, dual-sport and scrambler motorcycles.",
+            "Full-day programs that unlock what your adventure or dual-sport motorcycle — and you — can really do off-road.",
     },
     multiday: {
-        label: "Multi-Day Experiences",
+        label: "Multi-Day Experience",
         accent: "Ride. Camp. Repeat.",
         blurb:
-            "Immersive multi-day off-road experiences combining training, guided trails, camping and the DRC community.",
+            "The complete off-road weekend — training, guided trails, camping and community, all in one escape.",
     },
     practice: {
         label: "Practice",
         accent: "More seat time",
         blurb:
-            "Independent practice sessions and passes to keep improving with more time on the bike throughout your journey.",
+            "Independent practice sessions and passes to keep sharpening your off-road skills throughout your journey.",
     },
     special: {
         label: "Family & Friends",
         accent: "Bring your people",
         blurb:
-            "Share the DRC overnighter with family and friends — camping, hospitality and the outdoors, together.",
+            "Share the DRC off-road overnighter with family and friends — camping, hospitality and the outdoors, together.",
     },
 };
 
@@ -112,145 +105,72 @@ export const programs: Program[] = [
         slug: "drc-ground-zero",
         category: "foundation",
         name: "DRC Ground Zero",
-        tagline: "Start on dirt. Build from the ground up.",
+        tagline: "Your first step beyond the road.",
         price: 2999,
         priceUnit: "per rider",
-        duration: "3 Hours",
+        duration: "Half Day",
         difficulty: "Beginner",
         requiresRiding: true,
         shortDesc:
-            "Take your first serious step into off-road riding — build the fundamental skills, confidence and control on dirt and loose terrain.",
+            "Every great off-road rider starts somewhere. This is where you start — the fundamentals that turn road riders into confident off-road riders.",
         description:
-            "DRC Ground Zero is the starting point for riders who are new to off-road motorcycling. It focuses on understanding motorcycle control, rider position, braking, balance and confidence away from normal roads. The objective is not speed — it is to build proper fundamentals and help riders understand how their motorcycle behaves on different off-road surfaces.",
+            "DRC Ground Zero is built for riders who look at an off-road trail and think, \u201cI want to ride that, but I don't know where to begin.\u201d Forget speed. Forget showing off. We start with the fundamentals that give you real confidence — how to stand, balance, brake, turn and control your motorcycle when the road disappears. By the end of the session, off-road won't feel like unfamiliar territory anymore. You'll understand your motorcycle better and leave ready for the next stage of your DRC journey.",
         learn: [
-            { title: "Riding Position", items: ["Neutral standing position", "Basic attack position", "Foot positioning", "Footpeg pressure", "Knee positioning", "Elbow positioning", "Head and eye position", "Looking ahead"] },
-            { title: "Motorcycle Control", items: ["Clutch control", "Understanding the friction zone", "Smooth throttle application", "Controlled acceleration", "Controlled deceleration", "Slow-speed motorcycle control"] },
+            { title: "Riding Position", items: ["Neutral standing position", "Basic attack position", "Foot & footpeg positioning", "Knee & elbow positioning", "Head and eye position", "Looking ahead"] },
+            { title: "Motorcycle Control", items: ["Clutch control", "Understanding the friction zone", "Smooth throttle application", "Controlled acceleration & deceleration", "Slow-speed control"] },
             { title: "Braking", items: ["Front brake control", "Rear brake control", "Combined braking", "Braking on loose surfaces", "Controlled emergency stopping"] },
-            { title: "Turning", items: ["Basic turns", "Wide turns", "Slow-speed turns", "Figure-eight practice", "Looking through the turn", "Basic weight transfer"] },
-            { title: "Terrain Confidence", items: ["Loose dirt", "Uneven terrain", "Small bumps", "Basic inclines", "Controlled descents"] },
+            { title: "Turning", items: ["Basic & wide turns", "Slow-speed turns", "Figure-eight practice", "Looking through the turn", "Basic weight transfer"] },
+            { title: "Terrain Confidence", items: ["Loose off-road surfaces", "Uneven terrain", "Small bumps", "Basic inclines", "Controlled descents"] },
         ],
-        bestFor: ["Riders new to off-road riding", "Adventure motorcycle riders", "Riders with little dirt experience", "Riders wanting stronger motorcycle control"],
-        outcome: "Riders finish with a strong understanding of basic off-road riding position and motorcycle-control fundamentals.",
+        bestFor: ["Riders new to off-road riding", "Adventure motorcycle riders", "Riders with little off-road experience", "Riders wanting stronger motorcycle control"],
+        outcome: "You came with road-riding confidence. You leave with your first real off-road skills.",
         cta: "Start Your Off-Road Journey",
-    },
-    {
-        slug: "drc-traction-lab",
-        category: "foundation",
-        name: "DRC Traction Lab",
-        tagline: "Don't fight the dirt. Learn to work with it.",
-        price: 2099,
-        priceUnit: "per rider",
-        duration: "3 Hours",
-        difficulty: "Beginner to Intermediate",
-        requiresRiding: true,
-        shortDesc:
-            "Understand how traction changes and how throttle, braking and body position affect motorcycle control on loose terrain.",
-        description:
-            "DRC Traction Lab helps riders understand how motorcycles behave when grip changes. Riders learn how body position, throttle input, braking and weight transfer influence control on loose surfaces.",
-        learn: [
-            { title: "Traction Awareness", items: ["Understanding grip", "Understanding loose surfaces", "Weight transfer", "Motorcycle balance"] },
-            { title: "Throttle Control", items: ["Smooth throttle application", "Throttle modulation", "Controlled acceleration", "Maintaining available traction"] },
-            { title: "Braking", items: ["Loose-surface braking", "Rear brake awareness", "Front brake confidence", "Controlled deceleration"] },
-            { title: "Body Position", items: ["Weight distribution", "Footpeg pressure", "Standing position", "Body movement"] },
-            { title: "Motorcycle Control", items: ["Managing rear-wheel movement", "Loose terrain recovery basics", "Controlled corner exits", "Maintaining stability"] },
-            { title: "Surfaces May Include", items: ["Dirt", "Gravel", "Loose soil", "Uneven terrain"] },
-        ],
-        bestFor: ["Riders with basic off-road experience", "Adventure riders", "Riders uncomfortable on loose terrain", "Riders wanting better traction awareness"],
-        outcome: "Riders develop a better understanding of traction and increased confidence on loose surfaces.",
-        cta: "Master the Terrain",
-    },
-
-    // ─────────────── TRAIL EXPERIENCES ───────────────
-    {
-        slug: "drc-trail-core",
-        category: "trail",
-        name: "DRC Trail Core",
-        tagline: "Leave the road behind.",
-        price: 2099,
-        priceUnit: "per rider",
-        duration: "3 to 4 Hours",
-        difficulty: "Beginner Friendly",
-        requiresRiding: true,
-        shortDesc:
-            "A guided off-road trail experience introducing riders to natural terrain and real-world trail riding.",
-        description:
-            "DRC Trail Core is a guided off-road riding experience for riders who want to explore natural terrain. It combines trail riding, exploration, basic coaching and community riding.",
-        experience: ["Guided trail riding", "Natural terrain", "Dirt sections", "Uneven terrain", "Small climbs", "Controlled descents", "Scenic routes", "Community riding"],
-        guidance: ["Standing position", "Terrain awareness", "Basic line selection", "Group riding etiquette", "Trail safety", "Riding within personal ability"],
-        bestFor: ["Riders new to DRC", "Adventure riders", "Beginners with basic motorcycle confidence", "Riders wanting a shorter trail experience"],
-        note: "Terrain difficulty may vary depending on route and weather conditions.",
-        cta: "Join the Trail",
     },
 
     // ─────────────── SKILL DEVELOPMENT ───────────────
     {
-        slug: "drc-terrain-control",
+        slug: "drc-trail-craft-level-1",
         category: "skill",
-        name: "DRC Terrain Control",
-        tagline: "The terrain changes. Your control shouldn't.",
+        name: "DRC Trail Craft – Level 1",
+        tagline: "When the ground changes, so should your riding.",
         price: 3299,
         priceUnit: "per rider",
         duration: "Half Day",
         difficulty: "Intermediate",
         requiresRiding: true,
         shortDesc:
-            "Develop stronger terrain awareness and motorcycle control across changing off-road conditions.",
+            "The basics got you onto the off-road. Now learn how to actually ride it — read the terrain, pick smart lines and place your bike exactly where you want it.",
         description:
-            "DRC Terrain Control is for riders who understand the basics and want to improve their ability to read and ride different off-road terrain.",
+            "The basics got you onto the off-road. Now it's time to learn how to actually ride it. Trail Craft Level 1 takes you beyond simple drills and into the skills that matter when the terrain starts fighting back — rocks, ruts, climbs, loose sections, uneven ground. You'll learn to read the terrain before you ride it, choose smarter lines, control momentum and place your motorcycle exactly where you want it. This is where you stop reacting to the trail — and start understanding it.",
         learn: [
-            { title: "Body Position", items: ["Advanced standing position", "Weight transfer", "Dynamic body movement", "Motorcycle balance"] },
-            { title: "Terrain Reading", items: ["Identifying safer lines", "Reading surface conditions", "Understanding traction changes", "Planning an approach"] },
-            { title: "Technical Terrain", items: ["Ruts", "Loose climbs", "Controlled descents", "Uneven terrain", "Rocky sections where suitable"] },
-            { title: "Momentum Management", items: ["Maintaining momentum", "Controlled throttle", "Gear selection concepts", "Speed management"] },
-            { title: "Braking", items: ["Advanced braking control", "Braking on changing surfaces", "Controlled downhill braking"] },
-        ],
-        bestFor: ["Riders with previous off-road experience", "Riders who have completed beginner training", "Adventure riders wanting stronger off-road confidence"],
-        cta: "Control the Terrain",
-    },
-    {
-        slug: "drc-technical-trails-level-1",
-        category: "skill",
-        name: "DRC Technical Trails – Level 1",
-        tagline: "Pick the line. Commit to it.",
-        price: 3299,
-        priceUnit: "per rider",
-        duration: "3 to 4 Hours",
-        difficulty: "Intermediate",
-        requiresRiding: true,
-        shortDesc:
-            "Learn precision, line selection and motorcycle control while riding more demanding natural terrain.",
-        description:
-            "Technical Trails Level 1 introduces riders to more demanding off-road terrain. The focus is on line selection, controlled momentum and accurate motorcycle placement.",
-        learn: [
-            { title: "Line Selection", items: ["Reading technical terrain", "Choosing safer lines", "Planning an approach", "Looking ahead"] },
-            { title: "Technical Terrain", intro: "Depending on terrain availability:", items: ["Rocks", "Ruts", "Small obstacles", "Uneven sections", "Small climbs"] },
+            { title: "Line Selection & Terrain Reading", items: ["Reading terrain before you ride it", "Choosing safer lines", "Planning an approach", "Looking ahead"] },
+            { title: "Technical Terrain", intro: "Depending on terrain availability:", items: ["Rocks", "Ruts", "Small obstacles", "Uneven sections", "Controlled climbs & descents"] },
             { title: "Motorcycle Control", items: ["Clutch and throttle coordination", "Controlled momentum", "Wheel placement", "Balance"] },
-            { title: "Hill Techniques", items: ["Approach strategy", "Body positioning", "Momentum management", "Controlled climbing"] },
         ],
-        bestFor: ["Riders with previous off-road experience", "Riders comfortable standing on the motorcycle", "Riders progressing toward technical riding"],
-        cta: "Take On the Technical",
+        bestFor: ["Riders who've completed Ground Zero", "Riders with basic off-road experience", "Riders comfortable standing on the motorcycle", "Riders ready for real terrain"],
+        cta: "Master the Trail",
     },
     {
-        slug: "drc-technical-trails-level-2",
+        slug: "drc-trail-craft-level-2",
         category: "skill",
-        name: "DRC Technical Trails – Level 2",
-        tagline: "Control the chaos.",
+        name: "DRC Trail Craft – Level 2",
+        tagline: "When the easy line disappears.",
         price: 4299,
         priceUnit: "per rider",
-        duration: "3 to 4 Hours",
+        duration: "Half Day",
         difficulty: "Advanced",
         requiresRiding: true,
         shortDesc:
-            "An advanced technical riding program focused on precision, control and efficient riding through demanding terrain.",
+            "Level 2 is where the trail asks serious questions. Steeper climbs, bigger rocks, tighter lines — ride demanding off-road terrain with real control.",
         description:
-            "Technical Trails Level 2 is designed for experienced riders looking to challenge themselves on demanding terrain.",
+            "Level 2 is where the trail starts asking serious questions. Steeper climbs. Bigger rocks. Tighter sections. Less room for mistakes. DRC Trail Craft Level 2 is for riders who already have the basics and want to push their control, precision and confidence further. Here, every line matters. Every movement matters. Every decision matters. The goal isn't simply to survive difficult terrain — it's to ride through it with control.",
         learn: [
-            { title: "Advanced Terrain", intro: "Depending on location and conditions:", items: ["Advanced climbs", "Steep descents", "Rock gardens", "Multi-obstacle sections", "Tight technical turns", "Difficult uneven terrain"] },
-            { title: "Advanced Control", items: ["Precise wheel placement", "Advanced line selection", "Controlled momentum", "Technical recovery basics", "Energy-efficient riding"] },
+            { title: "Advanced Terrain", intro: "Depending on location and conditions:", items: ["Steeper climbs", "Technical descents", "Rock gardens", "Multi-obstacle sections", "Tight technical turns"] },
+            { title: "Advanced Control", items: ["Advanced line selection", "Precise wheel placement", "Advanced momentum control", "Recovery techniques", "Energy-efficient riding"] },
         ],
-        bestFor: ["Experienced off-road riders", "Riders comfortable with technical terrain", "Riders who have completed Level 1 or have equivalent experience"],
+        bestFor: ["Experienced off-road riders", "Riders comfortable with technical terrain", "Riders who've completed Level 1 or equivalent"],
         note: "Participation may require a rider skill assessment.",
-        cta: "Control the Chaos",
+        cta: "Take On the Challenge",
     },
 
     // ─────────────── ADVENTURE RIDING ───────────────
@@ -258,7 +178,7 @@ export const programs: Program[] = [
         slug: "drc-adventure-ready",
         category: "adventure",
         name: "DRC Adventure Ready",
-        tagline: "Adventure starts where the road ends.",
+        tagline: "Take your adventure beyond the road.",
         price: 6599,
         priceUnit: "per rider",
         duration: "Full Day",
@@ -266,24 +186,24 @@ export const programs: Program[] = [
         lunch: "Included",
         requiresRiding: true,
         shortDesc:
-            "A full-day program designed to help adventure motorcycle riders build practical off-road confidence.",
+            "You bought an adventure motorcycle for a reason. Learn to ride it where the road ends — loose terrain, climbs, descents and real off-road trails.",
         description:
-            "Adventure Ready is for riders who want to take their adventure motorcycle beyond normal roads and build confidence on real off-road terrain. Suitable for adventure, dual-sport and scrambler-style motorcycles.",
+            "You bought an adventure motorcycle for a reason — not just for city traffic, not just for highways. DRC Adventure Ready is for riders who want to discover what their motorcycle, and they themselves, can do when the road ends. Learn to manage a bigger motorcycle on loose terrain, climbs, descents and real trails, and build the confidence to explore places Google Maps might not recommend. Because an adventure bike should occasionally go on an adventure.",
         learn: [
-            { title: "Big Bike Control", items: ["Motorcycle balance", "Weight management", "Slow-speed control", "Standing position"] },
-            { title: "Terrain Riding", items: ["Loose dirt", "Uneven terrain", "Hills", "Controlled descents"] },
-            { title: "Technical Skills", items: ["Line selection", "Momentum management", "Controlled braking", "Trail recovery techniques"] },
-            { title: "Real-World Riding", intro: "Where suitable and safe:", items: ["Water crossings", "Trail strategy", "Longer off-road sections"] },
+            { title: "Big-Bike Control", items: ["Big-bike balance", "Standing riding position", "Weight management", "Slow-speed control"] },
+            { title: "Terrain Riding", items: ["Loose terrain", "Hill climbing", "Controlled descents", "Uneven ground"] },
+            { title: "Technical Skills", items: ["Line selection", "Braking", "Momentum management", "Trail recovery"] },
+            { title: "Real-World Riding", intro: "Where available and safe:", items: ["Water crossings", "Trail strategy", "Longer off-road sections"] },
         ],
         included: ["Full-day program", "Lunch", "Guided instruction", "Rider feedback"],
-        bestFor: ["Adventure riders", "Riders wanting practical off-road confidence", "Riders planning adventure trips"],
+        bestFor: ["Adventure & dual-sport riders", "Riders wanting practical off-road confidence", "Riders planning adventure trips"],
         cta: "Get Adventure Ready",
     },
     {
         slug: "drc-wild-terrain",
         category: "adventure",
         name: "DRC Wild Terrain",
-        tagline: "Built for terrain that doesn't forgive mistakes.",
+        tagline: "For riders who want more than a road can offer.",
         price: 7499,
         priceUnit: "per rider",
         duration: "Full Day",
@@ -291,24 +211,24 @@ export const programs: Program[] = [
         lunch: "Included",
         requiresRiding: true,
         shortDesc:
-            "An advanced full-day riding program for experienced riders looking to challenge themselves on demanding natural terrain.",
+            "Some terrain can't be understood from YouTube — you have to ride it. The raw side of adventure riding, for experienced riders.",
         description:
-            "Wild Terrain is designed for experienced adventure and off-road riders who want to improve their ability to manage difficult terrain.",
-        experience: ["Steep climbs", "Steep descents", "Technical rocks", "Deep ruts", "Difficult natural terrain", "Longer technical sections"],
+            "Some terrain cannot be understood from YouTube. You have to ride it. DRC Wild Terrain is for experienced riders ready to take on the raw side of adventure riding — steep climbs, technical descents, rocks, ruts and long, demanding sections. This isn't about chasing speed. It's about making better decisions when the terrain gets difficult and keeping control when your comfort zone disappears. Wild terrain doesn't care how expensive your motorcycle is — only your skills matter.",
+        experience: ["Steep climbs", "Technical descents", "Rocks & ruts", "Difficult natural terrain", "Longer technical sections"],
         learn: [
-            { title: "Skills", items: ["Advanced line selection", "Momentum management", "Technical recovery", "Body positioning", "Energy management", "Terrain strategy"] },
+            { title: "Advanced Off-Road Skills", items: ["Advanced line selection", "Momentum management", "Technical recovery", "Body positioning", "Energy management", "Terrain strategy"] },
         ],
         included: ["Full-day program", "Lunch", "Guided instruction", "Rider feedback"],
         bestFor: ["Experienced off-road riders", "Advanced adventure riders", "Riders comfortable with technical terrain"],
         note: "Rider assessment may be required.",
-        cta: "Enter Wild Terrain",
+        cta: "Enter the Wild",
     },
 
-    // ─────────────── MULTI-DAY EXPERIENCES ───────────────
+    // ─────────────── MULTI-DAY EXPERIENCE ───────────────
     {
-        slug: "drc-dirt-escape",
+        slug: "drc-off-road-escape",
         category: "multiday",
-        name: "DRC Dirt Escape",
+        name: "DRC Off-Road Escape",
         tagline: "Ride. Camp. Wake up and ride again.",
         price: 8999,
         priceUnit: "per rider",
@@ -317,14 +237,14 @@ export const programs: Program[] = [
         lunch: "2 Lunches, 1 Dinner, 1 Breakfast",
         requiresRiding: true,
         shortDesc:
-            "A two-day immersive off-road experience combining training, trail riding, camping and the DRC community.",
+            "A two-day off-road escape — guided trails, real coaching, a campfire with your crew, and riding memories a weekend road trip can't give you.",
         description:
-            "DRC Dirt Escape is a complete weekend experience combining off-road learning, natural trails, camping and community.",
+            "Ride hard. Camp under the stars. Wake up and do it again. DRC Off-Road Escape is a complete weekend combining off-road learning, natural trails, camping and community — skills by day, stories by night. It's the DRC weekend riders keep coming back for.",
         days: [
             {
                 title: "Day 1",
                 blocks: [
-                    { title: "On the dirt", items: ["Foundation drills", "Terrain training", "Guided trail riding", "Evening riding experience where suitable", "Camping setup", "Community experience", "Dinner"] },
+                    { title: "On the off-road", items: ["Foundation drills", "Terrain training", "Guided trail riding", "Evening ride where suitable", "Camping setup", "Community experience", "Dinner"] },
                 ],
             },
             {
@@ -335,9 +255,9 @@ export const programs: Program[] = [
             },
         ],
         included: ["Accommodation or camping stay", "2 Lunches", "1 Dinner", "1 Breakfast", "Training sessions", "Guided trail experience"],
-        experience: ["Off-road confidence", "Terrain awareness", "Motorcycle control", "Group trail riding experience", "Basic technical skills"],
-        bestFor: ["Riders wanting a complete weekend experience", "Riders wanting training plus adventure", "Riders who enjoy camping and community experiences"],
-        cta: "Escape to the Dirt",
+        experience: ["Off-road confidence", "Terrain awareness", "Motorcycle control", "Group trail riding", "Basic technical skills"],
+        bestFor: ["Riders wanting a complete weekend experience", "Riders wanting training plus adventure", "Riders who enjoy camping and community"],
+        cta: "Escape Off-Road",
     },
 
     // ─────────────── PRACTICE ───────────────
@@ -352,9 +272,9 @@ export const programs: Program[] = [
         difficulty: "All Levels",
         requiresRiding: true,
         shortDesc:
-            "Independent practice access for riders who want more seat time in designated DRC riding and practice areas.",
+            "More seat time in designated DRC off-road practice areas — practise what you've learned and keep getting better.",
         description:
-            "DRC Free Ride is for riders who want to practice and improve through additional seat time.",
+            "Skills fade without practice. DRC Free Ride gives you independent access to designated DRC off-road practice areas so you can put in the seat time that actually makes riders better — at your own pace, on your own bike.",
         included: ["Access to designated practice areas", "Access to approved riding sections", "Basic safety briefing", "Marshal or supervisor support"],
         note: "Not included: formal instructor-led training or personal coaching. Riders must follow DRC safety rules and remain within designated riding areas.",
         cta: "Get More Seat Time",
@@ -370,9 +290,9 @@ export const programs: Program[] = [
         difficulty: "All Levels",
         requiresRiding: true,
         shortDesc:
-            "Four DRC Free Ride sessions for riders who want consistent practice and long-term improvement.",
+            "Four DRC Free Ride sessions in one pass — consistent practice, long-term improvement, and ₹1,497 saved.",
         description:
-            "The DRC Skill Builder Pass is designed for riders who want consistent practice and long-term improvement. Regular value ₹5,996 — you save ₹1,497.",
+            "Real improvement comes from repetition. The DRC Skill Builder Pass bundles four DRC Free Ride sessions so you keep riding, keep practising and keep getting better — for less. Regular value ₹5,996; your price ₹4,499 — you save ₹1,497.",
         included: ["Four DRC Free Ride sessions", "Access to designated practice areas", "Basic safety briefing", "Supervisor support"],
         note: "Regular value ₹5,996. Pass price ₹4,499 — you save ₹1,497.",
         cta: "Build Your Skills",
@@ -392,24 +312,16 @@ export const programs: Program[] = [
         requiresRiding: true,
         supportsCompanions: true,
         description:
-            "Bring your people to the DRC overnighter — camping, hospitality and the outdoors together. Add as many family members, friends and kids as you like; each is priced individually.",
+            "Bring your people to the DRC off-road overnighter — camping, hospitality and the outdoors together. Add as many family members, friends and kids as you like; each is priced individually.",
         included: ["Evening Trail (rider)", "Camping", "High Tea", "Dinner", "Breakfast", "Morning Trail (rider)"],
         familyExperience: ["Outdoor environment", "Camping experience", "High Tea", "Dinner", "Breakfast", "Nature", "Community experience"],
         note: "Companions join the camping and hospitality experience. Anyone who wants to ride must be separately registered and approved for riding activities.",
     },
 ];
 
-// Ordered DRC rider progression (skill journey through the programs).
-export const drcProgression = [
-    "DRC Ground Zero",
-    "DRC Traction Lab",
-    "DRC Trail Core",
-    "DRC Terrain Control",
-    "DRC Technical Trails – Level 1",
-    "DRC Technical Trails – Level 2",
-    "DRC Adventure Ready",
-    "DRC Wild Terrain",
-];
+// Two DRC progression tracks — riders start on Foundation, then branch by goal.
+export const coreSkillsTrack = ["DRC Ground Zero", "DRC Trail Craft – Level 1", "DRC Trail Craft – Level 2"];
+export const adventureTrack = ["DRC Adventure Ready", "DRC Wild Terrain"];
 
 export const skillProgression = [
     {
@@ -436,7 +348,7 @@ export const skillProgression = [
 
 export const customerJourney = ["Try", "Learn", "Improve", "Explore", "Experience"];
 
-export const recommendedProgression = drcProgression;
+export const recommendedProgression = coreSkillsTrack;
 
 export const riderRequirements = {
     mandatory: [

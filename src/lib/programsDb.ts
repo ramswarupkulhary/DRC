@@ -80,23 +80,31 @@ export async function ensureProgramsSeeded(): Promise<void> {
 }
 
 /**
- * Idempotently reconciles an already-seeded catalog with the current defaults:
- * removes retired legacy programs and inserts any new default programs (by slug).
+ * Idempotently reconciles an already-seeded catalog with the current defaults.
+ * A sentinel slug marks the current catalog version: while it's missing we do a
+ * one-time resync of the training programs (so a code catalog change goes live),
+ * after which admin edits are preserved.
  */
 export async function reconcileProgramCatalog(): Promise<void> {
     const count = await prisma.program.count();
     if (count === 0) return; // fresh installs are handled by ensureProgramsSeeded
 
-    // Retired programs replaced by the new DRC training catalog.
-    const legacySlugs = [
-        "private-training-half-day", "private-training-full-day", "two-day-off-road-training",
-        "private-1on1-half-day", "private-1on1-full-day", "private-1on1-two-day",
-        "half-day-trail", "full-day-trail", "overnighter-trail",
-        "family-overnighter-plan", "friends-plan",
-    ];
-    await prisma.program.deleteMany({ where: { slug: { in: legacySlugs } } }).catch(() => { });
+    // Bump this slug whenever the training catalog is intentionally replaced.
+    const SENTINEL = "drc-off-road-escape";
+    const sentinel = await prisma.program.findUnique({ where: { slug: SENTINEL } }).catch(() => null);
 
-    // Insert any default programs missing from the DB (the new DRC programs).
+    if (!sentinel) {
+        // One-time migration to the new catalog: drop all non-special (training) programs
+        // and re-seed them from the current defaults. Family & Friends (special) is preserved.
+        await prisma.program.deleteMany({ where: { category: { not: "special" } } }).catch(() => { });
+        const trainingDefaults = DEFAULT_PROGRAMS.filter((p) => p.category !== "special");
+        await prisma.program.createMany({
+            data: trainingDefaults.map((p, i) => ({ ...programToRow(p, i), active: true, featured: false })),
+            skipDuplicates: true,
+        });
+    }
+
+    // Ensure any still-missing default programs (e.g. Family & Friends) exist.
     const existing = await prisma.program.findMany({ select: { slug: true } });
     const have = new Set(existing.map((e) => e.slug));
     const missing = DEFAULT_PROGRAMS.filter((p) => !have.has(p.slug));

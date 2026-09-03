@@ -8,7 +8,7 @@ import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection } f
 import { BreadcrumbJsonLd, FAQJsonLd, ItemListJsonLd } from "@/components/seo/JsonLd";
 import { ProgramsExplorer } from "@/components/programs/ProgramsExplorer";
 import { listPrograms } from "@/lib/programsDb";
-import { skillProgression, customerJourney, recommendedProgression, riderRequirements } from "@/lib/programs";
+import { skillProgression, customerJourney, coreSkillsTrack, adventureTrack, riderRequirements } from "@/lib/programs";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -114,7 +114,7 @@ export default async function TrainingsPage() {
 
       {/* Main training programs — Off-Road + Private 1:1, shown directly */}
       <section className="mt-8">
-        <ProgramsExplorer programs={programs} categories={["foundation", "trail", "skill", "adventure", "multiday", "practice"]} />
+        <ProgramsExplorer programs={programs} categories={["foundation", "skill", "adventure", "multiday", "practice"]} />
       </section>
 
       {/* Admin-created training sessions */}
@@ -220,17 +220,33 @@ export default async function TrainingsPage() {
             </div>
           ))}
         </div>
-        <div className="mt-10 bg-surface border border-border rounded-sm p-6">
-          <p className="text-sm font-semibold text-muted uppercase tracking-wider mb-4">Recommended progression</p>
-          <div className="flex flex-wrap items-center gap-2">
-            {recommendedProgression.map((step, i) => (
-              <div key={step} className="flex items-center gap-2">
-                <span className="text-sm bg-background border border-border rounded-sm px-3 py-1.5">{step}</span>
-                {i < recommendedProgression.length - 1 && <ChevronRight className="w-4 h-4 text-orange/50" />}
-              </div>
-            ))}
+        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-surface border border-border rounded-sm p-6">
+            <p className="text-sm font-semibold text-orange uppercase tracking-wider mb-4">Core Skills Track</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {coreSkillsTrack.map((step, i) => (
+                <div key={step} className="flex items-center gap-2">
+                  <span className="text-sm bg-background border border-border rounded-sm px-3 py-1.5">{step}</span>
+                  {i < coreSkillsTrack.length - 1 && <ChevronRight className="w-4 h-4 text-orange/50" />}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-surface border border-border rounded-sm p-6">
+            <p className="text-sm font-semibold text-orange uppercase tracking-wider mb-4">Adventure Track</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {adventureTrack.map((step, i) => (
+                <div key={step} className="flex items-center gap-2">
+                  <span className="text-sm bg-background border border-border rounded-sm px-3 py-1.5">{step}</span>
+                  {i < adventureTrack.length - 1 && <ChevronRight className="w-4 h-4 text-orange/50" />}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+        <p className="text-center text-sm text-muted mt-6">
+          Ready for the full experience? <span className="text-foreground font-medium">DRC Off-Road Escape</span> is our two-day weekend of training, trails and camping — and <span className="text-foreground font-medium">DRC Free Ride</span> lets you practise anytime.
+        </p>
       </section>
 
       {/* Rider requirements */}
