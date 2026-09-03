@@ -34,11 +34,12 @@ export async function POST(req: Request) {
   }
 
   const userId = (session.user as { id: string }).id;
+  let registrationId: string | null = null;
 
   try {
     if (type === "ride" || type === "training") {
       const quote = await computeQuote(type as PurchaseType, itemId, userId, couponCode);
-      await prisma.registration.create({
+      const reg = await prisma.registration.create({
         data: {
           userId,
           ...(type === "ride" ? { rideId: itemId } : { trainingId: itemId }),
@@ -50,6 +51,7 @@ export async function POST(req: Request) {
           couponId: quote?.coupon?.id ?? null,
         },
       });
+      registrationId = reg.id;
       if (quote?.finalAmount) {
         await prisma.user.update({
           where: { id: userId },
@@ -99,7 +101,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ success: true, paymentId: razorpay_payment_id });
+    return NextResponse.json({ success: true, paymentId: razorpay_payment_id, registrationId });
   } catch {
     return NextResponse.json({ error: "Failed to process payment" }, { status: 500 });
   }

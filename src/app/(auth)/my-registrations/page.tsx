@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { formatPrice, formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { MapPin, Calendar, MessageCircle, Image as ImageIcon, Star } from "lucide-react";
+import { IndemnityWaiverModal } from "@/components/waiver/IndemnityWaiverModal";
 
 interface Registration {
   id: string;
@@ -15,6 +16,7 @@ interface Registration {
   paymentStatus: string;
   amount: number;
   createdAt: string;
+  waiverSigned?: boolean;
   ride?: {
     id: string;
     title: string;
@@ -60,6 +62,7 @@ export default function MyRegistrationsPage() {
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState<string | null>(null);
+  const [signingWaiver, setSigningWaiver] = useState<{ id: string; context: string } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -178,6 +181,23 @@ export default function MyRegistrationsPage() {
                   </div>
                 )}
 
+                {isConfirmedPaid && !reg.waiverSigned && (
+                  <div className="mt-3 pt-3 border-t border-border flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-xs text-warning">Please sign the liability waiver &amp; indemnity form before your {reg.training ? "training" : "ride"}.</p>
+                    <button
+                      onClick={() => setSigningWaiver({ id: reg.id, context: `${reg.training ? "Training" : "Ride"}: ${item?.title || ""}` })}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-orange text-white rounded-sm hover:bg-orange/90"
+                    >
+                      Sign Indemnity Waiver
+                    </button>
+                  </div>
+                )}
+                {isConfirmedPaid && reg.waiverSigned && (
+                  <div className="mt-3 pt-3 border-t border-border">
+                    <p className="text-xs text-success">✓ Indemnity waiver signed</p>
+                  </div>
+                )}
+
                 {isConfirmed && reg.ride && (
                   <div className="mt-3 pt-3 border-t border-border">
                     {reviewSuccess === reg.ride.id ? (
@@ -225,6 +245,18 @@ export default function MyRegistrationsPage() {
             );
           })}
         </div>
+      )}
+
+      {signingWaiver && (
+        <IndemnityWaiverModal
+          context={signingWaiver.context}
+          registrationId={signingWaiver.id}
+          onClose={() => setSigningWaiver(null)}
+          onSigned={() => {
+            setRegistrations((prev) => prev.map((r) => (r.id === signingWaiver.id ? { ...r, waiverSigned: true } : r)));
+            setSigningWaiver(null);
+          }}
+        />
       )}
     </div>
   );

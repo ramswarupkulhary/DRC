@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { X, CheckCircle2, Clock3, IdCard, Users, Bike } from "lucide-react";
 import { CouponInput, type AppliedCoupon } from "@/components/payments/CouponInput";
+import { IndemnityWaiverModal } from "@/components/waiver/IndemnityWaiverModal";
 import {
     formatINR,
     computeProgramPrice,
@@ -51,6 +52,8 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
     const [companions, setCompanions] = useState<CompanionRow[]>([]);
     const [savingCompanions, setSavingCompanions] = useState(false);
     const [companionsSaved, setCompanionsSaved] = useState(false);
+    const [showWaiver, setShowWaiver] = useState(false);
+    const [waiverSigned, setWaiverSigned] = useState(false);
     const [coupon, setCoupon] = useState<AppliedCoupon | null>(null);
     const [bikes, setBikes] = useState<{ id: string; name: string; price: number }[]>([]);
     const [bikeId, setBikeId] = useState<string | null>(null); // null = own bike
@@ -360,10 +363,34 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                                     <p className="text-sm text-muted">
                                         {companionsSaved ? "Companion details saved. " : ""}You can view your booking status anytime.
                                     </p>
-                                    <Button onClick={() => router.push("/my-programs")}>View My Bookings</Button>
+                                    {!waiverSigned ? (
+                                        <div className="bg-orange/10 border border-orange/30 rounded-sm p-4 space-y-3 text-left">
+                                            <p className="text-sm text-foreground">
+                                                One last step — please sign the <strong>liability waiver &amp; indemnity form</strong> before the program.
+                                            </p>
+                                            <Button className="w-full" onClick={() => setShowWaiver(true)}>Sign Indemnity Waiver</Button>
+                                            <button className="text-xs text-muted hover:text-foreground w-full" onClick={() => router.push("/my-programs")}>
+                                                I&apos;ll sign it later
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <Button onClick={() => router.push("/my-programs")}>View My Bookings</Button>
+                                    )}
                                 </div>
                             )}
                         </div>
+                    )}
+
+                    {showWaiver && (
+                        <IndemnityWaiverModal
+                            context={`Program: ${program.name}`}
+                            programBookingId={bookingId ?? undefined}
+                            onClose={() => setShowWaiver(false)}
+                            onSigned={() => {
+                                setWaiverSigned(true);
+                                setShowWaiver(false);
+                            }}
+                        />
                     )}
                 </div>
             </div>

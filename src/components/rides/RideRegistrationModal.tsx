@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { X, Upload, CheckCircle2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { CouponInput, type AppliedCoupon } from "@/components/payments/CouponInput";
+import { IndemnityWaiverModal } from "@/components/waiver/IndemnityWaiverModal";
 
 interface Props {
   rideId: string;
@@ -40,6 +41,9 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [registrationId, setRegistrationId] = useState<string | null>(null);
+  const [showWaiver, setShowWaiver] = useState(false);
+  const [waiverSigned, setWaiverSigned] = useState(false);
 
   const [razorpayEnabled, setRazorpayEnabled] = useState<boolean | null>(null);
   const [upiIntentUrls, setUpiIntentUrls] = useState<Record<string, string>>({});
@@ -141,10 +145,7 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
         const data = await res.json();
         if (res.ok) {
           setSuccess(true);
-          setTimeout(() => {
-            onClose();
-            router.push("/my-registrations");
-          }, 1500);
+          setRegistrationId(data.registrationId ?? null);
         } else {
           setError(data.error || "Could not complete booking.");
           setPaying(false);
@@ -204,11 +205,9 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
           });
 
           if (verifyRes.ok) {
+            const vdata = await verifyRes.json();
             setSuccess(true);
-            setTimeout(() => {
-              onClose();
-              router.push("/my-registrations");
-            }, 1500);
+            setRegistrationId(vdata.registrationId ?? null);
           } else {
             setError("Payment verification failed. Contact support.");
           }
@@ -283,12 +282,46 @@ export function RideRegistrationModal({ rideId, rideTitle, ridePrice, onClose, i
           {loading && <div className="text-center text-muted py-8">Loading...</div>}
 
           {!loading && success && (
-            <div className="text-center space-y-3 py-6">
+            <div className="text-center space-y-4 py-6">
               <CheckCircle2 className="w-16 h-16 text-success mx-auto" />
               <h4 className="font-heading text-xl font-bold">{razorpayEnabled ? "Payment Successful!" : "Registered Successfully!"}</h4>
-              <p className="text-sm text-muted">{razorpayEnabled ? "Your registration is confirmed." : "Admin will verify your payment."} Redirecting...</p>
+              <p className="text-sm text-muted">{razorpayEnabled ? "Your registration is confirmed." : "Admin will verify your payment."}</p>
+
+              {registrationId && !waiverSigned && (
+                <div className="bg-orange/10 border border-orange/30 rounded-sm p-4 space-y-3 text-left">
+                  <p className="text-sm text-foreground">
+                    One last step — please sign the <strong>liability waiver &amp; indemnity form</strong> before your ride.
+                  </p>
+                  <Button className="w-full" onClick={() => setShowWaiver(true)}>Sign Indemnity Waiver</Button>
+                  <button className="text-xs text-muted hover:text-foreground w-full" onClick={() => { onClose(); router.push("/my-registrations"); }}>
+                    I&apos;ll sign it later
+                  </button>
+                </div>
+              )}
+
+              {registrationId && waiverSigned && (
+                <p className="text-sm text-success font-medium">Waiver signed. Redirecting…</p>
+              )}
+
+              {!registrationId && (
+                <Button className="w-full" onClick={() => { onClose(); router.push("/my-registrations"); }}>View My Registrations</Button>
+              )}
             </div>
           )}
+
+          {showWaiver && (
+            <IndemnityWaiverModal
+              context={`${isTraining ? "Training" : "Ride"}: ${rideTitle}`}
+              registrationId={registrationId ?? undefined}
+              onClose={() => setShowWaiver(false)}
+              onSigned={() => {
+                setWaiverSigned(true);
+                setShowWaiver(false);
+                setTimeout(() => { onClose(); router.push("/my-registrations"); }, 1200);
+              }}
+            />
+          )}
+
 
           {!loading && !success && profile && !hasEmergency && !emergencySaved && (
             <div className="space-y-4">

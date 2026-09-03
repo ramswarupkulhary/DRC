@@ -32,6 +32,7 @@ export async function POST(req: Request) {
     }
 
     const paymentRef = `coupon:${quote.coupon?.code || "FREE"}`;
+    let registrationId: string | null = null;
 
     try {
         if (type === "ride" || type === "training") {
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
             });
             if (existing) return NextResponse.json({ error: "You are already registered." }, { status: 409 });
 
-            await prisma.registration.create({
+            const reg = await prisma.registration.create({
                 data: {
                     userId,
                     ...(type === "ride" ? { rideId: itemId } : { trainingId: itemId }),
@@ -52,6 +53,7 @@ export async function POST(req: Request) {
                     couponId: quote.coupon?.id ?? null,
                 },
             });
+            registrationId = reg.id;
         } else if (type === "membership") {
             const plan = await prisma.membershipPlan.findUnique({ where: { id: itemId } });
             if (!plan) return NextResponse.json({ error: "Plan not found" }, { status: 404 });
@@ -86,7 +88,7 @@ export async function POST(req: Request) {
             push: true,
         });
 
-        return NextResponse.json({ success: true, free: true });
+        return NextResponse.json({ success: true, free: true, registrationId });
     } catch {
         return NextResponse.json({ error: "Failed to complete booking" }, { status: 500 });
     }

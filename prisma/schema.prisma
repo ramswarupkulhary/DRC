@@ -484,6 +484,11 @@ model Waiver {
   allergies      String?
   medications    String?
   agreedTerms    Boolean  @default(false)
+  signature      String?
+  ipAddress      String?
+  context        String?
+  registrationId String?
+  programBookingId String?
   signedAt       DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -665,6 +670,7 @@ model ProgramBooking {
   lunch         Boolean  @default(false)
   bikeName      String?
   bikePrice     Int      @default(0)
+  waiverSigned  Boolean  @default(false)
   amount        Int
   status        String   @default("awaiting_approval")
   paymentId     String?

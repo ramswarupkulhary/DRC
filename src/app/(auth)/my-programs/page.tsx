@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { Clock3, CheckCircle2, XCircle, IdCard } from "lucide-react";
 import { formatINR, FAMILY_PACKAGES, familyCompanionCount, type FamilyOption } from "@/lib/programs";
+import { IndemnityWaiverModal } from "@/components/waiver/IndemnityWaiverModal";
 
 interface Companion {
     id: string;
@@ -28,6 +29,7 @@ interface Booking {
     status: string;
     rejectionNote: string | null;
     createdAt: string;
+    waiverSigned?: boolean;
     companions: Companion[];
 }
 
@@ -109,6 +111,7 @@ export default function MyProgramsPage() {
     const router = useRouter();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
+    const [signingWaiver, setSigningWaiver] = useState<{ id: string; context: string } | null>(null);
 
     const load = useCallback(() => {
         fetch("/api/programs/mine")
@@ -160,10 +163,35 @@ export default function MyProgramsPage() {
                                 )}
 
                                 {maxCompanions > 0 && <CompanionEditor booking={b} onSaved={load} />}
+
+                                {b.status !== "rejected" && (
+                                    <div className="mt-4 border-t border-border pt-4">
+                                        {b.waiverSigned ? (
+                                            <p className="text-xs text-success">✓ Indemnity waiver signed</p>
+                                        ) : (
+                                            <div className="flex items-center justify-between gap-3 flex-wrap">
+                                                <p className="text-xs text-warning">Please sign the liability waiver &amp; indemnity form before the program.</p>
+                                                <Button size="sm" onClick={() => setSigningWaiver({ id: b.id, context: `Program: ${b.programName}` })}>Sign Indemnity Waiver</Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         );
                     })}
                 </div>
+            )}
+
+            {signingWaiver && (
+                <IndemnityWaiverModal
+                    context={signingWaiver.context}
+                    programBookingId={signingWaiver.id}
+                    onClose={() => setSigningWaiver(null)}
+                    onSigned={() => {
+                        setBookings((prev) => prev.map((x) => (x.id === signingWaiver.id ? { ...x, waiverSigned: true } : x)));
+                        setSigningWaiver(null);
+                    }}
+                />
             )}
         </div>
     );
