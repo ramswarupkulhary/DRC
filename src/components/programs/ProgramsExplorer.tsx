@@ -21,7 +21,7 @@ import {
     Info,
 } from "lucide-react";
 
-const order: ProgramCategory[] = ["training", "trails", "special"];
+const order: ProgramCategory[] = ["foundation", "trail", "skill", "adventure", "multiday", "practice", "special"];
 
 function List({ items }: { items: string[] }) {
     return (
@@ -39,6 +39,7 @@ function List({ items }: { items: string[] }) {
 function ProgramDetail({ program }: { program: Program }) {
     return (
         <div className="space-y-8">
+            {program.tagline && <p className="font-heading text-lg text-orange italic">{program.tagline}</p>}
             <p className="text-foreground/80 leading-relaxed">{program.description}</p>
 
             <div className="flex flex-wrap gap-3">
@@ -177,6 +178,13 @@ function ProgramDetail({ program }: { program: Program }) {
                     <span>{program.note}</span>
                 </div>
             )}
+
+            {program.outcome && (
+                <div className="bg-background border border-orange/30 rounded-sm p-4">
+                    <p className="text-xs font-semibold text-orange uppercase tracking-wide mb-1">Program outcome</p>
+                    <p className="text-sm text-foreground/80">{program.outcome}</p>
+                </div>
+            )}
         </div>
     );
 }
@@ -201,13 +209,14 @@ function ProgramCard({ program, onView, onBook }: { program: Program; onView: ()
                 </div>
 
                 <h3 className="font-heading text-xl font-bold mt-4 group-hover:text-orange transition-colors">{program.name}</h3>
+                {program.tagline && <p className="text-sm text-orange/90 italic mt-1">{program.tagline}</p>}
 
                 <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-muted">
                     <span className="inline-flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-orange" /> {program.duration}</span>
                     {program.lunch && <span className="inline-flex items-center gap-1"><UtensilsCrossed className="w-3.5 h-3.5 text-orange" /> {program.lunch}</span>}
                 </div>
 
-                <p className="text-sm text-foreground/70 mt-3 line-clamp-3">{program.description}</p>
+                <p className="text-sm text-foreground/70 mt-3 line-clamp-3">{program.shortDesc || program.description}</p>
 
                 {highlights.length > 0 && (
                     <ul className="mt-4 space-y-1.5">
@@ -294,7 +303,7 @@ export function ProgramsExplorer({ programs, categories }: { programs: Program[]
                                     openBooking(p);
                                 }}
                             >
-                                Book Now
+                                {detail.cta || "Book Now"}
                             </Button>
                         </div>
                     </div>

@@ -79,7 +79,7 @@ export default async function TrainingsPage() {
     "@type": "ItemList",
     name: "DRC Off-Road Training & Trail Programs",
     itemListElement: programs
-      .filter((p) => p.category === "training" || p.category === "trails")
+      .filter((p) => p.category !== "special")
       .map((p, i) => ({
         "@type": "ListItem",
         position: i + 1,
@@ -114,7 +114,7 @@ export default async function TrainingsPage() {
 
       {/* Main training programs — Off-Road + Private 1:1, shown directly */}
       <section className="mt-8">
-        <ProgramsExplorer programs={programs} categories={["training", "trails"]} />
+        <ProgramsExplorer programs={programs} categories={["foundation", "trail", "skill", "adventure", "multiday", "practice"]} />
       </section>
 
       {/* Admin-created training sessions */}

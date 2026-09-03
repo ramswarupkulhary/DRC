@@ -16,8 +16,8 @@ export default async function AdminTrainingsPage() {
     <div className="space-y-10">
       {/* Core off-road training & trail programs (Off-Road, Private 1:1, guided trails) */}
       <ProgramCatalogManager
-        categories={["training", "trails"]}
-        defaultCategory="training"
+        categories={["foundation", "trail", "skill", "adventure", "multiday", "practice"]}
+        defaultCategory="foundation"
         title="Off-Road Training & Trails"
         subtitle="Off-Road training, Private 1:1 coaching and guided trails shown on the Training page."
         newLabel="New Training / Trail"

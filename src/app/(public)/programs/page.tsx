@@ -51,15 +51,9 @@ function programsJsonLd(programs: Program[]) {
             "@type": "ListItem",
             position: i + 1,
             item: {
-                "@type": p.category === "training" ? "Course" : "Product",
+                "@type": "Product",
                 name: p.name,
                 description: p.description,
-                ...(p.category === "training"
-                    ? {
-                        provider: { "@type": "Organization", name: "Dirt Ride Camp", url: BASE_URL },
-                        url: `${BASE_URL}/programs`,
-                    }
-                    : {}),
                 offers: {
                     "@type": "Offer",
                     price: p.price,

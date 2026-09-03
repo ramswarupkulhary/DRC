@@ -30,8 +30,12 @@ interface Program {
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
-    training: "Training",
-    trails: "Trails",
+    foundation: "Foundation Training",
+    trail: "Trail Experience",
+    skill: "Skill Development",
+    adventure: "Adventure Riding",
+    multiday: "Multi-Day Experience",
+    practice: "Practice",
     special: "Family & Friends",
 };
 

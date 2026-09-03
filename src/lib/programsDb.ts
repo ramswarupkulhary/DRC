@@ -81,29 +81,22 @@ export async function ensureProgramsSeeded(): Promise<void> {
 
 /**
  * Idempotently reconciles an already-seeded catalog with the current defaults:
- * renames the legacy "Private Training" programs to "Off-Road Training" (only when the
- * DB still holds the old default name, so admin edits are preserved) and inserts any
- * new default programs that don't yet exist by slug.
+ * removes retired legacy programs and inserts any new default programs (by slug).
  */
 export async function reconcileProgramCatalog(): Promise<void> {
     const count = await prisma.program.count();
     if (count === 0) return; // fresh installs are handled by ensureProgramsSeeded
 
-    // Apply the Private → Off-Road rename only if the row still has the old default name.
-    const renames: { slug: string; from: string; to: string }[] = [
-        { slug: "private-training-half-day", from: "Private Training — Half Day", to: "Off-Road Training — Half Day" },
-        { slug: "private-training-full-day", from: "Private Training — Full Day", to: "Off-Road Training — Full Day" },
+    // Retired programs replaced by the new DRC training catalog.
+    const legacySlugs = [
+        "private-training-half-day", "private-training-full-day", "two-day-off-road-training",
+        "private-1on1-half-day", "private-1on1-full-day", "private-1on1-two-day",
+        "half-day-trail", "full-day-trail", "overnighter-trail",
+        "family-overnighter-plan", "friends-plan",
     ];
-    for (const r of renames) {
-        await prisma.program.updateMany({ where: { slug: r.slug, name: r.from }, data: { name: r.to } }).catch(() => { });
-    }
+    await prisma.program.deleteMany({ where: { slug: { in: legacySlugs } } }).catch(() => { });
 
-    // Legacy Family/Friends were two separate plans — they're now one dynamic "Family & Friends".
-    await prisma.program.deleteMany({ where: { slug: { in: ["family-overnighter-plan", "friends-plan"] } } }).catch(() => { });
-    // The Overnighter is a solo trail; companions are handled by the Family & Friends program.
-    await prisma.program.updateMany({ where: { slug: "overnighter-trail" }, data: { supportsCompanions: false } }).catch(() => { });
-
-    // Insert any default programs missing from the DB (e.g. the new Private 1:1 trainings, Family & Friends).
+    // Insert any default programs missing from the DB (the new DRC programs).
     const existing = await prisma.program.findMany({ select: { slug: true } });
     const have = new Set(existing.map((e) => e.slug));
     const missing = DEFAULT_PROGRAMS.filter((p) => !have.has(p.slug));
