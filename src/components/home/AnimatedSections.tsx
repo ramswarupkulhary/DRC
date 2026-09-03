@@ -4,6 +4,7 @@ import { FadeIn, StaggerContainer, StaggerItem, CountUp, ScaleIn, ParallaxSectio
 import { Mountain, Shield, Flame, Users, Star, ArrowRight, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 
 const features = [
@@ -207,6 +208,8 @@ export function AnimatedTestimonials({ reviews }: { reviews?: { name: string; te
 }
 
 export function AnimatedCTA() {
+  const { status } = useSession();
+  const loggedIn = status === "authenticated";
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
       <FadeIn>
@@ -216,8 +219,8 @@ export function AnimatedCTA() {
           </h2>
           <p className="text-muted text-lg">Join DRC and be part of a growing community of off-road adventurers. Your next adventure is just a click away.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup">
-              <Button size="lg" className="min-w-[200px]">Join DRC <ArrowRight className="w-5 h-5" /></Button>
+            <Link href={loggedIn ? "/rides" : "/signup"}>
+              <Button size="lg" className="min-w-[200px]">{loggedIn ? "Explore Rides" : "Join DRC"} <ArrowRight className="w-5 h-5" /></Button>
             </Link>
             <a href="https://wa.me/919414870102" target="_blank" rel="noopener noreferrer">
               <Button variant="outline" size="lg" className="min-w-[200px]">WhatsApp Us</Button>

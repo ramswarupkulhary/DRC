@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { signIn } from "next-auth/react";
+import { Suspense, useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
@@ -20,6 +20,12 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/profile";
+  const { status } = useSession();
+
+  // Already logged in? Skip the login form.
+  useEffect(() => {
+    if (status === "authenticated") router.replace(redirect);
+  }, [status, router, redirect]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
