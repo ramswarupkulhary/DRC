@@ -32,6 +32,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     if (b.description !== undefined) data.description = b.description;
     if (b.lunch !== undefined) data.lunch = b.lunch || null;
     if (b.optionalLunch !== undefined) data.optionalLunch = b.optionalLunch ? parseInt(b.optionalLunch, 10) : null;
+    if (b.personPrice !== undefined) data.personPrice = b.personPrice != null && b.personPrice !== "" ? parseInt(b.personPrice, 10) : null;
+    if (b.kidPrice !== undefined) data.kidPrice = b.kidPrice != null && b.kidPrice !== "" ? parseInt(b.kidPrice, 10) : null;
     if (b.requiresRiding !== undefined) data.requiresRiding = b.requiresRiding;
     if (b.supportsCompanions !== undefined) data.supportsCompanions = b.supportsCompanions;
     if (b.active !== undefined) data.active = b.active;

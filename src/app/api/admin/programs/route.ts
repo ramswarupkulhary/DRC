@@ -50,6 +50,8 @@ export async function POST(req: Request) {
                 description: b.description || "",
                 lunch: b.lunch || null,
                 optionalLunch: b.optionalLunch ? parseInt(b.optionalLunch, 10) : null,
+                personPrice: b.personPrice != null && b.personPrice !== "" ? parseInt(b.personPrice, 10) : null,
+                kidPrice: b.kidPrice != null && b.kidPrice !== "" ? parseInt(b.kidPrice, 10) : null,
                 requiresRiding: b.requiresRiding ?? true,
                 supportsCompanions: b.supportsCompanions ?? false,
                 active: b.active ?? true,

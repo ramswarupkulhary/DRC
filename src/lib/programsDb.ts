@@ -12,6 +12,8 @@ type ProgramRow = {
     description: string;
     lunch: string | null;
     optionalLunch: number | null;
+    personPrice: number | null;
+    kidPrice: number | null;
     requiresRiding: boolean;
     supportsCompanions: boolean;
     content: string | null;
@@ -36,6 +38,8 @@ export function rowToProgram(row: ProgramRow): Program {
         description: row.description,
         lunch: row.lunch || undefined,
         optionalLunch: row.optionalLunch ?? undefined,
+        personPrice: row.personPrice ?? undefined,
+        kidPrice: row.kidPrice ?? undefined,
         requiresRiding: row.requiresRiding,
         supportsCompanions: row.supportsCompanions,
         ...content,
@@ -44,7 +48,7 @@ export function rowToProgram(row: ProgramRow): Program {
 
 /** Splits a rich Program into DB columns + a JSON content blob. */
 export function programToRow(p: Program, sortOrder = 0) {
-    const { slug, category, name, price, priceUnit, duration, difficulty, description, lunch, optionalLunch, requiresRiding, supportsCompanions, ...content } = p;
+    const { slug, category, name, price, priceUnit, duration, difficulty, description, lunch, optionalLunch, personPrice, kidPrice, requiresRiding, supportsCompanions, ...content } = p;
     return {
         slug,
         category,
@@ -56,6 +60,8 @@ export function programToRow(p: Program, sortOrder = 0) {
         description,
         lunch: lunch ?? null,
         optionalLunch: optionalLunch ?? null,
+        personPrice: personPrice ?? null,
+        kidPrice: kidPrice ?? null,
         requiresRiding: requiresRiding ?? true,
         supportsCompanions: supportsCompanions ?? false,
         sortOrder,
@@ -92,7 +98,12 @@ export async function reconcileProgramCatalog(): Promise<void> {
         await prisma.program.updateMany({ where: { slug: r.slug, name: r.from }, data: { name: r.to } }).catch(() => { });
     }
 
-    // Insert any default programs missing from the DB (e.g. the new Private 1:1 trainings).
+    // Legacy Family/Friends were two separate plans — they're now one dynamic "Family & Friends".
+    await prisma.program.deleteMany({ where: { slug: { in: ["family-overnighter-plan", "friends-plan"] } } }).catch(() => { });
+    // The Overnighter is a solo trail; companions are handled by the Family & Friends program.
+    await prisma.program.updateMany({ where: { slug: "overnighter-trail" }, data: { supportsCompanions: false } }).catch(() => { });
+
+    // Insert any default programs missing from the DB (e.g. the new Private 1:1 trainings, Family & Friends).
     const existing = await prisma.program.findMany({ select: { slug: true } });
     const have = new Set(existing.map((e) => e.slug));
     const missing = DEFAULT_PROGRAMS.filter((p) => !have.has(p.slug));

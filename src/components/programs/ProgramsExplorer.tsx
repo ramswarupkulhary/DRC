@@ -9,7 +9,6 @@ import {
     formatINR,
     type Program,
     type ProgramCategory,
-    type FamilyOption,
 } from "@/lib/programs";
 import {
     X,
@@ -232,20 +231,11 @@ function ProgramCard({ program, onView, onBook }: { program: Program; onView: ()
 
 export function ProgramsExplorer({ programs, categories }: { programs: Program[]; categories?: ProgramCategory[] }) {
     const [detail, setDetail] = useState<Program | null>(null);
-    const [booking, setBooking] = useState<{ program: Program; presetFamily: FamilyOption | null } | null>(null);
+    const [booking, setBooking] = useState<Program | null>(null);
     const visibleCategories = categories ?? order;
 
-    // Family & Friends cards are add-ons to the Overnighter, so they open the
-    // Overnighter booking (which has the companion selectors).
     function openBooking(program: Program) {
-        const over = programs.find((p) => p.slug === "overnighter-trail");
-        if (program.slug === "family-overnighter-plan") {
-            if (over) return setBooking({ program: over, presetFamily: "rider_wife" });
-        }
-        if (program.slug === "friends-plan") {
-            if (over) return setBooking({ program: over, presetFamily: null });
-        }
-        setBooking({ program, presetFamily: null });
+        setBooking(program);
     }
 
     return (
@@ -312,7 +302,7 @@ export function ProgramsExplorer({ programs, categories }: { programs: Program[]
             )}
 
             {/* Booking modal */}
-            {booking && <ProgramBookingModal program={booking.program} presetFamily={booking.presetFamily} onClose={() => setBooking(null)} />}
+            {booking && <ProgramBookingModal program={booking} onClose={() => setBooking(null)} />}
         </>
     );
 }

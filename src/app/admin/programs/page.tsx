@@ -19,6 +19,8 @@ interface Program {
     description: string;
     lunch: string | null;
     optionalLunch: number | null;
+    personPrice: number | null;
+    kidPrice: number | null;
     requiresRiding: boolean;
     supportsCompanions: boolean;
     active: boolean;
@@ -36,6 +38,7 @@ const CATEGORIES = [
 const empty: Partial<Program> = {
     slug: "", category: "training", name: "", price: 0, priceUnit: "per rider",
     duration: "", difficulty: "", description: "", lunch: "", optionalLunch: null,
+    personPrice: null, kidPrice: null,
     requiresRiding: true, supportsCompanions: false, active: true, featured: false, content: "",
 };
 
@@ -159,6 +162,12 @@ export default function AdminProgramsPage() {
                                 <Input id="lunch" label="Lunch label" value={editing.lunch || ""} onChange={(e) => set("lunch", e.target.value)} />
                                 <Input id="optionalLunch" label="Optional lunch add-on (₹)" type="number" value={editing.optionalLunch ?? ""} onChange={(e) => set("optionalLunch", e.target.value ? Number(e.target.value) : null)} />
                             </div>
+                            {editing.supportsCompanions && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-background border border-border rounded-sm p-3">
+                                    <Input id="personPrice" label="Price per person / adult (₹)" type="number" value={editing.personPrice ?? ""} onChange={(e) => set("personPrice", e.target.value ? Number(e.target.value) : null)} />
+                                    <Input id="kidPrice" label="Price per kid (₹)" type="number" value={editing.kidPrice ?? ""} onChange={(e) => set("kidPrice", e.target.value ? Number(e.target.value) : null)} />
+                                </div>
+                            )}
                             <Textarea id="description" label="Description" value={editing.description || ""} onChange={(e) => set("description", e.target.value)} />
                             <div className="flex flex-wrap gap-4">
                                 <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!editing.active} onChange={(e) => set("active", e.target.checked)} className="accent-orange" /> Published</label>

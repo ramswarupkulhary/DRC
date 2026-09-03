@@ -16,8 +16,8 @@ interface Companion {
 interface Booking {
     id: string;
     programName: string;
-    friends: number;
-    familyOption: string | null;
+    persons: number;
+    kids: number;
     lunch: boolean;
     bikeName: string | null;
     bikePrice: number;
@@ -113,9 +113,9 @@ export default function AdminProgramBookingsPage() {
                                 </div>
                                 <div className="text-right">
                                     <div className="font-heading text-xl font-bold text-orange">₹{b.amount.toLocaleString("en-IN")}</div>
-                                    {(b.friends > 0 || b.familyOption) && (
+                                    {(b.persons > 0 || b.kids > 0) && (
                                         <p className="text-xs text-muted mt-1">
-                                            {b.familyOption ? b.familyOption.replace(/_/g, " ") : ""}{b.friends > 0 ? ` · ${b.friends} friend(s)` : ""}
+                                            {[b.persons > 0 ? `${b.persons} person(s)` : null, b.kids > 0 ? `${b.kids} kid(s)` : null].filter(Boolean).join(" · ")}
                                         </p>
                                     )}
                                     <p className="text-xs text-muted mt-1">Bike: {b.bikeName ? `${b.bikeName} (₹${b.bikePrice.toLocaleString("en-IN")})` : "Own bike"}</p>

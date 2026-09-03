@@ -33,6 +33,8 @@ export interface Program {
     difficulty: string;
     lunch?: string;
     optionalLunch?: number;
+    personPrice?: number;
+    kidPrice?: number;
     description: string;
     included?: string[];
     learn?: ProgramModule[];
@@ -516,7 +518,7 @@ export const programs: Program[] = [
         duration: "Evening + Overnight Camping + Morning Trail",
         difficulty: "Beginner to Intermediate (route dependent)",
         requiresRiding: true,
-        supportsCompanions: true,
+        supportsCompanions: false,
         description:
             "A premium DRC off-road adventure combining trail riding, camping, community and nature.",
         days: [
@@ -580,20 +582,20 @@ export const programs: Program[] = [
 
     // ─────────────── SPECIAL EXPERIENCES ───────────────
     {
-        slug: "family-overnighter-plan",
+        slug: "family-friends",
         category: "special",
-        name: "Family Overnighter Plan",
-        price: 7999,
-        priceOptions: [
-            { label: "Rider + Wife", price: 7999 },
-            { label: "Rider + Wife + Children", price: 9999, note: "Max 2 children" },
-        ],
+        name: "Family & Friends",
+        price: 4999,
+        priceUnit: "per rider",
+        personPrice: 1999,
+        kidPrice: 999,
         duration: "Evening + Overnight Camping + Morning Trail",
-        difficulty: "Family Friendly",
+        difficulty: "Everyone Welcome",
         requiresRiding: true,
+        supportsCompanions: true,
         description:
-            "Bring your family along to enjoy the DRC overnighter camping and outdoor experience together while you ride the trails.",
-        included: ["Evening Trail (rider)", "Camping", "Dinner", "Breakfast", "Morning Trail (rider)"],
+            "Bring your people to the DRC overnighter — camping, hospitality and the outdoors together. Add as many family members, friends and kids as you like; each is priced individually.",
+        included: ["Evening Trail (rider)", "Camping", "High Tea", "Dinner", "Breakfast", "Morning Trail (rider)"],
         familyExperience: [
             "Outdoor environment",
             "Camping experience",
@@ -603,28 +605,7 @@ export const programs: Program[] = [
             "Nature",
             "Community experience",
         ],
-        note: "Family members participate in the camping and hospitality experience unless separately registered and approved for riding activities.",
-    },
-    {
-        slug: "friends-plan",
-        category: "special",
-        name: "Friends Plan",
-        price: 1999,
-        priceUnit: "per friend",
-        duration: "Overnighter (non-riding)",
-        difficulty: "Everyone Welcome",
-        requiresRiding: false,
-        description:
-            "Friends can join the DRC Overnighter experience for the camping, hospitality and community — without riding.",
-        included: [
-            "Camping",
-            "High Tea",
-            "Dinner",
-            "Breakfast",
-            "Outdoor experience",
-            "Community experience",
-        ],
-        note: "Friends are not automatically included in motorcycle riding activities unless separately registered and approved.",
+        note: "Companions join the camping and hospitality experience. Anyone who wants to ride must be separately registered and approved for riding activities.",
     },
 ];
 
@@ -692,27 +673,19 @@ export function formatINR(amount: number): string {
     return `₹${amount.toLocaleString("en-IN")}`;
 }
 
-// ─── Companion pricing (Overnighter add-ons) ───
-export const FRIEND_PRICE = 1999;
-
-export type FamilyOption = "rider_wife" | "rider_wife_children";
-
-export const FAMILY_PACKAGES: Record<FamilyOption, { label: string; price: number; note?: string }> = {
-    rider_wife: { label: "Rider + Wife", price: 7999 },
-    rider_wife_children: { label: "Rider + Wife + Children", price: 9999, note: "Max 2 children" },
-};
+// ─── Companion pricing (dynamic per-program add-ons) ───
 
 export interface CompanionSelection {
-    friends?: number;
-    familyOption?: FamilyOption | null;
+    persons?: number; // additional adults
+    kids?: number;    // children
     lunch?: boolean;
     bikePrice?: number;
 }
 
 export interface ProgramBreakdown {
     riderBase: number; // rider's own fare — the only part a coupon discounts
-    familyUpgrade: number;
-    friends: number;
+    persons: number;
+    kids: number;
     lunch: number;
     bike: number;
     extras: number; // everything that is NOT coupon-discountable
@@ -721,20 +694,18 @@ export interface ProgramBreakdown {
 
 /** Full price breakdown; only `riderBase` is coupon-discountable. */
 export function computeProgramBreakdown(program: Program, sel?: CompanionSelection): ProgramBreakdown {
-    const friendsCount = Math.max(0, Math.floor(sel?.friends ?? 0));
-    const familyOption = sel?.familyOption ?? null;
+    const supports = !!program.supportsCompanions;
+    const personCount = Math.max(0, Math.floor(sel?.persons ?? 0));
+    const kidCount = Math.max(0, Math.floor(sel?.kids ?? 0));
 
     const riderBase = program.price;
-    const familyUpgrade =
-        program.supportsCompanions && familyOption && FAMILY_PACKAGES[familyOption]
-            ? Math.max(0, FAMILY_PACKAGES[familyOption].price - program.price)
-            : 0;
-    const friends = program.supportsCompanions ? friendsCount * FRIEND_PRICE : 0;
+    const persons = supports ? personCount * (program.personPrice ?? 0) : 0;
+    const kids = supports ? kidCount * (program.kidPrice ?? 0) : 0;
     const lunch = program.optionalLunch && sel?.lunch ? program.optionalLunch : 0;
     const bike = Math.max(0, Math.floor(sel?.bikePrice ?? 0));
 
-    const extras = familyUpgrade + friends + lunch + bike;
-    return { riderBase, familyUpgrade, friends, lunch, bike, extras, total: riderBase + extras };
+    const extras = persons + kids + lunch + bike;
+    return { riderBase, persons, kids, lunch, bike, extras, total: riderBase + extras };
 }
 
 /** Authoritative total price for a program including all add-ons. */
@@ -742,9 +713,7 @@ export function computeProgramPrice(program: Program, sel?: CompanionSelection):
     return computeProgramBreakdown(program, sel).total;
 }
 
-/** Number of family companions implied by a family option (for the companion form). */
-export function familyCompanionCount(familyOption?: FamilyOption | null): number {
-    if (familyOption === "rider_wife") return 1; // wife
-    if (familyOption === "rider_wife_children") return 3; // wife + up to 2 children
-    return 0;
+/** Total companions (adults + kids) for the companion-details form. */
+export function companionCount(persons?: number | null, kids?: number | null): number {
+    return Math.max(0, Math.floor(persons ?? 0)) + Math.max(0, Math.floor(kids ?? 0));
 }

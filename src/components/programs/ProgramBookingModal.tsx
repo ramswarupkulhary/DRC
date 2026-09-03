@@ -11,11 +11,7 @@ import { IndemnityWaiverModal } from "@/components/waiver/IndemnityWaiverModal";
 import {
     formatINR,
     computeProgramPrice,
-    FAMILY_PACKAGES,
-    FRIEND_PRICE,
-    familyCompanionCount,
     type Program,
-    type FamilyOption,
 } from "@/lib/programs";
 
 declare global {
@@ -26,24 +22,23 @@ declare global {
 
 interface Props {
     program: Program;
-    presetFamily?: FamilyOption | null;
     onClose: () => void;
 }
 
 interface CompanionRow {
     label: string;
-    type: "friend" | "family";
+    type: "person" | "kid";
     firstName: string;
     lastName: string;
     phone: string;
 }
 
-export function ProgramBookingModal({ program, presetFamily = null, onClose }: Props) {
+export function ProgramBookingModal({ program, onClose }: Props) {
     const { status: authStatus } = useSession();
     const router = useRouter();
 
-    const [familyOption, setFamilyOption] = useState<FamilyOption | null>(presetFamily);
-    const [friends, setFriends] = useState(0);
+    const [persons, setPersons] = useState(0);
+    const [kids, setKids] = useState(0);
     const [lunch, setLunch] = useState(false);
     const [paying, setPaying] = useState(false);
     const [error, setError] = useState("");
@@ -68,27 +63,23 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
     const bikePrice = bikes.find((b) => b.id === bikeId)?.price ?? 0;
 
     const total = useMemo(
-        () => computeProgramPrice(program, { friends, familyOption, lunch, bikePrice }),
-        [program, friends, familyOption, lunch, bikePrice]
+        () => computeProgramPrice(program, { persons, kids, lunch, bikePrice }),
+        [program, persons, kids, lunch, bikePrice]
     );
     const payable = coupon?.finalAmount ?? total;
 
     const buildCompanionRows = useCallback((): CompanionRow[] => {
         const rows: CompanionRow[] = [];
-        if (familyOption === "rider_wife" || familyOption === "rider_wife_children") {
-            rows.push({ label: "Spouse", type: "family", firstName: "", lastName: "", phone: "" });
+        for (let i = 0; i < persons; i++) {
+            rows.push({ label: `Person ${i + 1}`, type: "person", firstName: "", lastName: "", phone: "" });
         }
-        if (familyOption === "rider_wife_children") {
-            rows.push({ label: "Child 1", type: "family", firstName: "", lastName: "", phone: "" });
-            rows.push({ label: "Child 2 (optional)", type: "family", firstName: "", lastName: "", phone: "" });
-        }
-        for (let i = 0; i < friends; i++) {
-            rows.push({ label: `Friend ${i + 1}`, type: "friend", firstName: "", lastName: "", phone: "" });
+        for (let i = 0; i < kids; i++) {
+            rows.push({ label: `Kid ${i + 1}`, type: "kid", firstName: "", lastName: "", phone: "" });
         }
         return rows;
-    }, [familyOption, friends]);
+    }, [persons, kids]);
 
-    const totalCompanions = friends + familyCompanionCount(familyOption);
+    const totalCompanions = persons + kids;
 
     const handlePay = useCallback(async () => {
         setPaying(true);
@@ -99,7 +90,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                 const res = await fetch("/api/programs/free-checkout", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null, bikeId }),
+                    body: JSON.stringify({ programSlug: program.slug, persons, kids, lunch, couponCode: coupon?.code ?? null, bikeId }),
                 });
                 const data = await res.json();
                 if (res.ok) {
@@ -115,7 +106,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
             const orderRes = await fetch("/api/programs/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null, bikeId }),
+                body: JSON.stringify({ programSlug: program.slug, persons, kids, lunch, couponCode: coupon?.code ?? null, bikeId }),
             });
             if (!orderRes.ok) {
                 const err = await orderRes.json();
@@ -148,7 +139,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
                     const verifyRes = await fetch("/api/programs/verify", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ ...response, programSlug: program.slug, friends, familyOption, lunch, couponCode: coupon?.code ?? null, bikeId }),
+                        body: JSON.stringify({ ...response, programSlug: program.slug, persons, kids, lunch, couponCode: coupon?.code ?? null, bikeId }),
                     });
                     if (verifyRes.ok) {
                         const { bookingId: id } = await verifyRes.json();
@@ -168,7 +159,7 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
             setError("Payment failed. Please try again.");
             setPaying(false);
         }
-    }, [program, friends, familyOption, lunch, coupon, payable, bikeId, buildCompanionRows]);
+    }, [program, persons, kids, lunch, coupon, payable, bikeId, buildCompanionRows]);
 
     const saveCompanions = useCallback(async () => {
         if (!bookingId) return;
@@ -229,39 +220,29 @@ export function ProgramBookingModal({ program, presetFamily = null, onClose }: P
 
                             {program.supportsCompanions && (
                                 <div className="space-y-4">
-                                    <div>
-                                        <p className="text-sm font-medium text-tan-light mb-2">Bring family (optional)</p>
-                                        <div className="grid grid-cols-1 gap-2">
-                                            {([null, "rider_wife", "rider_wife_children"] as (FamilyOption | null)[]).map((opt) => {
-                                                const label = opt === null ? "Just me" : FAMILY_PACKAGES[opt].label;
-                                                const price = opt === null ? program.price : FAMILY_PACKAGES[opt].price;
-                                                const note = opt && FAMILY_PACKAGES[opt].note;
-                                                return (
-                                                    <button
-                                                        key={String(opt)}
-                                                        type="button"
-                                                        onClick={() => setFamilyOption(opt)}
-                                                        className={`flex items-center justify-between px-4 py-3 rounded-sm border text-left transition-colors ${familyOption === opt ? "border-orange bg-orange/10" : "border-border bg-background hover:border-orange/40"}`}
-                                                    >
-                                                        <span className="text-sm text-foreground">
-                                                            {label}
-                                                            {note && <span className="text-xs text-muted ml-2">({note})</span>}
-                                                        </span>
-                                                        <span className="font-heading font-bold text-orange">{formatINR(price)}</span>
-                                                    </button>
-                                                );
-                                            })}
+                                    <p className="text-sm font-medium text-tan-light">Bring family & friends (optional)</p>
+
+                                    <div className="flex items-center justify-between gap-3 bg-background border border-border rounded-sm p-3">
+                                        <div>
+                                            <p className="text-sm text-foreground">Persons (adults)</p>
+                                            <p className="text-xs text-muted">{formatINR(program.personPrice ?? 0)} each</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <button type="button" onClick={() => setPersons((n) => Math.max(0, n - 1))} className="w-10 h-10 rounded-sm border border-border text-lg hover:border-orange/50">−</button>
+                                            <span className="font-heading text-xl font-bold w-8 text-center">{persons}</span>
+                                            <button type="button" onClick={() => setPersons((n) => Math.min(30, n + 1))} className="w-10 h-10 rounded-sm border border-border text-lg hover:border-orange/50">+</button>
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <label htmlFor="friends" className="text-sm font-medium text-tan-light block mb-1">
-                                            Add friends ({formatINR(FRIEND_PRICE)} each)
-                                        </label>
+                                    <div className="flex items-center justify-between gap-3 bg-background border border-border rounded-sm p-3">
+                                        <div>
+                                            <p className="text-sm text-foreground">Kids</p>
+                                            <p className="text-xs text-muted">{formatINR(program.kidPrice ?? 0)} each</p>
+                                        </div>
                                         <div className="flex items-center gap-3">
-                                            <button type="button" onClick={() => setFriends((f) => Math.max(0, f - 1))} className="w-10 h-10 rounded-sm border border-border text-lg hover:border-orange/50">−</button>
-                                            <span className="font-heading text-xl font-bold w-10 text-center">{friends}</span>
-                                            <button type="button" onClick={() => setFriends((f) => Math.min(20, f + 1))} className="w-10 h-10 rounded-sm border border-border text-lg hover:border-orange/50">+</button>
+                                            <button type="button" onClick={() => setKids((n) => Math.max(0, n - 1))} className="w-10 h-10 rounded-sm border border-border text-lg hover:border-orange/50">−</button>
+                                            <span className="font-heading text-xl font-bold w-8 text-center">{kids}</span>
+                                            <button type="button" onClick={() => setKids((n) => Math.min(30, n + 1))} className="w-10 h-10 rounded-sm border border-border text-lg hover:border-orange/50">+</button>
                                         </div>
                                     </div>
                                 </div>

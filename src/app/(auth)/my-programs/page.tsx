@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { Clock3, CheckCircle2, XCircle, IdCard } from "lucide-react";
-import { formatINR, FAMILY_PACKAGES, familyCompanionCount, type FamilyOption } from "@/lib/programs";
+import { formatINR } from "@/lib/programs";
 import { IndemnityWaiverModal } from "@/components/waiver/IndemnityWaiverModal";
 
 interface Companion {
@@ -22,8 +22,8 @@ interface Companion {
 interface Booking {
     id: string;
     programName: string;
-    friends: number;
-    familyOption: string | null;
+    persons: number;
+    kids: number;
     lunch: boolean;
     amount: number;
     status: string;
@@ -33,7 +33,7 @@ interface Booking {
     companions: Companion[];
 }
 
-interface Row { label: string; type: "friend" | "family"; firstName: string; lastName: string; phone: string }
+interface Row { label: string; type: "person" | "kid"; firstName: string; lastName: string; phone: string }
 
 function statusBadge(status: string) {
     if (status === "approved") return <Badge variant="success"><CheckCircle2 className="w-3.5 h-3.5 mr-1" />Approved</Badge>;
@@ -43,13 +43,8 @@ function statusBadge(status: string) {
 
 function buildRows(booking: Booking): Row[] {
     const rows: Row[] = [];
-    const fam = booking.familyOption as FamilyOption | null;
-    if (fam === "rider_wife" || fam === "rider_wife_children") rows.push({ label: "Spouse", type: "family", firstName: "", lastName: "", phone: "" });
-    if (fam === "rider_wife_children") {
-        rows.push({ label: "Child 1", type: "family", firstName: "", lastName: "", phone: "" });
-        rows.push({ label: "Child 2 (optional)", type: "family", firstName: "", lastName: "", phone: "" });
-    }
-    for (let i = 0; i < booking.friends; i++) rows.push({ label: `Friend ${i + 1}`, type: "friend", firstName: "", lastName: "", phone: "" });
+    for (let i = 0; i < (booking.persons || 0); i++) rows.push({ label: `Person ${i + 1}`, type: "person", firstName: "", lastName: "", phone: "" });
+    for (let i = 0; i < (booking.kids || 0); i++) rows.push({ label: `Kid ${i + 1}`, type: "kid", firstName: "", lastName: "", phone: "" });
     // Prefill from saved companions in order.
     booking.companions.forEach((c, i) => {
         if (rows[i]) {
@@ -139,8 +134,11 @@ export default function MyProgramsPage() {
             ) : (
                 <div className="mt-10 space-y-5">
                     {bookings.map((b) => {
-                        const maxCompanions = b.friends + familyCompanionCount(b.familyOption as FamilyOption | null);
-                        const famLabel = b.familyOption ? FAMILY_PACKAGES[b.familyOption as FamilyOption]?.label : null;
+                        const maxCompanions = (b.persons || 0) + (b.kids || 0);
+                        const companionLabel = [
+                            b.persons > 0 ? `${b.persons} person${b.persons > 1 ? "s" : ""}` : null,
+                            b.kids > 0 ? `${b.kids} kid${b.kids > 1 ? "s" : ""}` : null,
+                        ].filter(Boolean).join(" · ");
                         return (
                             <div key={b.id} className="bg-surface border border-border rounded-sm p-6">
                                 <div className="flex items-start justify-between gap-4">
@@ -148,8 +146,7 @@ export default function MyProgramsPage() {
                                         <h3 className="font-heading text-xl font-bold">{b.programName}</h3>
                                         <p className="text-sm text-muted mt-1">
                                             {new Date(b.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                                            {famLabel && ` · ${famLabel}`}
-                                            {b.friends > 0 && ` · ${b.friends} friend${b.friends > 1 ? "s" : ""}`}
+                                            {companionLabel && ` · ${companionLabel}`}
                                         </p>
                                     </div>
                                     <div className="text-right">

@@ -668,6 +668,8 @@ model ProgramBooking {
   programName   String
   friends       Int      @default(0)
   familyOption  String?
+  persons       Int      @default(0)
+  kids          Int      @default(0)
   lunch         Boolean  @default(false)
   bikeName      String?
   bikePrice     Int      @default(0)
@@ -720,6 +722,8 @@ model Program {
   description        String
   lunch              String?
   optionalLunch      Int?
+  personPrice        Int? // per additional adult when supportsCompanions
+  kidPrice           Int? // per child when supportsCompanions
   requiresRiding     Boolean  @default(true)
   supportsCompanions Boolean  @default(false)
   active             Boolean  @default(true)

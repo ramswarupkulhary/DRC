@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { computeProgramBreakdown, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { computeProgramBreakdown } from "@/lib/programs";
 import { getProgramBySlug, getRentalBike } from "@/lib/programsDb";
 import { applyCouponToBase } from "@/lib/pricing";
 import { notifyRider } from "@/lib/notify";
@@ -15,17 +15,17 @@ export async function POST(req: Request) {
     }
 
     const userId = (session.user as { id: string }).id;
-    const { programSlug, friends, familyOption, lunch, couponCode, bikeId } = await req.json();
+    const { programSlug, persons, kids, lunch, couponCode, bikeId } = await req.json();
 
     const program = await getProgramBySlug(programSlug);
     if (!program) return NextResponse.json({ error: "Invalid program" }, { status: 400 });
 
-    const normalizedFamily: FamilyOption | null =
-        familyOption && FAMILY_PACKAGES[familyOption as FamilyOption] ? (familyOption as FamilyOption) : null;
-    const normalizedFriends = program.supportsCompanions ? Math.max(0, Math.floor(Number(friends) || 0)) : 0;
+    const supports = !!program.supportsCompanions;
+    const normalizedPersons = supports ? Math.max(0, Math.floor(Number(persons) || 0)) : 0;
+    const normalizedKids = supports ? Math.max(0, Math.floor(Number(kids) || 0)) : 0;
 
     const bike = await getRentalBike(bikeId);
-    const breakdown = computeProgramBreakdown(program, { friends: normalizedFriends, familyOption: normalizedFamily, lunch: !!lunch, bikePrice: bike.price });
+    const breakdown = computeProgramBreakdown(program, { persons: normalizedPersons, kids: normalizedKids, lunch: !!lunch, bikePrice: bike.price });
     const quote = await applyCouponToBase(breakdown.riderBase, breakdown.total, couponCode);
     if (quote.error) return NextResponse.json({ error: quote.error }, { status: 400 });
 
@@ -39,8 +39,8 @@ export async function POST(req: Request) {
                 userId,
                 programSlug: program.slug,
                 programName: program.name,
-                friends: normalizedFriends,
-                familyOption: normalizedFamily,
+                persons: normalizedPersons,
+                kids: normalizedKids,
                 lunch: !!lunch,
                 bikeName: bike.name,
                 bikePrice: bike.price,

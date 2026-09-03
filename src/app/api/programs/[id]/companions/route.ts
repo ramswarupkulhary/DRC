@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { familyCompanionCount, type FamilyOption } from "@/lib/programs";
+import { companionCount } from "@/lib/programs";
 import { getProgramBySlug } from "@/lib/programsDb";
 
 interface CompanionInput {
@@ -32,8 +32,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     const program = await getProgramBySlug(booking.programSlug);
-    const maxCompanions =
-        booking.friends + familyCompanionCount(booking.familyOption as FamilyOption | null);
+    const maxCompanions = companionCount(booking.persons, booking.kids);
     if (!program || maxCompanions === 0) {
         return NextResponse.json({ error: "This booking has no companions to add." }, { status: 400 });
     }

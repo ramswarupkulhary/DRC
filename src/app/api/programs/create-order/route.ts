@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getRazorpay } from "@/lib/razorpay";
-import { computeProgramBreakdown, FAMILY_PACKAGES, type FamilyOption } from "@/lib/programs";
+import { computeProgramBreakdown } from "@/lib/programs";
 import { applyCouponToBase } from "@/lib/pricing";
 import { getProgramBySlug, getRentalBike } from "@/lib/programsDb";
 
@@ -20,24 +20,24 @@ export async function POST(req: Request) {
         );
     }
 
-    const { programSlug, friends, familyOption, lunch, couponCode, bikeId } = await req.json();
+    const { programSlug, persons, kids, lunch, couponCode, bikeId } = await req.json();
 
     const program = await getProgramBySlug(programSlug);
     if (!program) {
         return NextResponse.json({ error: "Invalid program." }, { status: 400 });
     }
 
-    const normalizedFamily: FamilyOption | null =
-        familyOption && FAMILY_PACKAGES[familyOption as FamilyOption] ? (familyOption as FamilyOption) : null;
-    const normalizedFriends = program.supportsCompanions ? Math.max(0, Math.floor(Number(friends) || 0)) : 0;
+    const supports = !!program.supportsCompanions;
+    const normalizedPersons = supports ? Math.max(0, Math.floor(Number(persons) || 0)) : 0;
+    const normalizedKids = supports ? Math.max(0, Math.floor(Number(kids) || 0)) : 0;
 
     // Bike rental price is resolved server-side and is NOT coupon-discountable.
     const bike = await getRentalBike(bikeId);
 
     // Price is always computed server-side — never trust the client.
     const breakdown = computeProgramBreakdown(program, {
-        friends: normalizedFriends,
-        familyOption: normalizedFamily,
+        persons: normalizedPersons,
+        kids: normalizedKids,
         lunch: !!lunch,
         bikePrice: bike.price,
     });
