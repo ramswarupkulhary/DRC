@@ -1,68 +1,50 @@
 @import "tailwindcss";
 
-/* Vintage adventure palette — aged paper, warm ink, muted rust & olive. */
 @theme inline {
-  --color-background: #EFE7D4;
-  --color-foreground: #1E1A14;
-  --color-orange: #B4471F;
-  --color-orange-dark: #8E3616;
-  --color-orange-light: #D26B3E;
-  --color-tan: #A89B7A;
-  --color-tan-light: #C8BC9C;
-  --color-tan-dark: #6E6247;
-  --color-surface: #E6DBC0;
-  --color-surface-light: #DED2B4;
-  --color-surface-lighter: #D3C6A2;
-  --color-muted: #6B6350;
-  --color-border: #C3B694;
-  --color-success: #5C7A3A;
-  --color-error: #A83A2C;
-  --color-warning: #C88A2E;
+  --color-background: #0D0D0D;
+  --color-foreground: #F1E9DD;
+  --color-orange: #E8622C;
+  --color-orange-dark: #C4501F;
+  --color-orange-light: #F08C5A;
+  --color-tan: #B9A886;
+  --color-tan-light: #D4C9AD;
+  --color-tan-dark: #8A7D64;
+  --color-surface: #1A1A1A;
+  --color-surface-light: #242424;
+  --color-surface-lighter: #2E2E2E;
+  --color-muted: #888888;
+  --color-border: #333333;
+  --color-success: #4CAF50;
+  --color-error: #E53935;
+  --color-warning: #FF9800;
 
-  --font-heading: var(--font-heading-family), "Georgia", "Times New Roman", serif;
-  --font-body: var(--font-body-family), "Georgia", serif;
-  --font-mono: var(--font-mono-family), "Courier New", monospace;
+  --font-heading: "Oswald", "Impact", sans-serif;
+  --font-body: "Inter", "Helvetica Neue", sans-serif;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body);
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-body {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  font-family: var(--font-body);
-  /* subtle paper grain */
-  background-image:
-    radial-gradient(rgba(30, 26, 20, 0.045) 1px, transparent 1px),
-    radial-gradient(rgba(30, 26, 20, 0.025) 1px, transparent 1px);
-  background-size: 3px 3px, 7px 7px;
-  background-position: 0 0, 1px 2px;
-}
-
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--color-foreground);
-}
-
-/* Small caps eyebrow labels — restrained, mono, not shouty gradients */
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--color-tan-dark);
+  letter-spacing: 0.02em;
 }
 
 ::selection {
   background-color: var(--color-orange);
-  color: #F4EDDF;
+  color: white;
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -70,8 +52,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-tan-dark);
-  border-radius: 0;
+  background: var(--color-surface-lighter);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

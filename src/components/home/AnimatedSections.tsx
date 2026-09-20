@@ -22,46 +22,81 @@ const defaultTestimonials = [
 
 export function AnimatedHero() {
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-border">
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background z-10" />
+      {/* Place hero.mp4 in /public/videos/ to activate the background video */}
       <video
         autoPlay
         muted
         loop
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: "sepia(0.35) contrast(0.95) brightness(0.75)" }}
+        style={{ filter: "brightness(0.4)" }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
-      {/* Warm paper wash so type reads on any frame */}
-      <div className="absolute inset-0 bg-[color:var(--color-background)]/70" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[color:var(--color-background)]" />
+      <div className="absolute inset-0 bg-gradient-to-br from-surface via-background to-surface-light" />
 
-      <motion.div
-        className="relative z-20 text-center px-4 max-w-3xl mx-auto"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-      >
-        <span className="eyebrow">Est. Bangalore &middot; Since the dirt</span>
-        <h1 className="font-heading text-5xl sm:text-6xl lg:text-7xl font-semibold leading-[1.05] mt-5">
-          Dirt Ride Camp.
-        </h1>
-        <p className="font-heading italic text-xl sm:text-2xl text-tan-dark mt-3">
-          an off-road academy &amp; riding club
-        </p>
+      <div className="relative z-20 text-center px-4 max-w-5xl mx-auto space-y-8">
+        <motion.div className="space-y-2" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}>
+          <span className="text-orange text-sm sm:text-base font-semibold tracking-[0.4em] uppercase">Ride &middot; Explore &middot; Connect</span>
+          <motion.h1
+            className="font-heading text-5xl sm:text-7xl lg:text-8xl font-bold leading-[0.9]"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
+          >
+            <span className="text-foreground">D</span>
+            <motion.span className="text-orange inline-block" animate={{ rotateY: [0, 360] }} transition={{ duration: 1.5, delay: 0.8 }}>R</motion.span>
+            <span className="text-foreground">C</span>
+          </motion.h1>
+          <motion.p
+            className="font-heading text-xl sm:text-2xl lg:text-3xl text-tan tracking-[0.15em]"
+            initial={{ opacity: 0, letterSpacing: "0.5em" }}
+            animate={{ opacity: 1, letterSpacing: "0.15em" }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
+            DIRT RIDE CAMP
+          </motion.p>
+        </motion.div>
 
-        <p className="text-base sm:text-lg text-foreground/80 max-w-xl mx-auto leading-relaxed mt-6">
-          Small-group adventure rides, hands-on off-road training, and campfire nights across Karnataka &amp; India.
-        </p>
+        <motion.p
+          className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
+          Bangalore&apos;s off-road academy — adventure bike trips, camping rides & off-road riding classes across India.
+          <br />
+          <span className="text-orange font-semibold">Ride &middot; Explore &middot; Connect</span>
+        </motion.p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+        <motion.div
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
           <Link href="/rides">
             <Button size="lg" className="min-w-[200px]">Explore Rides <ArrowRight className="w-5 h-5" /></Button>
           </Link>
           <Link href="/trainings">
             <Button variant="outline" size="lg" className="min-w-[200px]">Training Programs</Button>
           </Link>
+        </motion.div>
+      </div>
+
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <div className="w-6 h-10 border-2 border-foreground/30 rounded-full flex justify-center pt-2">
+          <motion.div
+            className="w-1.5 h-3 bg-orange rounded-full"
+            animate={{ y: [0, 8, 0], opacity: [1, 0.3, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
         </div>
       </motion.div>
     </section>
@@ -83,7 +118,7 @@ export function AnimatedStats() {
               <div className="font-heading text-3xl sm:text-4xl font-bold text-orange">
                 <CountUp target={stat.value} suffix={stat.suffix} duration={stat.value > 100 ? 2.5 : 1.5} />
               </div>
-              <div className="eyebrow mt-2">{stat.label}</div>
+              <div className="text-sm text-muted mt-1 uppercase tracking-wider">{stat.label}</div>
             </div>
           </FadeIn>
         ))}
@@ -98,8 +133,8 @@ export function AnimatedFeatures() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         <FadeIn>
           <div className="text-center mb-12">
-            <span className="eyebrow">Why ride with us</span>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3">The DRC Difference</h2>
+            <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">Why ride with us</span>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mt-2">The DRC Difference</h2>
             <p className="text-muted mt-3 max-w-xl mx-auto">We&apos;re not just organizing rides — we&apos;re building a community of adventurers.</p>
           </div>
         </FadeIn>
@@ -133,8 +168,8 @@ export function AnimatedTestimonials({ reviews }: { reviews?: { name: string; te
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         <FadeIn>
           <div className="text-center mb-12">
-            <span className="eyebrow">From the trail</span>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3">What Riders Say</h2>
+            <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">From the trail</span>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mt-2">What Riders Say</h2>
           </div>
         </FadeIn>
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6" staggerDelay={0.2}>
@@ -179,8 +214,8 @@ export function AnimatedCTA() {
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
       <FadeIn>
         <div className="text-center space-y-6 max-w-2xl mx-auto">
-          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold">
-            Ready to get <span className="text-orange italic">dirty</span>?
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold">
+            Ready to Get <motion.span className="text-orange inline-block" whileInView={{ scale: [1, 1.1, 1] }} transition={{ duration: 0.6 }} viewport={{ once: true }}>Dirty</motion.span>?
           </h2>
           <p className="text-muted text-lg">Join DRC and be part of a growing community of off-road adventurers. Your next adventure is just a click away.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -202,8 +237,8 @@ export function AnimatedRidesSection({ children }: { children: React.ReactNode }
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
       <FadeIn>
         <div className="text-center mb-12">
-          <span className="eyebrow">Hit the dirt</span>
-          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3">Upcoming Rides</h2>
+          <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">Hit the dirt</span>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mt-2">Upcoming Rides</h2>
           <p className="text-muted mt-3 max-w-xl mx-auto">Limited slots, unlimited adventure. Book your spot before it&apos;s gone.</p>
         </div>
       </FadeIn>
@@ -224,8 +259,8 @@ export function AnimatedTrainingsSection({ children }: { children: React.ReactNo
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
       <FadeIn>
         <div className="text-center mb-12">
-          <span className="eyebrow">Level up your skills</span>
-          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3">Training Programs</h2>
+          <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">Level up your skills</span>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mt-2">Training Programs</h2>
           <p className="text-muted mt-3 max-w-xl mx-auto">From first-time riders to seasoned off-roaders — there&apos;s a program for you.</p>
         </div>
       </FadeIn>
@@ -250,8 +285,8 @@ export function AnimatedFAQ({ faqs }: { faqs: { question: string; answer: string
     <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
       <FadeIn>
         <div className="text-center mb-12">
-          <span className="eyebrow">Got questions?</span>
-          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3">Frequently Asked Questions</h2>
+          <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">Got questions?</span>
+          <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold mt-2">Frequently Asked Questions</h2>
         </div>
       </FadeIn>
       <StaggerContainer className="space-y-4">

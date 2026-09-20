@@ -1,31 +1,21 @@
 import type { Metadata } from "next";
-import { Fraunces, Lora, IBM_Plex_Mono } from "next/font/google";
+import { Inter, Oswald } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import { PWA } from "@/components/PWA";
 import { Analytics } from "@/components/seo/Analytics";
 import "./globals.css";
 
-// Retro serif display for headings — warm, editorial, hand-set feel.
-const fraunces = Fraunces({
-  variable: "--font-heading-family",
+const inter = Inter({
+  variable: "--font-body",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const oswald = Oswald({
+  variable: "--font-heading",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600", "700"],
-});
-
-// Warm book serif for body copy.
-const lora = Lora({
-  variable: "--font-body-family",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-// Typewriter mono for eyebrows, captions, tags.
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-mono-family",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500"],
 });
 
 const BASE_URL = "https://www.dirtridecamp.com";
@@ -133,7 +123,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${lora.variable} ${plexMono.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} ${oswald.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
         <Providers>{children}</Providers>
         <PWA />
