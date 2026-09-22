@@ -27,10 +27,10 @@ export function Logo({ variant = "compact", className, priority, title = "DRC Mo
 
     return (
         <Image
-            src="/brand/drc-motorsports-on-tar.png"
+            src="/brand/drc-logo-main.png"
             alt={title}
-            width={2528}
-            height={1280}
+            width={1000}
+            height={1000}
             priority={priority}
             className={cn("w-auto object-contain", heightClass, className)}
         />
