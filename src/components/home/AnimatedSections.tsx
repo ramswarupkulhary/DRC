@@ -1,39 +1,38 @@
 "use client";
 
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/Animations";
-import { Mountain, Shield, Flame, Users, Star, ArrowRight, ChevronRight } from "lucide-react";
+import { Trophy, GraduationCap, Compass, Users, Star, ArrowRight, ChevronRight, Calendar, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 
-const features = [
+const pillars = [
+  {
+    icon: Trophy,
+    title: "DRC Racing",
+    desc: "Six official races, every year, across India. Championship-grade motorsport built from the rider up.",
+  },
+  {
+    icon: GraduationCap,
+    title: "Training & Academy",
+    desc: "Structured off-road progression — from first time on dirt to enduro, rock garden and hill-climb ready.",
+  },
+  {
+    icon: Compass,
+    title: "Adventure",
+    desc: "Curated expeditions and camping rides across Karnataka and beyond. On the horizon: a five-day desert endurance in Rajasthan.",
+  },
   {
     icon: Users,
-    title: "Groups of six, not sixty",
-    desc: "Every ride is capped so you actually know the people you're riding with by lunch. No convoys, no chaos.",
-  },
-  {
-    icon: Mountain,
-    title: "Terrain your GPS gives up on",
-    desc: "Krishnagiri granite, Sakleshpur coffee mud, Coorg forest trails. Scouted by us, not lifted off a blog.",
-  },
-  {
-    icon: Shield,
-    title: "Marshals with first-aid kits, not band-aids",
-    desc: "Trained sweep riders, a support vehicle with tools and spares, and an evac plan for every route.",
-  },
-  {
-    icon: Flame,
-    title: "Camp dinners, torch-lit repairs",
-    desc: "Tents, a real fire, food you actually want to eat, and the kind of stories that only happen after a long ride.",
+    title: "Community & Culture",
+    desc: "A home for Indian motorcycle culture — riders, content, brands and experiences under one platform.",
   },
 ];
 
 export function AnimatedHero() {
   return (
     <section className="relative border-b border-border overflow-hidden">
-      {/* Editorial hero — no fake video, no centered wall of text. */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle_at_1px_1px,rgba(30,26,20,1)_1px,transparent_0)] [background-size:14px_14px]" />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-14 sm:pb-20">
@@ -44,31 +43,31 @@ export function AnimatedHero() {
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
           <div className="lg:col-span-8">
-            <span className="eyebrow">Est. Bangalore</span>
+            <span className="eyebrow">DRC Motorsports Pvt Ltd &middot; Est. Bengaluru</span>
             <h1 className="font-heading text-[2.75rem] leading-[1.02] sm:text-6xl lg:text-[5.5rem] font-semibold mt-4 max-w-4xl">
-              We ride the trails your GPS gives up on.
+              Adventure isn&rsquo;t found. It&rsquo;s earned.
             </h1>
-            <p className="font-heading italic text-xl sm:text-2xl text-tan-dark mt-4 max-w-2xl">
-              A small off-road academy &amp; riding club, run out of Bangalore.
+            <p className="font-heading italic text-xl sm:text-2xl text-tan-dark mt-5 max-w-2xl">
+              An Indian motorcycle culture &amp; motorsport platform — racing, training, adventure and community, in one place.
             </p>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8">
-              <Link href="/rides">
-                <Button size="lg">Book a ride <ArrowRight className="w-5 h-5" /></Button>
+              <Link href="/events">
+                <Button size="lg">See DRC Ultimate Rider <ArrowRight className="w-5 h-5" /></Button>
               </Link>
-              <Link href="/trainings" className="font-heading text-lg underline decoration-tan-dark/40 underline-offset-4 hover:text-orange hover:decoration-orange transition-colors">
-                or learn to ride one →
+              <Link href="/rides" className="font-heading text-lg underline decoration-tan-dark/40 underline-offset-4 hover:text-orange hover:decoration-orange transition-colors">
+                or explore rides &amp; training →
               </Link>
             </div>
           </div>
 
           <aside className="lg:col-span-4 border-t-2 border-tan-dark/40 pt-5 lg:border-t-0 lg:border-l-2 lg:pt-0 lg:pl-6 lg:self-stretch flex flex-col justify-end">
-            <p className="font-mono text-xs text-tan-dark uppercase tracking-widest">The pitch</p>
+            <p className="font-mono text-xs text-tan-dark uppercase tracking-widest">The platform</p>
             <p className="font-heading text-lg leading-snug mt-3 text-foreground/85">
-              Six riders per group. Real terrain — Krishnagiri granite, Sakleshpur mud, Coorg forests. A support jeep with tools. A camp with a real fire.
+              Riding &middot; Training &middot; Adventure &middot; Motorsport &middot; Racing &middot; Experiences &middot; Community &middot; Content &middot; Brands.
             </p>
             <p className="font-body text-sm text-muted mt-4 leading-relaxed">
-              We're not a tour company. We're the people you'd want to ride with.
+              The rider is the centre. Everything else is built around that.
             </p>
           </aside>
         </motion.div>
@@ -79,10 +78,10 @@ export function AnimatedHero() {
 
 export function AnimatedStats() {
   const items = [
-    { k: "Rides run", v: "50+" },
-    { k: "Riders through camp", v: "300+" },
-    { k: "States ridden", v: "5" },
-    { k: "Serious injuries", v: "0" },
+    { k: "Official races / year", v: "6" },
+    { k: "Prize pool — Ultimate Rider", v: "₹5L" },
+    { k: "Flag-off", v: "Dec\u00A012\u201313" },
+    { k: "Country", v: "India" },
   ];
   return (
     <section className="bg-surface border-y border-border">
@@ -100,18 +99,94 @@ export function AnimatedStats() {
   );
 }
 
+export function UltimateRiderSpotlight() {
+  return (
+    <section className="relative border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <div className="lg:col-span-7">
+            <span className="eyebrow">The first official DRC race</span>
+            <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-semibold mt-3 leading-[1.02]">
+              DRC Ultimate Rider.
+            </h2>
+            <p className="font-heading italic text-xl text-tan-dark mt-4 max-w-2xl">
+              Two days. Every surface. Not just a race — a test of everything.
+            </p>
+
+            <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl">
+              <div>
+                <div className="font-mono text-[10px] text-tan-dark uppercase tracking-widest">Dates</div>
+                <div className="font-heading text-lg mt-1">12 &ndash; 13 Dec 2026</div>
+              </div>
+              <div>
+                <div className="font-mono text-[10px] text-tan-dark uppercase tracking-widest">City</div>
+                <div className="font-heading text-lg mt-1">Bengaluru</div>
+              </div>
+              <div>
+                <div className="font-mono text-[10px] text-tan-dark uppercase tracking-widest">Prize pool</div>
+                <div className="font-heading text-lg mt-1 text-orange">₹5,00,000</div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-wrap gap-2">
+              {["Enduro", "Rock Garden", "Hill Climb", "Slush", "Mud", "Technical"].map((s) => (
+                <span key={s} className="font-mono text-[11px] uppercase tracking-widest px-3 py-1.5 border border-border rounded-sm text-foreground/80">
+                  {s}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <Link href="/events">
+                <Button size="lg">Race details <ArrowRight className="w-5 h-5" /></Button>
+              </Link>
+              <a
+                href="/magazine/DRC-Ultimate-Rider.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-heading text-lg underline decoration-tan-dark/40 underline-offset-4 hover:text-orange hover:decoration-orange transition-colors"
+              >
+                Sponsor / partner deck →
+              </a>
+            </div>
+          </div>
+
+          <aside className="lg:col-span-5 border-t-2 border-tan-dark/40 pt-6 lg:border-t-0 lg:border-l-2 lg:pt-0 lg:pl-8">
+            <p className="font-mono text-xs text-tan-dark uppercase tracking-widest">Format</p>
+            <div className="mt-3 space-y-4">
+              <div>
+                <p className="font-heading text-lg"><span className="text-orange">Sat</span> &mdash; Qualification &middot; Elimination &middot; Challenges</p>
+                <p className="text-sm text-muted mt-1">The proving ground. The riders who last the day have not won. They have only earned Sunday.</p>
+              </div>
+              <div>
+                <p className="font-heading text-lg"><span className="text-orange">Sun</span> &mdash; The Final</p>
+                <p className="text-sm text-muted mt-1">Smaller field. Same dirt. This is where the weekend is decided.</p>
+              </div>
+            </div>
+            <p className="font-body text-sm text-muted leading-relaxed mt-6 border-t border-border/60 pt-4">
+              The flag-off lands on ground that already knows how to hold a championship — in partnership with <strong className="text-foreground">Dev Venkat</strong> (3× National Champion) and Tribal Adventure.
+            </p>
+          </aside>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function AnimatedFeatures() {
   return (
     <section className="bg-surface border-y border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         <FadeIn>
-          <div className="mb-12 max-w-2xl">
-            <span className="eyebrow">Why DRC</span>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3">Not a tour company. Not a race school. A riding club that runs both.</h2>
+          <div className="mb-12 max-w-3xl">
+            <span className="eyebrow">The platform</span>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3 leading-[1.05]">
+              A world around the rider &mdash; not a single weekend, and not a single start line.
+            </h2>
           </div>
         </FadeIn>
         <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" staggerDelay={0.12}>
-          {features.map((f) => (
+          {pillars.map((f) => (
             <StaggerItem key={f.title}>
               <div className="h-full p-6 border-t-2 border-tan-dark/40 bg-surface/40 hover:border-orange transition-colors">
                 <f.icon className="w-6 h-6 text-tan-dark" strokeWidth={1.4} />
@@ -183,9 +258,9 @@ export function AnimatedCTA() {
       <FadeIn>
         <div className="text-center space-y-6 max-w-2xl mx-auto">
           <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold">
-            Come ride with us.
+            Ride with DRC.
           </h2>
-          <p className="text-muted text-lg">Pick a ride, book a slot, show up with your bike. We'll handle the rest — route, marshals, food, camp, the works.</p>
+          <p className="text-muted text-lg">Pick a ride, join a training, or race at Ultimate Rider. Whatever it is — adventure isn&rsquo;t found. It&rsquo;s earned.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href={loggedIn ? "/rides" : "/signup"}>
               <Button size="lg" className="min-w-[200px]">{loggedIn ? "Explore Rides" : "Join DRC"} <ArrowRight className="w-5 h-5" /></Button>

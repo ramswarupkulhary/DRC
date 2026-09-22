@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X, User, LogOut, ChevronDown, Crown, Bell, Calendar, Shield, MapPinned, Star, Gift } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -87,14 +87,10 @@ export function Navbar() {
     >
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 xl:px-8">
         <div className={cn("flex items-center justify-between transition-all duration-300", scrolled ? "h-16" : "h-16 sm:h-20")}>
-          <Link href="/" className="flex items-center gap-3 shrink-0" aria-label="DRC Motorsports — home">
-            <Image
-              src="/brand/drc-logo-main.png"
-              alt="DRC Motorsports"
-              width={360}
-              height={240}
-              priority
-              className={cn("w-auto transition-all duration-300", scrolled ? "h-11" : "h-12 sm:h-14")}
+          <Link href="/" className="flex items-center shrink-0" aria-label="DRC Motorsports — home">
+            <Logo
+              variant="compact"
+              className={cn("transition-all duration-300", scrolled ? "text-3xl" : "text-3xl sm:text-4xl")}
             />
           </Link>
 

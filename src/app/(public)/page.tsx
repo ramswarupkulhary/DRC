@@ -13,6 +13,7 @@ import {
   AnimatedTrainingsSection,
   AnimatedCard,
   AnimatedFAQ,
+  UltimateRiderSpotlight,
 } from "@/components/home/AnimatedSections";
 
 async function getHomeData() {
@@ -53,28 +54,32 @@ export default async function HomePage() {
 
   const homeFaqs = [
     {
-      question: "What is DRC — Dirt Ride Camp?",
-      answer: "DRC (Dirt Ride Camp) is Bangalore's premier off-road academy and adventure riding community. We organize curated off-road bike trips, professional off-road training classes, adventure camping trips, and trail riding experiences across Karnataka and India. Founded by passionate riders, DRC offers limited-slot adventure rides to ensure quality, safety, and a personal touch.",
+      question: "What is DRC Motorsports?",
+      answer: "DRC Motorsports Pvt Ltd is an Indian motorcycle culture and motorsport platform, headquartered in Bengaluru. DRC exists to build a world around the rider — racing, training, adventure, experiences, community, content and brands under one roof. Our flag-off is DRC Ultimate Rider (12\u201313 December 2026), the first race of DRC Racing, a series of six official races every year across India.",
     },
     {
-      question: "What off-road training classes does DRC's academy offer in Bangalore?",
-      answer: "DRC's off-road academy offers structured training classes for all skill levels in Bangalore — from beginner courses covering basic dirt bike handling and body positioning, to advanced enduro techniques including hill climbs, water crossings, and rock gardens. Our professional instructors provide hands-on coaching with a maximum 6:1 rider-to-instructor ratio.",
+      question: "What is DRC Ultimate Rider?",
+      answer: "DRC Ultimate Rider is a two-day motorsport event on 12\u201313 December 2026 in Bengaluru \u2014 the first official DRC Race and the flag-off of DRC Racing. Saturday is qualification, elimination and challenges across enduro, rock garden, hill climb, slush, mud and technical surfaces. Sunday is the Final. Overall prize pool: \u20b95,00,000. Held in partnership with Dev Venkat (3\u00d7 National Champion) and Tribal Adventure.",
+    },
+    {
+      question: "What training does DRC offer in Bengaluru?",
+      answer: "DRC runs structured off-road training \u2014 from first-time-on-dirt fundamentals (body position, throttle control, standing up) through to advanced enduro, hill climbs, water crossings and rock gardens. Coaches with race-level experience, small groups, real terrain.",
     },
     {
       question: "Do I need an off-road bike to join DRC rides?",
-      answer: "No! DRC welcomes all motorcycle types. While dedicated off-road/adventure bikes are ideal for technical trails, many of our rides are suitable for standard motorcycles. We categorize rides by difficulty — from easy gravel paths suitable for any bike, to challenging terrain requiring off-road-specific motorcycles. Check each ride's difficulty rating before registering.",
+      answer: "No. DRC welcomes all motorcycle types. Dedicated off-road/adventure bikes are ideal for technical trails, but many of our rides are suitable for standard motorcycles. Each ride is categorised by difficulty \u2014 from easy gravel paths for any bike to advanced terrain requiring off-road-specific machines. Check the difficulty on each ride page before registering.",
     },
     {
-      question: "How do I register for a DRC ride or training?",
-      answer: "Simply create an account on dirtridecamp.com, browse upcoming rides or training programs, and click 'Register'. Slots are limited and fill up fast — typically 10-15 riders per ride. Payment is required to confirm your spot. You'll receive ride details, WhatsApp group link, and route information after confirmation.",
+      question: "How do I register for a ride, training or race?",
+      answer: "Create an account on dirtridecamp.com, browse upcoming rides, trainings and events, and register. Slots are limited by design. Payment confirms your spot; ride details, WhatsApp group and route information follow on email and WhatsApp.",
     },
     {
-      question: "What areas does DRC cover for bike trips & adventure rides near Bangalore?",
-      answer: "DRC organizes adventure bike trips across Karnataka including Kanakapura trails, Ramanagara rocky terrains, Sakleshpur coffee estate trails, Coorg forest paths, Chikkamagaluru dirt tracks, and Krishnagiri off-road circuits. We also run multi-day camping trips and expedition rides to Hampi, Goa coastal trails, and Ladakh/Spiti adventure tours.",
+      question: "Where does DRC operate?",
+      answer: "Headquartered in Bengaluru. Rides and expeditions across Karnataka \u2014 Krishnagiri, Kanakapura, Ramanagara, Sakleshpur, Coorg, Chikkamagaluru \u2014 with multi-day trips to Hampi, Goa, Ladakh and Spiti. DRC Racing runs six official races every year across India. On the horizon: DRC Mini Dakar, a five-day desert endurance vision in Rajasthan.",
     },
     {
-      question: "Is off-road riding safe? What safety measures does DRC follow?",
-      answer: "Safety is DRC's top priority. Every ride includes: experienced ride leads and sweep riders, mandatory riding gear checks (helmet, boots, gloves, knee guards), first-aid trained marshals, support vehicle with tools and spares, GPS tracking, and emergency evacuation plans. We maintain a maximum group size of 15 riders for better safety management.",
+      question: "How does DRC handle safety?",
+      answer: "Every ride and race includes experienced ride leads and sweep riders, mandatory gear checks (helmet, boots, gloves, knee guards), first-aid trained marshals, support vehicles with tools and spares, GPS tracking, and evacuation plans. Group sizes are capped for control.",
     },
   ];
 
@@ -86,6 +91,7 @@ export default async function HomePage() {
       {reviews.length > 0 && <AggregateRatingJsonLd ratingValue={Math.round(avgRating * 10) / 10} reviewCount={reviews.length} />}
       <AnimatedHero />
       <AnimatedStats />
+      <UltimateRiderSpotlight />
 
       <AnimatedRidesSection>
         {rides.map((ride) => (

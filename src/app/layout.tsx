@@ -33,8 +33,8 @@ const BASE_URL = "https://www.dirtridecamp.com";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides in Bangalore",
-    template: "%s | DRC Dirt Ride Camp",
+    default: "DRC Motorsports — Racing, Training & Adventure Across India",
+    template: "%s | DRC Motorsports",
   },
   icons: {
     icon: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     shortcut: ["/brand/drc-logo-main.png"],
   },
   description:
-    "A small Bangalore off-road riding club and academy. We run limited-slot adventure rides, hands-on dirt-bike training, and camping trips across Karnataka and India — six riders per group, a support jeep, a real fire at camp.",
+    "DRC Motorsports Pvt Ltd — an Indian motorcycle culture and motorsport platform. Racing, training, adventure and community. Flag-off event: DRC Ultimate Rider, 12\u201313 December 2026, Bengaluru. Six official races every year across India.",
   keywords: [
     "off road academy",
     "off road academy bangalore",

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { Logo } from "@/components/brand/Logo";
 
 export function Footer() {
   const { data: session } = useSession();
@@ -13,15 +13,9 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <Image
-              src="/brand/drc-logo-main.png"
-              alt="DRC Motorsports"
-              width={360}
-              height={240}
-              className="h-24 w-auto"
-            />
-            <p className="text-sm text-muted leading-relaxed">
-              Bangalore-based off-road academy. We run small-group adventure rides, hands-on dirt-bike training, and camping trips across Karnataka &amp; India.
+            <Logo variant="full" className="text-5xl" />
+            <p className="text-sm text-muted leading-relaxed mt-6">
+              DRC Motorsports Pvt Ltd — an Indian motorcycle culture &amp; motorsport platform. Racing, training, adventure and community, out of Bengaluru.
             </p>
             <div className="flex gap-3 pt-2">
               <a
