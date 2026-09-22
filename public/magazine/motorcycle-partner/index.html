@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DRC Ultimate Rider — Official Motorcycle Partner</title>
+  <meta name="description" content="Official Motorcycle Partner invitation for DRC Ultimate Rider. The flag-off of DRC Racing. 12–13 December 2026, Bengaluru." />
+  <style>
+    @font-face {
+      font-family: "Oswald";
+      src: url("../ultimate-rider/fonts/Oswald.ttf") format("truetype");
+      font-weight: 200 700;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Libre Baskerville";
+      src: url("../ultimate-rider/fonts/LibreBaskerville-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Libre Baskerville";
+      src: url("../ultimate-rider/fonts/LibreBaskerville-Italic.woff2") format("woff2");
+      font-weight: 400;
+      font-style: italic;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Libre Baskerville";
+      src: url("../ultimate-rider/fonts/LibreBaskerville-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: block;
+    }
+
+    :root {
+      --black: #0D0D0D;
+      --ink: #141414;
+      --paper: #F1E9DD;
+      --orange: #E8622C;
+      --tan: #B9A886;
+      --muted: #8A8276;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #2C2C2C; }
+    body {
+      font-family: "Libre Baskerville", Georgia, serif;
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+    img { display: block; max-width: 100%; }
+    h1, h2, h3, .oswald {
+      font-family: "Oswald", sans-serif;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .screen-bar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; padding: 14px 28px;
+      background: var(--black); color: var(--paper);
+      font-family: "Oswald", sans-serif; font-size: 12px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+    }
+    .screen-bar button {
+      background: var(--orange); color: white; border: 0;
+      padding: 8px 16px; font-family: "Oswald", sans-serif;
+      letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
+    }
+    .spread {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 28px; padding: 36px 16px 80px;
+    }
+    .page {
+      position: relative; width: 210mm; height: 297mm;
+      overflow: hidden; background: var(--paper);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+    }
+    .folio {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: "Oswald", sans-serif; font-size: 7pt;
+      letter-spacing: 0.28em; text-transform: uppercase; color: var(--tan);
+    }
+    .kicker {
+      font-family: "Oswald", sans-serif; font-size: 8pt;
+      letter-spacing: 0.32em; text-transform: uppercase; color: var(--orange);
+    }
+
+    /* ========== COVER ========== */
+    .cover { background: var(--black); color: var(--paper); }
+    .cover .bleed {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: 46% 42%;
+    }
+    .cover .veil {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(180deg, rgba(13,13,13,0.55) 0%, rgba(13,13,13,0.12) 32%, rgba(13,13,13,0.18) 52%, rgba(13,13,13,0.92) 100%),
+        linear-gradient(90deg, rgba(13,13,13,0.38) 0%, rgba(13,13,13,0) 48%);
+    }
+    .cover-top {
+      position: absolute; top: 11mm; left: 14mm; right: 14mm;
+      display: flex; justify-content: space-between; align-items: flex-start; z-index: 2;
+    }
+    .drc-mark { font-family: "Oswald", sans-serif; font-size: 22pt; letter-spacing: 0.08em; line-height: 0.9; font-weight: 600; }
+    .drc-mark .r { color: var(--orange); }
+    .cover-role {
+      text-align: right; font-family: "Oswald", sans-serif;
+      font-size: 8pt; letter-spacing: 0.28em; color: var(--orange); line-height: 1.55;
+    }
+    .cover-role span { display: block; color: var(--tan); letter-spacing: 0.22em; margin-top: 1.2mm; }
+    .cover-copy {
+      position: absolute; left: 14mm; right: 14mm; bottom: 13mm; z-index: 2;
+    }
+    .cover-copy h1 {
+      font-size: 18.6mm; line-height: 0.86; letter-spacing: -0.02em; font-weight: 600;
+      max-width: 182mm;
+    }
+    .cover-line {
+      margin-top: 6mm; color: var(--orange);
+      font-family: "Oswald", sans-serif; font-size: 11pt;
+      letter-spacing: 0.22em; font-weight: 500;
+    }
+    .cover-rule { height: 0.4pt; background: rgba(241,233,221,0.28); margin: 6.5mm 0 5mm; }
+    .cover-foot {
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 8mm;
+    }
+    .cover-where {
+      font-family: "Oswald", sans-serif; font-size: 9.5pt;
+      letter-spacing: 0.18em; line-height: 1.55;
+    }
+    .cover-where em {
+      display: block; font-style: normal; color: var(--tan);
+      font-size: 7.5pt; letter-spacing: 0.26em; margin-top: 1.4mm;
+    }
+    .venue {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+    .venue img {
+      width: 48mm;
+      height: auto;
+      display: block;
+    }
+
+    /* ========== PAGE 2 WEEKEND ========== */
+    .weekend { background: var(--paper); }
+    .week-hero {
+      position: relative; height: 96mm; overflow: hidden;
+    }
+    .week-hero img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+    .week-hero .veil {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(13,13,13,0.15) 0%, rgba(13,13,13,0.45) 48%, rgba(13,13,13,0.92) 100%);
+    }
+    .week-hero-copy {
+      position: absolute; left: 14mm; right: 14mm; bottom: 7mm; color: var(--paper);
+    }
+    .week-hero-copy h1 { font-size: 11.6mm; line-height: 0.9; letter-spacing: -0.01em; }
+    .week-hero-copy .under {
+      margin-top: 2.8mm; font-size: 10pt; font-style: italic; max-width: 158mm;
+    }
+    .week-body { padding: 7mm 14mm 18mm; }
+    .week-intro {
+      font-size: 10pt; line-height: 1.48; color: #2A2A2A; margin-bottom: 6mm; max-width: 182mm;
+    }
+    .days { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-bottom: 6mm; }
+    .day { border-top: 1.2pt solid var(--black); padding-top: 3.2mm; }
+    .day h2 { font-size: 15pt; letter-spacing: 0.08em; }
+    .day .when {
+      font-family: "Oswald", sans-serif; font-size: 7.6pt; letter-spacing: 0.24em;
+      color: var(--orange); margin: 1mm 0 2.2mm;
+    }
+    .day p { font-size: 8.4pt; line-height: 1.48; color: #333; }
+    .surfaces {
+      display: flex; flex-wrap: wrap; gap: 1.4mm 0;
+      border-top: 0.4pt solid rgba(13,13,13,0.16);
+      border-bottom: 0.4pt solid rgba(13,13,13,0.16);
+      padding: 3mm 0; margin-bottom: 5.5mm;
+    }
+    .surfaces span {
+      font-family: "Oswald", sans-serif; font-size: 8pt; letter-spacing: 0.18em;
+      text-transform: uppercase; padding-right: 4mm; margin-right: 4mm;
+      border-right: 0.4pt solid rgba(13,13,13,0.22);
+    }
+    .surfaces span:last-child { border: 0; padding-right: 0; margin-right: 0; }
+    .strip {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 2mm; margin-bottom: 5.5mm;
+    }
+    .strip figure { position: relative; height: 40mm; overflow: hidden; }
+    .strip img { width: 100%; height: 100%; object-fit: cover; }
+    .strip figcaption {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 6mm 2.2mm 1.6mm;
+      background: linear-gradient(180deg, transparent, rgba(13,13,13,0.82));
+      color: var(--paper); font-family: "Oswald", sans-serif;
+      font-size: 7pt; letter-spacing: 0.18em; text-transform: uppercase;
+    }
+    .mx-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; align-items: start;
+      margin-bottom: 6mm;
+    }
+    .mx-row h3 { font-size: 11pt; letter-spacing: 0.12em; margin-bottom: 1.6mm; }
+    .mx-row p { font-size: 8.3pt; line-height: 1.48; color: #333; }
+    .prizes { font-family: "Oswald", sans-serif; font-size: 8pt; letter-spacing: 0.06em; line-height: 1.55; color: #222; margin-top: 2mm; }
+    .prizes b { color: var(--orange); font-weight: 500; }
+    .flag-bar {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--black); color: var(--paper);
+      padding: 4.4mm 14mm;
+      font-family: "Oswald", sans-serif; font-size: 9pt; letter-spacing: 0.2em;
+    }
+    .flag-bar span { color: var(--orange); }
+
+    /* ========== PAGE 3 AFTER ========== */
+    .after { background: var(--black); color: var(--paper); }
+    .after-grid {
+      display: grid; grid-template-columns: 1fr 86mm; height: 297mm;
+    }
+    .after-copy { padding: 12mm 11mm 12mm 14mm; display: flex; flex-direction: column; }
+    .after-copy h1 {
+      font-size: 11.2mm; line-height: 0.9; letter-spacing: -0.015em;
+      margin: 6mm 0 5mm;
+    }
+    .belief {
+      font-family: "Libre Baskerville", Georgia, serif; font-style: italic;
+      font-size: 12.5pt; line-height: 1.35; color: var(--orange); margin-bottom: 6mm;
+    }
+    .after-copy p {
+      font-size: 8.6pt; line-height: 1.55; color: rgba(241,233,221,0.86); margin-bottom: 3.6mm;
+    }
+    .lives { margin-top: 3mm; display: flex; flex-direction: column; gap: 3.4mm; }
+    .live {
+      border-top: 0.4pt solid rgba(241,233,221,0.16); padding-top: 2.6mm;
+    }
+    .live h3 { font-size: 10.5pt; letter-spacing: 0.16em; color: var(--paper); }
+    .live p { margin: 1mm 0 0; font-size: 8pt; color: rgba(241,233,221,0.78); }
+    .after-photos { display: grid; grid-template-rows: 1fr 1fr 1fr; }
+    .after-photos figure { position: relative; overflow: hidden; }
+    .after-photos img { width: 100%; height: 100%; object-fit: cover; }
+    .after-photos figcaption {
+      position: absolute; left: 5mm; right: 5mm; bottom: 5mm;
+      font-family: "Oswald", sans-serif; font-size: 7pt;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--paper);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+    }
+
+    /* ========== PAGE 4 ASK ========== */
+    .ask { background: var(--paper); }
+    .ask-inner { padding: 12mm 14mm 0; height: 297mm; display: flex; flex-direction: column; }
+    .ask-inner h1 {
+      font-size: 10.4mm; line-height: 0.92; letter-spacing: -0.01em; margin: 5mm 0 4mm;
+    }
+    .ask-lead {
+      font-size: 10.2pt; line-height: 1.45; font-style: italic; color: #333;
+      max-width: 178mm; margin-bottom: 6mm;
+    }
+    .deal {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 6mm;
+    }
+    .deal article {
+      padding: 6mm 6.5mm 6.5mm; min-height: 72mm;
+    }
+    .deal .in { background: var(--black); color: var(--paper); }
+    .deal .out { background: #1C1712; color: var(--paper); }
+    .deal h2 {
+      font-size: 12pt; letter-spacing: 0.18em; margin-bottom: 4mm; color: var(--orange);
+    }
+    .deal li {
+      list-style: none; font-size: 8.3pt; line-height: 1.45;
+      padding: 2.4mm 0; border-top: 0.4pt solid rgba(241,233,221,0.14);
+      color: rgba(241,233,221,0.9);
+    }
+    .ask-photo {
+      position: relative; height: 84mm; overflow: hidden; margin-bottom: 0;
+    }
+    .ask-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 40% 50%; }
+    .ask-photo .veil {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 28%, rgba(13,13,13,0.82));
+    }
+    .closer {
+      position: absolute; left: 6mm; right: 6mm; bottom: 5mm;
+      font-family: "Oswald", sans-serif; font-size: 16pt; letter-spacing: 0.08em;
+      line-height: 1.12; color: var(--paper); z-index: 2;
+    }
+    .closer em { font-style: normal; color: var(--orange); }
+    .contact {
+      margin-top: auto; border-top: 0.8pt solid var(--black);
+      padding: 5mm 0 10mm;
+      display: grid; grid-template-columns: 1fr 22mm; gap: 8mm; align-items: end;
+    }
+    .earn {
+      font-family: "Oswald", sans-serif; font-size: 11pt;
+      letter-spacing: 0.16em; color: var(--orange); margin-bottom: 1mm;
+    }
+    .who strong {
+      font-family: "Oswald", sans-serif; font-size: 12pt; letter-spacing: 0.06em;
+    }
+    .who .role {
+      font-family: "Oswald", sans-serif; font-size: 7.6pt; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--muted); margin: 0.6mm 0 2mm;
+    }
+    .coords {
+      font-family: "Oswald", sans-serif; font-size: 8pt;
+      letter-spacing: 0.08em; line-height: 1.7;
+    }
+    .qr { width: 22mm; height: 22mm; object-fit: cover; }
+
+    body.solo { background: #000; }
+    body.solo .screen-bar { display: none !important; }
+    body.solo .spread { padding: 0; gap: 0; }
+    body.solo .page { box-shadow: none; }
+
+    @media print {
+      .screen-bar { display: none !important; }
+      html, body { background: #fff; }
+      .spread { padding: 0; gap: 0; }
+      .page { box-shadow: none; page-break-after: always; break-after: page; }
+      .page:last-child { page-break-after: auto; }
+      @page { size: A4 portrait; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="screen-bar">
+    <span>DRC Ultimate Rider · Official Motorcycle Partner · 4-page A4</span>
+    <button type="button" onclick="window.print()">Print / Save PDF</button>
+  </div>
+
+  <div class="spread">
+
+    <!-- PAGE 1 COVER -->
+    <article class="page cover">
+      <img class="bleed" src="../ultimate-rider/cover.png" alt="Dirt bike launching through dust" />
+      <div class="veil"></div>
+      <header class="cover-top">
+        <div class="drc-mark"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+        <div class="cover-role">
+          Official Motorcycle Partner
+          <span>01 / 04</span>
+        </div>
+      </header>
+      <div class="cover-copy">
+        <h1>The motorcycle<br />that doesn’t<br />go home.</h1>
+        <div class="cover-line">Two days on the start line. Every trail after.</div>
+        <div class="cover-rule"></div>
+        <div class="cover-foot">
+          <div class="cover-where">
+            DRC Ultimate Rider<br />
+            12–13 December 2026 · Bengaluru
+            <em>The first official DRC Race · Flag-off of DRC Racing</em>
+          </div>
+          <div class="venue">
+            <img src="tribal-adventure.png" alt="Tribal Adventure" />
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- PAGE 2 -->
+    <article class="page weekend">
+      <div class="week-hero">
+        <img src="../ultimate-rider/mud.png" alt="Motorcycle through mud" />
+        <div class="veil"></div>
+        <div class="week-hero-copy">
+          <div class="folio" style="margin-bottom:3.5mm;">
+            <span>02 / The Weekend</span>
+            <span>The machine, in public</span>
+          </div>
+          <p class="kicker">12–13 December 2026</p>
+          <h1>Every surface<br />is a proving ground.</h1>
+          <p class="under">The official motorcycle doesn’t sit behind a fence. It goes where the rider goes.</p>
+        </div>
+      </div>
+      <div class="week-body">
+        <p class="week-intro">DRC Ultimate Rider is a two-day motorsport event. Saturday filters the field. Sunday decides it. Professional and Amateur share the same dirt — and the same motorcycle has to live through all of it.</p>
+        <div class="days">
+          <div class="day">
+            <h2>Saturday</h2>
+            <div class="when">Qualification · Elimination · Challenges</div>
+            <p>The proving ground. Multiple challenges. The riders who last the day have only earned Sunday. The motorcycle is already in the story.</p>
+          </div>
+          <div class="day">
+            <h2>Sunday</h2>
+            <div class="when">The Final</div>
+            <p>The field is smaller. The surfaces still change. Titles are decided here — with your machine in the frame.</p>
+          </div>
+        </div>
+        <div class="surfaces">
+          <span>Enduro</span>
+          <span>Motocross</span>
+          <span>Rock Garden</span>
+          <span>Hill Climb</span>
+          <span>Slush</span>
+          <span>Mud</span>
+          <span>Technical</span>
+        </div>
+        <div class="strip">
+          <figure>
+            <img src="../ultimate-rider/mx.png" alt="Motocross jump" />
+            <figcaption>Motocross</figcaption>
+          </figure>
+          <figure>
+            <img src="../drc-editorial/drc-editorial-01-hillclimb.jpg" alt="Hill climb" />
+            <figcaption>Hill climb</figcaption>
+          </figure>
+          <figure>
+            <img src="../ultimate-rider/rocks.png" alt="Rock garden" />
+            <figcaption>Rock garden</figcaption>
+          </figure>
+          <figure>
+            <img src="../drc-editorial/drc-editorial-08-tyre.jpg" alt="Knobby tyre packed with dirt" />
+            <figcaption>The machine</figcaption>
+          </figure>
+        </div>
+        <div class="mx-row">
+          <div>
+            <h3>Dedicated Motocross</h3>
+            <p>A motocross race inside the weekend. The motorcycle gets air, roost, and a crowd that came for engines.</p>
+          </div>
+          <div>
+            <h3>A real championship</h3>
+            <p>Professional and Amateur. Same dirt. Their own title.</p>
+            <div class="prizes">
+              Pro &nbsp;<b>₹1,00,000</b> · 50,000 · 25,000 · 15,000 · 10,000<br />
+              Amateur &nbsp;<b>₹25,000</b> · 15,000 · 10,000
+            </div>
+          </div>
+        </div>
+        <div class="flag-bar">
+          <span>6 races</span>
+          <span>Every year</span>
+          <span>Across India</span>
+          <span>This is the flag-off</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- PAGE 3 -->
+    <article class="page after">
+      <div class="after-grid">
+        <div class="after-copy">
+          <div class="folio">
+            <span>03 / After Sunday</span>
+            <span>The motorcycle stays</span>
+          </div>
+          <h1>The flags<br />come down.<br />The motorcycle<br />stays.</h1>
+          <p class="belief">Give us the bikes. We’ll keep them in the work.</p>
+          <p>Most race partnerships end when the podium is packed. This one is built to outlive the weekend. The official motorcycles don’t go back in a crate on Monday. They stay with DRC — ridden on trails, used in training, lived with on adventure, filmed because they are still being used.</p>
+          <p>That is the advertising that doesn’t look like advertising. A rider on your machine, on dirt, after the race is over. Again. And again.</p>
+          <div class="lives">
+            <div class="live">
+              <h3>Trails</h3>
+              <p>DRC keeps riding. The partner motorcycle keeps going out — on routes, on dirt, in the hands of riders who weren’t on the start list.</p>
+            </div>
+            <div class="live">
+              <h3>Training</h3>
+              <p>The same machine in the next pair of boots. New riders learn on it. The brand stays in their hands, not only on a barrier.</p>
+            </div>
+            <div class="live">
+              <h3>Adventure</h3>
+              <p>Camp. Dawn. Days that are not a start gate. The motorcycle is still there when the fire is lit and the helmets are on the ground.</p>
+            </div>
+            <div class="live">
+              <h3>Content</h3>
+              <p>Because the bikes stay in the work, they stay in the pictures. Race week is the flag-off. The trails keep the story in motion.</p>
+            </div>
+          </div>
+        </div>
+        <div class="after-photos">
+          <figure>
+            <img src="../drc-editorial/drc-editorial-09-training.jpg" alt="Training on a dirt bike" />
+            <figcaption>Training</figcaption>
+          </figure>
+          <figure>
+            <img src="../drc-editorial/drc-editorial-10-camp.jpg" alt="Riders around a fire with a motorcycle" />
+            <figcaption>Adventure</figcaption>
+          </figure>
+          <figure>
+            <img src="../drc-editorial/drc-editorial-15-dawn.jpg" alt="Dawn over dirt tracks" />
+            <figcaption>The next morning</figcaption>
+          </figure>
+        </div>
+      </div>
+    </article>
+
+    <!-- PAGE 4 -->
+    <article class="page ask">
+      <div class="ask-inner">
+        <div class="folio" style="color:#8A8276;">
+          <span>04 / The Partnership</span>
+          <span>Official Motorcycle Partner</span>
+        </div>
+        <h1>Leave the machine.<br />We’ll keep riding it.</h1>
+        <p class="ask-lead">One role. The motorcycle of the flag-off — and of the DRC world that continues after it.</p>
+        <div class="deal">
+          <article class="in">
+            <h2>You put in</h2>
+            <ul>
+              <li>Official motorcycles for DRC Ultimate Rider — the machine across every surface of the two-day race.</li>
+              <li>Bikes that remain with DRC after Sunday for trails, training and adventure. Not a weekend hire. A working fleet.</li>
+              <li>The right to be ridden, filmed and seen in the DRC world long after the flags are packed.</li>
+            </ul>
+          </article>
+          <article class="out">
+            <h2>You take out</h2>
+            <ul>
+              <li>Official Motorcycle Partner of the first official DRC Race — the flag-off of DRC Racing.</li>
+              <li>Your motorcycle on enduro, motocross, rock garden, hill climb, slush, mud and technical ground.</li>
+              <li>A place with riders, racing, content and community — then life after the podium, on DRC trails.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="ask-photo">
+          <img src="../ultimate-rider/night.png" alt="Dirt bike beside riders at night" />
+          <div class="veil"></div>
+          <p class="closer">Don’t sponsor a weekend.<br /><em>Put a motorcycle in the work.</em></p>
+        </div>
+        <div class="contact">
+          <div>
+            <div class="earn">Adventure isn’t found. It’s earned.</div>
+            <div class="who">
+              <strong>Ramswarup Kulhary</strong>
+              <div class="role">Founder &amp; MD · DRC — Dirt Ride Camp</div>
+              <div class="coords">
+                M &nbsp; 94148 70102<br />
+                E &nbsp; info@dirtridecamp.com<br />
+                W &nbsp; www.dirtridecamp.com<br />
+                IG &nbsp; @dirtridecamp
+              </div>
+            </div>
+          </div>
+          <img class="qr" src="../ultimate-rider/qr.png" alt="QR code to dirtridecamp.com" />
+        </div>
+      </div>
+    </article>
+
+  </div>
+  <script>
+    (function () {
+      var page = new URLSearchParams(window.location.search).get("page");
+      if (!page) return;
+      document.body.classList.add("solo");
+      document.querySelectorAll(".page").forEach(function (el, i) {
+        el.style.display = String(i + 1) === page ? "block" : "none";
+      });
+    })();
+  </script>
+</body>
+</html>

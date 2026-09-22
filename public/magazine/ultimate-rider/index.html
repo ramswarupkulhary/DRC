@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DRC Ultimate Rider</title>
+  <meta name="description" content="DRC Ultimate Rider. The first official DRC Race and the flag-off of DRC Racing. 12–13 December 2026. Tribal Adventure, Bengaluru. Overall prize pool ₹5 lakh." />
+  <style>
+    @font-face {
+      font-family: "Oswald";
+      src: url("fonts/Oswald.ttf") format("truetype");
+      font-weight: 200 700;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Libre Baskerville";
+      src: url("fonts/LibreBaskerville-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Libre Baskerville";
+      src: url("fonts/LibreBaskerville-Italic.woff2") format("woff2");
+      font-weight: 400;
+      font-style: italic;
+      font-display: block;
+    }
+    @font-face {
+      font-family: "Libre Baskerville";
+      src: url("fonts/LibreBaskerville-Bold.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: block;
+    }
+
+    :root {
+      --black: #0D0D0D;
+      --charcoal: #161616;
+      --ink: #1A1A1A;
+      --paper: #F1E9DD;
+      --orange: #E8622C;
+      --tan: #B9A886;
+      --muted: #8A8276;
+      --rule-dark: rgba(13, 13, 13, 0.16);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #2C2C2C; }
+    body {
+      font-family: "Libre Baskerville", Georgia, serif;
+      color: var(--black);
+      -webkit-font-smoothing: antialiased;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .screen-bar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; padding: 14px 28px;
+      background: var(--black); color: var(--paper);
+      font-family: "Oswald", sans-serif; font-size: 12px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+    }
+    .screen-bar button {
+      background: var(--orange); color: white; border: 0;
+      padding: 8px 16px; font-family: "Oswald", sans-serif;
+      letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer;
+    }
+    .spread {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 28px; padding: 36px 16px 80px;
+    }
+    .page {
+      position: relative; width: 210mm; height: 297mm;
+      overflow: hidden; background: var(--paper);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+    }
+    img { display: block; max-width: 100%; }
+    .folio {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: "Oswald", sans-serif; font-size: 7pt;
+      letter-spacing: 0.28em; text-transform: uppercase; color: var(--tan);
+    }
+    .kicker {
+      font-family: "Oswald", sans-serif; font-size: 8pt;
+      letter-spacing: 0.32em; text-transform: uppercase; color: var(--orange);
+    }
+    h1, h2, h3, .display {
+      font-family: "Oswald", sans-serif;
+      text-transform: uppercase; font-weight: 600;
+    }
+
+    /* COVER */
+    .cover { background: var(--black); color: var(--paper); }
+    .cover img.bleed {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: 46% 42%;
+    }
+    .cover .veil {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(180deg, rgba(13,13,13,0.78) 0%, rgba(13,13,13,0.18) 28%, rgba(13,13,13,0.12) 48%, rgba(13,13,13,0.92) 100%),
+        linear-gradient(90deg, rgba(13,13,13,0.55) 0%, rgba(13,13,13,0) 46%);
+    }
+    .cover-top {
+      position: absolute; top: 12mm; left: 14mm; right: 14mm;
+      display: flex; justify-content: space-between; align-items: flex-start; z-index: 2;
+    }
+    .drc-mark {
+      font-family: "Oswald", sans-serif;
+      font-size: 28pt; letter-spacing: 0.06em; line-height: 0.9; font-weight: 600;
+      color: #fff;
+    }
+    .drc-mark .r { color: var(--orange); }
+    .cover-copy {
+      position: absolute; left: 14mm; right: 14mm; bottom: 13mm; z-index: 2;
+    }
+    .cover-copy h1 {
+      font-size: 24mm; line-height: 0.84; letter-spacing: -0.015em; font-weight: 600;
+    }
+    .cover-line {
+      margin-top: 6mm; color: var(--orange);
+      font-family: "Oswald", sans-serif; font-size: 13pt;
+      letter-spacing: 0.22em; font-weight: 500;
+      text-transform: uppercase;
+    }
+    .cover-rule { height: 0.4pt; background: rgba(241,233,221,0.28); margin: 6.5mm 0 5mm; }
+    .cover-foot {
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 8mm;
+    }
+    .cover-where {
+      font-family: "Oswald", sans-serif; font-size: 10pt;
+      letter-spacing: 0.2em; line-height: 1.55;
+    }
+    .cover-where em {
+      display: block; font-style: normal; color: var(--tan);
+      font-size: 7.5pt; letter-spacing: 0.24em; margin-top: 1.6mm;
+    }
+    .venue { flex: 0 0 auto; }
+    .venue img { width: 46mm; height: auto; display: block; }
+
+    /* RACE */
+    .race-hero { position: relative; height: 84mm; overflow: hidden; }
+    .race-hero img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; }
+    .race-hero .veil {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(13,13,13,0.2) 0%, rgba(13,13,13,0.55) 55%, rgba(13,13,13,0.92) 100%);
+    }
+    .race-hero-copy {
+      position: absolute; left: 14mm; right: 14mm; bottom: 8mm; color: var(--paper);
+    }
+    .race-hero-copy h1 {
+      font-size: 11.2mm; line-height: 0.92; letter-spacing: -0.01em; max-width: 178mm;
+    }
+    .race-body { padding: 7mm 14mm 8mm; }
+    .race-intro {
+      font-size: 9.3pt; line-height: 1.55; color: #2A2A2A;
+      max-width: 182mm; margin-bottom: 6mm;
+    }
+    .days { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-bottom: 6mm; }
+    .day { border-top: 1.2pt solid var(--black); padding-top: 3.5mm; }
+    .day h2 { font-size: 16pt; letter-spacing: 0.08em; }
+    .day .when {
+      font-family: "Oswald", sans-serif; font-size: 8pt; letter-spacing: 0.24em;
+      color: var(--orange); margin: 1mm 0 2.5mm;
+    }
+    .day p { font-size: 8.6pt; line-height: 1.5; color: #333; }
+    .surfaces {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      border-top: 0.4pt solid var(--rule-dark);
+      border-bottom: 0.4pt solid var(--rule-dark);
+      margin-bottom: 6mm;
+    }
+    .surfaces span {
+      font-family: "Oswald", sans-serif; font-size: 7.2pt; letter-spacing: 0.12em;
+      text-transform: uppercase; text-align: center;
+      padding: 3.4mm 1.2mm;
+      border-right: 0.4pt solid rgba(13,13,13,0.22);
+    }
+    .surfaces span:last-child { border-right: 0; }
+    .race-still {
+      margin: 0 -14mm 6mm; height: 44mm; overflow: hidden;
+    }
+    .race-still img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 58%; }
+    .pool {
+      background: var(--ink); color: var(--paper);
+      padding: 7mm 8mm 7.5mm; display: grid;
+      grid-template-columns: 1fr 98mm; gap: 8mm; align-items: center;
+    }
+    .pool .amt {
+      font-family: "Oswald", sans-serif; font-size: 16.5mm; line-height: 0.88;
+      letter-spacing: -0.02em; color: var(--orange);
+    }
+    .pool .lab {
+      font-family: "Oswald", sans-serif; font-size: 9.5pt; letter-spacing: 0.28em;
+      text-transform: uppercase; margin-top: 2mm;
+    }
+    .pool .hook {
+      font-family: "Oswald", sans-serif; font-size: 13pt; letter-spacing: 0.08em;
+      text-transform: uppercase; line-height: 1.15; margin-bottom: 2.4mm;
+    }
+    .pool p { font-size: 8.6pt; line-height: 1.5; color: rgba(241,233,221,0.82); }
+
+    /* PLATFORM */
+    .story { background: var(--black); color: var(--paper); }
+    .story-grid { display: grid; grid-template-columns: 1fr 78mm; height: 297mm; }
+    .story-copy { padding: 12mm 12mm 14mm 14mm; display: flex; flex-direction: column; }
+    .story-copy h1 { font-size: 10.4mm; line-height: 0.94; margin: 6mm 0 8mm; }
+    .belief {
+      font-family: "Libre Baskerville", Georgia, serif; font-style: italic;
+      font-size: 13pt; line-height: 1.35; color: var(--orange); margin-bottom: 7mm;
+    }
+    .story-copy p { font-size: 8.7pt; line-height: 1.58; color: rgba(241,233,221,0.86); margin-bottom: 4mm; }
+    .pillars {
+      margin: 3mm 0 8mm; display: flex; flex-direction: column; gap: 0;
+    }
+    .pillars span {
+      font-family: "Oswald", sans-serif; font-size: 9pt; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--paper);
+      padding: 1.7mm 0; border-top: 0.35pt solid rgba(241,233,221,0.14);
+    }
+    .pillars span:last-child { border-bottom: 0.35pt solid rgba(241,233,221,0.14); }
+    .lockup { margin-top: auto; }
+    .lockup strong {
+      display: block; font-family: "Oswald", sans-serif;
+      font-size: 9.6mm; line-height: 0.92; font-weight: 600; letter-spacing: 0.02em;
+    }
+    .story-photo { position: relative; overflow: hidden; }
+    .story-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 60% 50%; }
+    .story-photo .cap {
+      position: absolute; left: 6mm; right: 6mm; bottom: 8mm;
+      font-family: "Oswald", sans-serif; font-size: 7pt; letter-spacing: 0.26em;
+      text-transform: uppercase; color: var(--paper);
+    }
+
+    /* BRAINS */
+    .brains { background: var(--black); color: var(--paper); display: flex; flex-direction: column; }
+    .brains-head { padding: 10mm 14mm 5mm; }
+    .brains-head h1 { font-size: 10mm; line-height: 0.92; margin: 3.5mm 0 2.6mm; max-width: 178mm; }
+    .brains-head p { font-size: 9pt; line-height: 1.48; color: rgba(241,233,221,0.82); max-width: 176mm; }
+    .brains-stack {
+      flex: 1; min-height: 0; display: grid; grid-template-rows: 1fr 1fr;
+      height: calc(297mm - 50mm);
+    }
+    .brain {
+      display: grid; grid-template-columns: 1fr 1fr; min-height: 0;
+      border-top: 0.4pt solid rgba(241,233,221,0.14);
+    }
+    .brain-shot { position: relative; overflow: hidden; min-height: 0; }
+    .brain-shot img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    }
+    .brain.ram .brain-shot img { object-position: 52% 18%; }
+    .brain.dev .brain-shot img { object-position: 50% 12%; }
+    .brain-copy {
+      padding: 8mm 10mm 8mm 11mm;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .brain-copy h2 { font-size: 15pt; letter-spacing: 0.06em; margin-bottom: 1.4mm; }
+    .brain-copy .role {
+      font-family: "Oswald", sans-serif; font-size: 8pt; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--orange); line-height: 1.45; margin-bottom: 4mm;
+    }
+    .brain-copy p {
+      font-size: 8.4pt; line-height: 1.52; color: rgba(241,233,221,0.84);
+    }
+
+    /* EXPERIENCE */
+    .exp-inner { padding: 11mm 14mm 12mm; height: 297mm; display: flex; flex-direction: column; }
+    .exp h1 { font-size: 9.2mm; line-height: 0.94; margin: 3.5mm 0 3mm; max-width: 182mm; }
+    .exp-lead { font-size: 10pt; font-style: italic; line-height: 1.45; max-width: 178mm; margin-bottom: 5mm; color: #2A2A2A; }
+    .exp-photo { margin: 0 -14mm 6mm; flex: 1; min-height: 118mm; overflow: hidden; }
+    .exp-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 52%; }
+    .five { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4.5mm; }
+    .five article { border-top: 1.1pt solid var(--black); padding-top: 2.8mm; }
+    .five h2 { font-size: 12pt; letter-spacing: 0.12em; margin-bottom: 1.6mm; }
+    .five p { font-size: 8pt; line-height: 1.42; color: #3A3A3A; }
+    .on-ground {
+      margin-top: 5.5mm; font-family: "Oswald", sans-serif;
+      font-size: 7.4pt; letter-spacing: 0.16em; text-transform: uppercase; color: #4A4A4A;
+    }
+    .on-ground b { color: var(--orange); font-weight: 600; margin-right: 2.5mm; }
+    .exp-foot {
+      margin-top: 5.5mm; border-top: 1.2pt solid var(--black); padding-top: 4mm;
+      font-family: "Oswald", sans-serif; font-size: 13pt; letter-spacing: 0.1em;
+      text-transform: uppercase; line-height: 1.2;
+    }
+
+    /* PARTNERS */
+    .part-inner { padding: 10mm 14mm 11mm; height: 297mm; display: flex; flex-direction: column; }
+    .part-inner h1 { font-size: 8.2mm; line-height: 0.94; margin: 3.2mm 0 2.6mm; max-width: 186mm; }
+    .part-lead { font-size: 9.4pt; font-style: italic; line-height: 1.4; max-width: 176mm; margin-bottom: 4mm; color: #2A2A2A; }
+    .part-photo { margin: 0 -14mm 5mm; height: 38mm; overflow: hidden; }
+    .part-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+    .channels {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 2.2mm; margin-bottom: 4.5mm;
+    }
+    .channels div {
+      background: var(--black); color: var(--paper); text-align: center;
+      padding: 2.6mm 1mm; font-family: "Oswald", sans-serif;
+      font-size: 7.4pt; letter-spacing: 0.16em; text-transform: uppercase;
+    }
+    .roles {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm;
+      border-top: 1.15pt solid var(--black); padding-top: 4mm; margin-bottom: 4.5mm;
+    }
+    .roles h3 { font-size: 8.5pt; letter-spacing: 0.16em; color: var(--orange); margin-bottom: 1.6mm; }
+    .roles p { font-size: 7.6pt; line-height: 1.42; color: #333; }
+    .cats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 8mm; margin-bottom: 5mm; }
+    .cat {
+      display: grid; grid-template-columns: 7mm 1fr; gap: 2mm;
+      border-top: 0.35pt solid var(--rule-dark); padding: 1.55mm 0;
+      font-family: "Oswald", sans-serif; font-size: 6.5pt; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #4A4A4A;
+    }
+    .cat i { font-style: normal; color: var(--orange); }
+    .include-kicker {
+      font-family: "Oswald", sans-serif; font-size: 7.5pt; letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--orange); margin-bottom: 2.4mm;
+    }
+    .include {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3.5mm 6mm;
+      margin-bottom: 4mm;
+    }
+    .include article { border-top: 1.05pt solid var(--black); padding-top: 2.2mm; }
+    .include h3 { font-size: 8pt; letter-spacing: 0.14em; margin-bottom: 1.2mm; }
+    .include p { font-size: 7.2pt; line-height: 1.38; color: #3A3A3A; }
+    .closer { margin-top: auto; border-top: 1.2pt solid var(--black); padding-top: 4mm; }
+    .closer p {
+      font-family: "Oswald", sans-serif; font-size: 7.6mm; line-height: 0.94;
+      text-transform: uppercase; font-weight: 600; letter-spacing: 0.01em;
+    }
+
+    /* FUTURE */
+    .future { background: var(--black); color: var(--paper); display: flex; flex-direction: column; }
+    .future-top { padding: 10mm 14mm 0; }
+    .future-top h1 { font-size: 10.2mm; line-height: 0.94; max-width: 176mm; margin: 4mm 0 6mm; }
+    .journey {
+      display: grid; grid-template-columns: 92mm 1fr; gap: 10mm;
+      padding: 0 14mm; flex: 1; min-height: 132mm; align-items: stretch;
+    }
+    .spine { position: relative; padding-left: 6mm; }
+    .spine::before {
+      content: ""; position: absolute; left: 0; top: 2mm; bottom: 4mm;
+      width: 0.5pt; background: var(--orange);
+    }
+    .node { margin-bottom: 4.8mm; position: relative; }
+    .node::before {
+      content: ""; position: absolute; left: -7.1mm; top: 1.8mm;
+      width: 2.2mm; height: 2.2mm; background: var(--orange);
+    }
+    .node .lab {
+      font-family: "Oswald", sans-serif; font-size: 7pt; letter-spacing: 0.28em;
+      color: var(--tan); text-transform: uppercase;
+    }
+    .node h3 { font-size: 13pt; letter-spacing: 0.08em; margin-top: 0.6mm; }
+    .node.future-vision {
+      background: var(--paper); color: var(--black);
+      padding: 4.5mm 5mm 5mm; margin-left: -4mm; border: 0;
+    }
+    .node.future-vision::before { left: -3.1mm; }
+    .badge {
+      display: inline-block; font-family: "Oswald", sans-serif; font-size: 6.5pt;
+      letter-spacing: 0.32em; color: #fff; background: var(--black);
+      padding: 0.9mm 2.6mm; margin-bottom: 2mm;
+    }
+    .node.future-vision .lab { color: var(--orange); }
+    .node.future-vision h3 { font-size: 12pt; color: var(--black); }
+    .disclaimer {
+      font-size: 8pt; line-height: 1.45; color: #3A3A3A;
+      font-style: italic; margin-top: 2.2mm;
+    }
+    .desert { position: relative; overflow: hidden; min-height: 0; height: 100%; }
+    .desert img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; }
+    .desert .veil {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(13,13,13,0.1) 0%, rgba(13,13,13,0.72) 100%);
+    }
+    .desert .cap {
+      position: absolute; left: 6mm; right: 6mm; bottom: 6mm;
+      font-family: "Oswald", sans-serif; font-size: 7pt; letter-spacing: 0.24em; text-transform: uppercase;
+    }
+    .end {
+      margin: 5mm 14mm 6mm; font-size: 9pt; line-height: 1.55;
+      color: rgba(241,233,221,0.88); max-width: 182mm;
+    }
+    .contact-wrap {
+      background: var(--paper); color: var(--black);
+      padding: 7mm 14mm 8mm; display: grid; grid-template-columns: 1fr 22mm;
+      gap: 8mm; align-items: end; margin-top: auto;
+    }
+    .earn {
+      font-family: "Oswald", sans-serif; font-size: 14pt; letter-spacing: 0.16em;
+      color: var(--orange); margin-bottom: 1.2mm;
+    }
+    .partner {
+      font-family: "Oswald", sans-serif; font-size: 9pt; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 4mm; font-weight: 500;
+    }
+    .who strong { font-family: "Oswald", sans-serif; font-size: 12pt; letter-spacing: 0.06em; font-weight: 600; }
+    .who .role {
+      font-family: "Oswald", sans-serif; font-size: 8pt; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--muted); margin: 0.6mm 0 2.4mm;
+    }
+    .coords { font-family: "Oswald", sans-serif; font-size: 8pt; letter-spacing: 0.08em; line-height: 1.7; }
+    .qr { width: 22mm; height: 22mm; object-fit: cover; }
+
+    body.solo { background: #000; }
+    body.solo .screen-bar { display: none !important; }
+    body.solo .spread { padding: 0; gap: 0; }
+    body.solo .page { box-shadow: none; }
+
+    @media print {
+      .screen-bar { display: none !important; }
+      html, body { background: #fff; }
+      .spread { padding: 0; gap: 0; }
+      .page { box-shadow: none; page-break-after: always; break-after: page; }
+      .page:last-child { page-break-after: auto; }
+      @page { size: A4 portrait; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="screen-bar">
+    <span>DRC Ultimate Rider · 7-page A4</span>
+    <button type="button" onclick="window.print()">Print / Save PDF</button>
+  </div>
+
+  <div class="spread">
+
+    <!-- 1 COVER -->
+    <article class="page cover">
+      <img class="bleed" src="cover.png" alt="Dirt bike rider launching through dust" />
+      <div class="veil"></div>
+      <header class="cover-top">
+        <div class="drc-mark"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+      </header>
+      <div class="cover-copy">
+        <h1>ULTIMATE<br />RIDER</h1>
+        <div class="cover-line">The first official DRC Race</div>
+        <div class="cover-rule"></div>
+        <div class="cover-foot">
+          <div class="cover-where">
+            12–13 December 2026<br />
+            Bengaluru
+            <em>The flag-off of DRC Racing · 6 races · Across India</em>
+          </div>
+          <div class="venue">
+            <img src="tribal-adventure.png" alt="Tribal Adventure" />
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 2 THE WEEKEND -->
+    <article class="page race">
+      <div class="race-hero">
+        <img src="mud.png" alt="Dirt bike through slush and mud" />
+        <div class="veil"></div>
+        <div class="race-hero-copy">
+          <div class="folio" style="color:#B9A886;margin-bottom:4mm;">
+            <span>The Weekend</span>
+            <span>DRC Ultimate Rider</span>
+          </div>
+          <p class="kicker">Two days. Every surface.</p>
+          <h1>Not just a race.<br />It’s a test of everything.</h1>
+        </div>
+      </div>
+      <div class="race-body">
+        <p class="race-intro">DRC Ultimate Rider is a two-day motorsport event built to test riders across different forms of off-road riding — not a single type of terrain. Saturday filters the field. Sunday decides it. The same dirt. One prize pool across the weekend.</p>
+        <div class="days">
+          <div class="day">
+            <h2>Saturday</h2>
+            <div class="when">Qualification · Elimination · Challenges</div>
+            <p>Saturday is the proving ground: qualification, elimination and multiple challenges across every surface. The day is built to strip the field down. The riders who last the day have not won. They have only earned Sunday.</p>
+          </div>
+          <div class="day">
+            <h2>Sunday</h2>
+            <div class="when">The Final</div>
+            <p>Sunday is the Final. The field is smaller. The surfaces still change. This is where the weekend is decided — after every rider still standing has already been tested.</p>
+          </div>
+        </div>
+        <div class="surfaces">
+          <span>Enduro</span>
+          <span>Rock Garden</span>
+          <span>Hill Climb</span>
+          <span>Slush</span>
+          <span>Mud</span>
+          <span>Technical</span>
+        </div>
+        <div class="race-still">
+          <img src="../drc-race/drc-race-07-hillclimb.jpg" alt="Hill climb" />
+        </div>
+        <div class="pool">
+          <div>
+            <div class="amt">₹5 LAKH</div>
+            <div class="lab">Overall prize pool</div>
+          </div>
+          <div>
+            <div class="hook">Five lakh.<br />On the line.</div>
+            <p>An overall prize pool for the two-day event — across Saturday, Sunday and every surface.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 3 PLATFORM -->
+    <article class="page story">
+      <div class="story-grid">
+        <div class="story-copy">
+          <div class="folio">
+            <span>The Platform</span>
+            <span>Dirt Ride Camp</span>
+          </div>
+          <h1>We are not building just another race.</h1>
+          <p class="belief">Adventure isn’t found. It’s earned.</p>
+          <p>That is the belief Dirt Ride Camp was built on. DRC exists because Indian motorcycle culture has always been larger than the space it was given. What was missing was a home: a world around the rider — not a single weekend, and not a single start line.</p>
+          <p>We are building a motorcycle and adventure world where riding, training, adventure, motorsport, racing, experiences, community, content and brands belong together.</p>
+          <div class="pillars">
+            <span>Riding</span>
+            <span>Training</span>
+            <span>Adventure</span>
+            <span>Motorsport</span>
+            <span>Racing</span>
+            <span>Experiences</span>
+            <span>Community</span>
+            <span>Content</span>
+            <span>Brands</span>
+          </div>
+          <p>DRC Ultimate Rider is the first official DRC Race, and the flag-off of DRC Racing. Not a finale. A beginning.</p>
+          <div class="lockup">
+            <strong>6 RACES.</strong>
+            <strong>EVERY YEAR.</strong>
+            <strong>ACROSS INDIA.</strong>
+          </div>
+        </div>
+        <div class="story-photo">
+          <img src="rocks.png" alt="Rider walking a technical rock garden" />
+          <div class="cap">The rider is the centre.</div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 4 BRAINS -->
+    <article class="page brains">
+      <div class="brains-head">
+        <div class="folio">
+          <span>The People</span>
+          <span>Brains behind the machines</span>
+        </div>
+        <h1>The brains behind the machines.</h1>
+        <p>This race is not hired in. It is built by people who ride — and by the ground that already knows how to hold a championship.</p>
+      </div>
+      <div class="brains-stack">
+        <div class="brain ram">
+          <div class="brain-shot">
+            <img src="ramswarup.jpg" alt="Ramswarup Kulhary, Founder of DRC" />
+          </div>
+          <div class="brain-copy">
+            <h2>Ramswarup Kulhary</h2>
+            <div class="role">Founder &amp; MD, DRC — Dirt Ride Camp<br />Enduro rider</div>
+            <p>He is building DRC around a simple belief: adventure isn’t found, it’s earned. Dirt Ride Camp is a world around the rider — riding, training, adventure, motorsport and community in one place. Ultimate Rider is the first official DRC Race, and the flag-off of DRC Racing: six races every year, across India.</p>
+          </div>
+        </div>
+        <div class="brain dev">
+          <div class="brain-copy">
+            <h2>Dev Venkat</h2>
+            <div class="role">Tribal Adventure<br />3 X National Champion</div>
+            <p>The flag-off lands on ground that already knows how to hold a championship. Dev built Tribal Adventure into a home for serious off-road riding. Ultimate Rider is here because the dirt, the people and the standard already exist.</p>
+          </div>
+          <div class="brain-shot">
+            <img src="dev.jpg" alt="Dev Venkat, Tribal Adventure" />
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- 5 EXPERIENCE -->
+    <article class="page exp">
+      <div class="exp-inner">
+        <div class="folio" style="color:#8A8276;">
+          <span>The Experience</span>
+          <span>Around the race</span>
+        </div>
+        <h1>The race is the heart.<br />The experience is everything around it.</h1>
+        <p class="exp-lead">A spectator at DRC Ultimate Rider does not only stand at a fence. They enter a two-day motorsport weekend — and they stay.</p>
+        <div class="exp-photo">
+          <img src="night.png" alt="Riders gathered at night around a dirt bike" />
+        </div>
+        <div class="five">
+          <article>
+            <h2>Watch</h2>
+            <p>Championship racing. Saturday’s filter. Sunday’s Final. Every surface, in public.</p>
+          </article>
+          <article>
+            <h2>Play</h2>
+            <p>ATV rides. Kids activities. Rider experiences on the ground.</p>
+          </article>
+          <article>
+            <h2>Eat</h2>
+            <p>Food as a place to land between sessions — and a reason to stay.</p>
+          </article>
+          <article>
+            <h2>Connect</h2>
+            <p>Community. Riders. Brand activations where the weekend actually happens.</p>
+          </article>
+          <article>
+            <h2>Celebrate</h2>
+            <p>A DJ night party after the engines quiet.</p>
+          </article>
+        </div>
+        <div class="on-ground"><b>On ground</b> ATV · Food · DJ Night · Kids Activities · Rider Experience · Community · Brand Activations · Motorsport</div>
+        <div class="exp-foot">Watch · Play · Eat · Connect · Celebrate</div>
+      </div>
+    </article>
+
+    <!-- 6 PARTNERS -->
+    <article class="page exp">
+      <div class="part-inner">
+        <div class="folio" style="color:#8A8276;">
+          <span>Partners</span>
+          <span>A role, not a banner</span>
+        </div>
+        <h1>Your brand doesn’t need a banner.<br />It needs a role.</h1>
+        <p class="part-lead">If you put a motorcycle, a tyre, a helmet or a table into this weekend, you should know exactly what that buys.</p>
+        <div class="part-photo">
+          <img src="../drc-editorial/drc-editorial-08-tyre.jpg" alt="Tyre and machine in the dirt" />
+        </div>
+        <div class="roles">
+          <article>
+            <h3>Title Partner</h3>
+            <p>Naming association with DRC Ultimate Rider. Lead presence across racing, riders, experiences, content and community.</p>
+          </article>
+          <article>
+            <h3>Motorcycle Partner</h3>
+            <p>Official motorcycle of the flag-off. The machine across enduro, rock garden, hill climb, slush, mud and technical ground.</p>
+          </article>
+          <article>
+            <h3>Experience Partner</h3>
+            <p>A live role inside what already exists: ATV, food, DJ night, kids activities, rider experiences, community.</p>
+          </article>
+        </div>
+        <div class="cats">
+          <div class="cat"><i>01</i> Title Partner</div>
+          <div class="cat"><i>02</i> Powered By Partner</div>
+          <div class="cat"><i>03</i> Official Motorcycle Partner</div>
+          <div class="cat"><i>04</i> Official Tyre Partner</div>
+          <div class="cat"><i>05</i> Official Lubricant Partner</div>
+          <div class="cat"><i>06</i> Official Riding Gear Partner</div>
+          <div class="cat"><i>07</i> Official Helmet Partner</div>
+          <div class="cat"><i>08</i> Official Performance Partner</div>
+          <div class="cat"><i>09</i> Official Hydration Partner</div>
+          <div class="cat"><i>10</i> Official Energy Partner</div>
+          <div class="cat"><i>11</i> Official Nutrition Partner</div>
+          <div class="cat"><i>12</i> Official Technology Partner</div>
+          <div class="cat"><i>13</i> Official Content &amp; Camera Partner</div>
+          <div class="cat"><i>14</i> Official Safety &amp; Medical Partner</div>
+          <div class="cat"><i>15</i> Official Media Partner</div>
+        </div>
+        <div class="channels">
+          <div>Race</div>
+          <div>Experience</div>
+          <div>Content</div>
+          <div>Community</div>
+          <div>Hospitality</div>
+        </div>
+        <div class="include-kicker">Partnership can include</div>
+        <div class="include">
+          <article>
+            <h3>Brand visibility</h3>
+            <p>Race zones · Podium · Event branding</p>
+          </article>
+          <article>
+            <h3>Product integration</h3>
+            <p>Rider use · Product display · Demonstration</p>
+          </article>
+          <article>
+            <h3>Content</h3>
+            <p>Race films · Social integration · Rider stories</p>
+          </article>
+          <article>
+            <h3>Activation</h3>
+            <p>Consumer experiences · Challenges · Product trials</p>
+          </article>
+          <article>
+            <h3>Hospitality</h3>
+            <p>VIP · Dealers · Customers · Corporate</p>
+          </article>
+          <article>
+            <h3>Exclusivity</h3>
+            <p>One category. One official partner.</p>
+          </article>
+        </div>
+        <div class="closer">
+          <p>Don’t sponsor the race.<br />Own a part of the experience.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- 7 FUTURE -->
+    <article class="page future">
+      <div class="future-top">
+        <div class="folio">
+          <span>The Flag-off</span>
+          <span>December 2026</span>
+        </div>
+        <h1>This is not the finish line.<br />It’s the flag-off.</h1>
+      </div>
+      <div class="journey">
+        <div class="spine">
+          <div class="node">
+            <div class="lab">Bengaluru</div>
+            <h3>First official DRC Race</h3>
+          </div>
+          <div class="node">
+            <div class="lab">The platform</div>
+            <h3>DRC Racing</h3>
+          </div>
+          <div class="node">
+            <div class="lab">The calendar</div>
+            <h3>6 races every year</h3>
+          </div>
+          <div class="node">
+            <div class="lab">The country</div>
+            <h3>Across India</h3>
+          </div>
+          <div class="node future-vision">
+            <div class="badge">Future vision</div>
+            <div class="lab">Rajasthan</div>
+            <h3>5-day desert endurance<br />DRC Mini Dakar</h3>
+            <p class="disclaimer">The horizon is a five-day desert endurance in Rajasthan. A DRC vision. Not an existing event. Not an official Dakar event.</p>
+          </div>
+        </div>
+        <div class="desert">
+          <img src="desert.png" alt="Empty desert dunes at dusk" />
+          <div class="veil"></div>
+          <div class="cap">The horizon — not the calendar.</div>
+        </div>
+      </div>
+      <p class="end">The long-term DRC vision is a recognizable Indian motorcycle culture and motorsport platform — where riders can participate, compete, learn, experience and connect. DRC Ultimate Rider is where that racing culture starts. The brands that take a role here are present at the beginning.</p>
+      <div class="contact-wrap">
+        <div>
+          <div class="earn">Adventure isn’t found. It’s earned.</div>
+          <div class="partner">Partner with DRC.</div>
+          <div class="who">
+            <strong>Ramswarup Kulhary</strong>
+            <div class="role">Founder &amp; MD · DRC — Dirt Ride Camp</div>
+            <div class="coords">
+              M &nbsp; 94148 70102<br />
+              E &nbsp; info@dirtridecamp.com<br />
+              W &nbsp; www.dirtridecamp.com<br />
+              IG &nbsp; @dirtridecamp
+            </div>
+          </div>
+        </div>
+        <img class="qr" src="qr.png" alt="QR code to dirtridecamp.com" />
+      </div>
+    </article>
+
+  </div>
+  <script>
+    (function () {
+      var page = new URLSearchParams(window.location.search).get("page");
+      if (!page) return;
+      document.body.classList.add("solo");
+      document.querySelectorAll(".page").forEach(function (el, i) {
+        el.style.display = String(i + 1) === page ? "" : "none";
+      });
+    })();
+  </script>
+</body>
+</html>

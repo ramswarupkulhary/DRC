@@ -89,10 +89,10 @@ export function Navbar() {
         <div className={cn("flex items-center justify-between transition-all duration-300", scrolled ? "h-16" : "h-16 sm:h-20")}>
           <Link href="/" className="flex items-center gap-3 shrink-0" aria-label="DRC Motorsports — home">
             <Image
-              src="/brand/drc-motorsports.png"
+              src="/brand/drc-logo-main.png"
               alt="DRC Motorsports"
-              width={160}
-              height={160}
+              width={360}
+              height={240}
               priority
               className={cn("w-auto transition-all duration-300", scrolled ? "h-11" : "h-12 sm:h-14")}
             />

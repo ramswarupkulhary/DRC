@@ -36,6 +36,14 @@ export const metadata: Metadata = {
     default: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides in Bangalore",
     template: "%s | DRC Dirt Ride Camp",
   },
+  icons: {
+    icon: [
+      { url: "/brand/drc-logo-main.png", type: "image/png" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png" }],
+    shortcut: ["/brand/drc-logo-main.png"],
+  },
   description:
     "A small Bangalore off-road riding club and academy. We run limited-slot adventure rides, hands-on dirt-bike training, and camping trips across Karnataka and India — six riders per group, a support jeep, a real fire at camp.",
   keywords: [

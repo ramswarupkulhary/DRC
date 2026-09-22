@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DRC Ultimate Rider — Instagram story</title>
+  <style>
+    @font-face {
+      font-family: "Oswald";
+      src: url("../ultimate-rider/fonts/Oswald.ttf") format("truetype");
+      font-weight: 200 700;
+      font-style: normal;
+      font-display: block;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #000; }
+    .story {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      background: #0A0908;
+      color: #F1E9DD;
+      font-family: "Oswald", sans-serif;
+    }
+    .bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 58% 42%;
+      filter: contrast(1.12) saturate(0.92) brightness(0.86);
+    }
+    .veil {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(8,7,6,0.78) 0%, rgba(8,7,6,0.08) 22%, rgba(8,7,6,0.05) 46%, rgba(8,7,6,0.55) 68%, rgba(8,7,6,0.94) 100%),
+        linear-gradient(90deg, rgba(8,7,6,0.35) 0%, rgba(8,7,6,0) 40%);
+    }
+    .grain {
+      position: absolute;
+      inset: 0;
+      background: url("grain.jpg") center / cover;
+      mix-blend-mode: overlay;
+      opacity: 0.34;
+      pointer-events: none;
+    }
+    .scratch {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(92deg, transparent 0 7px, rgba(255,255,255,0.015) 7px 8px);
+      mix-blend-mode: soft-light;
+    }
+    .inner {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      padding: 210px 58px 250px;
+      display: flex;
+      flex-direction: column;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .drc {
+      font-size: 52px;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .drc .r { color: #E8622C; }
+    .stamp {
+      font-size: 16px;
+      letter-spacing: 0.28em;
+      font-weight: 500;
+      color: #E8622C;
+      border: 1.5px solid #E8622C;
+      padding: 8px 12px 7px;
+      transform: rotate(-6deg);
+    }
+    .hero { margin-top: auto; }
+    .kicker {
+      font-size: 18px;
+      letter-spacing: 0.42em;
+      color: #E8622C;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .money {
+      font-size: 168px;
+      line-height: 0.82;
+      letter-spacing: -0.03em;
+      font-weight: 600;
+      color: #E8622C;
+      text-shadow: 0 10px 0 rgba(0,0,0,0.35);
+    }
+    .hook {
+      margin-top: 18px;
+      font-size: 64px;
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      font-weight: 600;
+    }
+    .meta {
+      margin-top: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+    }
+    .event {
+      font-size: 28px;
+      letter-spacing: 0.2em;
+      font-weight: 500;
+    }
+    .event span {
+      display: block;
+      margin-top: 8px;
+      font-size: 20px;
+      letter-spacing: 0.18em;
+      color: #B9A886;
+      font-weight: 500;
+    }
+    .tribal {
+      width: 320px;
+      height: auto;
+      transform: rotate(4deg);
+      filter: drop-shadow(0 8px 0 rgba(0,0,0,0.45));
+    }
+  </style>
+</head>
+<body>
+  <article class="story">
+    <img class="bg" src="../ultimate-rider/mud.png" alt="" />
+    <div class="veil"></div>
+    <div class="grain"></div>
+    <div class="scratch"></div>
+    <div class="inner">
+      <div class="top">
+        <div class="drc"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+        <div class="stamp">FIRST OFFICIAL RACE</div>
+      </div>
+      <div class="hero">
+        <div class="kicker">OVERALL PRIZE POOL</div>
+        <div class="money">₹5 LAKH</div>
+        <div class="hook">ON THE DIRT.</div>
+        <div class="meta">
+          <div class="event">
+            ULTIMATE RIDER
+            <span>12–13 DEC · BENGALURU</span>
+          </div>
+          <img class="tribal" src="tribal-adventure-clear.png" alt="Tribal Adventure" />
+        </div>
+      </div>
+    </div>
+  </article>
+</body>
+</html>

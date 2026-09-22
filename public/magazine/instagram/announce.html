@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DRC Ultimate Rider — Instagram announcement</title>
+  <style>
+    @font-face {
+      font-family: "Oswald";
+      src: url("../ultimate-rider/fonts/Oswald.ttf") format("truetype");
+      font-weight: 200 700;
+      font-style: normal;
+      font-display: block;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #111; }
+    .poster {
+      position: relative;
+      overflow: hidden;
+      width: 1080px;
+      height: 1350px;
+      background: #111110;
+      color: #F1E9DD;
+      font-family: "Oswald", sans-serif;
+    }
+    .poster.square { width: 1080px; height: 1080px; }
+    .poster.story { width: 1080px; height: 1920px; }
+
+    img { display: block; max-width: 100%; }
+
+    .shot {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 70%;
+      object-fit: cover;
+      object-position: 52% 8%;
+    }
+    .poster.square .shot { height: 64%; object-position: 52% 10%; }
+    .poster.story .shot {
+      height: 70%;
+      object-position: 50% 38%;
+    }
+
+    .board {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 32%;
+      background: #111110;
+      padding: 28px 48px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .poster.square .board { height: 40%; padding: 26px 44px 34px; }
+    .poster.story .board {
+      height: 34%;
+      background: #111110;
+      padding: 28px 52px 170px;
+    }
+
+    .kicker {
+      font-size: 17px;
+      letter-spacing: 0.32em;
+      color: #E8622C;
+      font-weight: 500;
+    }
+    .drc {
+      font-size: 28px;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+      line-height: 1;
+      margin: 10px 0 6px;
+    }
+    .drc .r { color: #E8622C; }
+    .name {
+      font-size: 92px;
+      line-height: 0.82;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+    }
+    .poster.square .name { font-size: 78px; }
+    .poster.story .name { font-size: 96px; }
+    .name em {
+      font-style: normal;
+      color: #E8622C;
+    }
+    .surfaces {
+      margin-top: 12px;
+      font-size: 14px;
+      letter-spacing: 0.16em;
+      color: #8A8276;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .facts {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      margin-top: 18px;
+    }
+    .pool {
+      font-size: 44px;
+      line-height: 0.9;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #E8622C;
+    }
+    .poster.square .pool { font-size: 38px; }
+    .pool span {
+      display: block;
+      margin-top: 5px;
+      font-size: 14px;
+      letter-spacing: 0.26em;
+      color: #B9A886;
+      font-weight: 500;
+    }
+    .when {
+      font-size: 22px;
+      letter-spacing: 0.14em;
+      font-weight: 500;
+      line-height: 1.35;
+      text-align: right;
+    }
+    .when b {
+      display: block;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      color: #B9A886;
+      margin-bottom: 4px;
+    }
+    .tribal {
+      position: absolute;
+      top: 32px;
+      right: 36px;
+      width: 200px;
+      height: auto;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.55));
+    }
+    .poster.square .tribal { width: 176px; top: 24px; right: 28px; }
+    .poster.story .tribal { width: 220px; top: 200px; right: 40px; }
+  </style>
+</head>
+<body>
+  <article class="poster feed" id="poster">
+    <img class="shot" src="hillclimb-clean.jpg" alt="" />
+    <img class="tribal" src="tribal-adventure-clear.png" alt="Tribal Adventure" />
+    <div class="board">
+      <div>
+        <div class="kicker">THE FIRST OFFICIAL DRC RACE</div>
+        <div class="drc"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+        <div class="name">ULTIMATE <em>RIDER</em></div>
+        <div class="surfaces">Enduro · Rock Garden · Hill Climb · Slush · Mud · Technical</div>
+      </div>
+      <div class="facts">
+        <div class="pool">
+          ₹5 LAKH
+          <span>Overall prize pool</span>
+        </div>
+        <div class="when">
+          <b>FLAG-OFF · 6 RACES · ACROSS INDIA</b>
+          12–13 DEC 2026<br />
+          BENGALURU
+        </div>
+      </div>
+    </div>
+  </article>
+  <script>
+    (function () {
+      var format = new URLSearchParams(window.location.search).get("format");
+      var el = document.getElementById("poster");
+      if (format === "1x1" || format === "square") el.className = "poster square";
+      if (format === "9x16" || format === "story") el.className = "poster story";
+    })();
+  </script>
+</body>
+</html>

@@ -14,10 +14,10 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Image
-              src="/brand/drc-motorsports.png"
+              src="/brand/drc-logo-main.png"
               alt="DRC Motorsports"
-              width={220}
-              height={220}
+              width={360}
+              height={240}
               className="h-24 w-auto"
             />
             <p className="text-sm text-muted leading-relaxed">

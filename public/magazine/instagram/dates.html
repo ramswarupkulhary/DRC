@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DRC Ultimate Rider — Dates announcement</title>
+  <style>
+    @font-face {
+      font-family: "Oswald";
+      src: url("../ultimate-rider/fonts/Oswald.ttf") format("truetype");
+      font-weight: 200 700;
+      font-style: normal;
+      font-display: block;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #120c08; }
+    .poster {
+      position: relative;
+      overflow: hidden;
+      width: 1080px;
+      height: 1350px;
+      background: #120c08;
+      color: #F6EBDA;
+      font-family: "Oswald", sans-serif;
+    }
+    .poster.square { width: 1080px; height: 1080px; }
+    .poster.story { width: 1080px; height: 1920px; }
+
+    .bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: 50% 62%;
+      filter: saturate(1.12) contrast(1.08) brightness(0.78);
+      z-index: 1;
+    }
+    .poster.story .bg { object-position: 50% 55%; }
+
+    .veil {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background:
+        linear-gradient(180deg, rgba(18,12,8,0.28) 0%, rgba(18,12,8,0.08) 28%, rgba(18,12,8,0.2) 52%, rgba(18,12,8,0.78) 100%),
+        linear-gradient(90deg, rgba(18,12,8,0.55) 0%, rgba(18,12,8,0.12) 48%, rgba(18,12,8,0.05) 100%);
+    }
+    .poster.square .veil {
+      background:
+        linear-gradient(180deg, rgba(18,12,8,0.32) 0%, rgba(18,12,8,0.12) 36%, rgba(18,12,8,0.82) 100%),
+        linear-gradient(90deg, rgba(18,12,8,0.5) 0%, rgba(18,12,8,0.1) 55%, transparent 100%);
+    }
+
+    .copy {
+      position: absolute;
+      z-index: 3;
+      left: 48px;
+      right: 48px;
+      top: 42px;
+      bottom: 48px;
+      display: flex;
+      flex-direction: column;
+    }
+    .poster.square .copy { top: 34px; left: 42px; right: 42px; bottom: 36px; }
+    .poster.story .copy { top: 210px; left: 52px; right: 52px; bottom: 180px; }
+
+    .kicker {
+      font-size: 15px;
+      letter-spacing: 0.34em;
+      color: #E8622C;
+      font-weight: 500;
+    }
+    .drc {
+      margin-top: 14px;
+      font-size: 34px;
+      letter-spacing: 0.16em;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .drc .r { color: #E8622C; }
+    .name {
+      margin-top: 6px;
+      font-size: 58px;
+      line-height: 0.88;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      max-width: 640px;
+    }
+    .poster.square .name { font-size: 50px; }
+    .poster.story .name { font-size: 62px; }
+    .name em {
+      font-style: normal;
+      color: #E8622C;
+    }
+    .when {
+      margin-top: 28px;
+    }
+    .day {
+      font-size: 148px;
+      line-height: 0.78;
+      font-weight: 600;
+      letter-spacing: -0.045em;
+      color: #F6EBDA;
+      text-shadow: 0 10px 28px rgba(18,12,8,0.45);
+    }
+    .poster.square .day { font-size: 124px; }
+    .poster.story .day { font-size: 156px; }
+    .month {
+      margin-top: 4px;
+      font-size: 36px;
+      letter-spacing: 0.22em;
+      font-weight: 600;
+      color: #E8622C;
+    }
+    .poster.square .month { font-size: 30px; }
+
+    .meta {
+      margin-top: auto;
+      max-width: 520px;
+    }
+    .place {
+      font-size: 22px;
+      letter-spacing: 0.16em;
+      font-weight: 500;
+    }
+    .surfaces {
+      margin-top: 8px;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      color: rgba(246,235,218,0.62);
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .flag {
+      margin-top: 16px;
+      font-size: 13px;
+      letter-spacing: 0.24em;
+      color: #E8622C;
+      font-weight: 500;
+    }
+
+    .fg {
+      position: absolute;
+      z-index: 4;
+      right: -2%;
+      bottom: -2%;
+      height: 80%;
+      width: auto;
+      filter: drop-shadow(0 18px 40px rgba(8,4,2,0.55));
+      pointer-events: none;
+    }
+    .poster.square .fg { height: 88%; right: -4%; bottom: -6%; }
+    .poster.story .fg { height: 58%; right: -2%; bottom: 8%; }
+
+    .tribal {
+      position: absolute;
+      z-index: 5;
+      top: 36px;
+      right: 36px;
+      width: 188px;
+      height: auto;
+      filter: drop-shadow(0 8px 14px rgba(0,0,0,0.5));
+    }
+    .poster.square .tribal { width: 160px; top: 26px; right: 28px; }
+    .poster.story .tribal { width: 210px; top: 200px; right: 40px; }
+  </style>
+</head>
+<body>
+  <article class="poster feed" id="poster">
+    <img class="bg" src="../ultimate-rider/desert.png" alt="" />
+    <div class="veil"></div>
+    <div class="copy">
+      <div class="kicker">THE FIRST OFFICIAL DRC RACE</div>
+      <div class="drc"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+      <div class="name">ULTIMATE <em>RIDER</em></div>
+      <div class="when">
+        <div class="day">12–13</div>
+        <div class="month">DECEMBER 2026</div>
+      </div>
+      <div class="meta">
+        <div class="place">BENGALURU · TRIBAL ADVENTURE</div>
+        <div class="surfaces">Enduro · Rock Garden · Hill Climb · Slush · Mud · Technical</div>
+        <div class="flag">THE FLAG-OFF OF DRC RACING</div>
+      </div>
+    </div>
+    <img class="fg" src="rider-fg.png" alt="" />
+    <img class="tribal" src="tribal-adventure-clear.png" alt="Tribal Adventure" />
+  </article>
+  <script>
+    (function () {
+      var format = new URLSearchParams(window.location.search).get("format");
+      var el = document.getElementById("poster");
+      if (format === "1x1" || format === "square") el.className = "poster square";
+      if (format === "9x16" || format === "story") el.className = "poster story";
+    })();
+  </script>
+</body>
+</html>
