@@ -32,44 +32,57 @@ const pillars = [
 
 export function AnimatedHero() {
   return (
-    <section className="relative border-b border-border overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle_at_1px_1px,rgba(30,26,20,1)_1px,transparent_0)] [background-size:14px_14px]" />
+    <section className="relative overflow-hidden border-b border-border">
+      {/* Racing grid + orange stripe glow. */}
+      <div className="absolute inset-0 bg-grid opacity-40 pointer-events-none" />
+      <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-orange/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-14 sm:pb-20">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 pb-16 sm:pb-24">
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end"
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="lg:col-span-8">
-            <span className="eyebrow">DRC Motorsports Pvt Ltd &middot; Est. Bengaluru</span>
-            <h1 className="font-heading text-[2.75rem] leading-[1.02] sm:text-6xl lg:text-[5.5rem] font-semibold mt-4 max-w-4xl">
-              Adventure isn&rsquo;t found. It&rsquo;s earned.
-            </h1>
-            <p className="font-heading italic text-xl sm:text-2xl text-tan-dark mt-5 max-w-2xl">
-              An Indian motorcycle culture &amp; motorsport platform — racing, training, adventure and community, in one place.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8">
-              <Link href="/events">
-                <Button size="lg">See DRC Ultimate Rider <ArrowRight className="w-5 h-5" /></Button>
-              </Link>
-              <Link href="/rides" className="font-heading text-lg underline decoration-tan-dark/40 underline-offset-4 hover:text-orange hover:decoration-orange transition-colors">
-                or explore rides &amp; training →
-              </Link>
-            </div>
+          <div className="flex items-center gap-3 mb-6">
+            <span className="h-px w-10 bg-orange" />
+            <span className="eyebrow">DRC Motorsports Pvt Ltd &middot; Bengaluru</span>
           </div>
 
-          <aside className="lg:col-span-4 border-t-2 border-tan-dark/40 pt-5 lg:border-t-0 lg:border-l-2 lg:pt-0 lg:pl-6 lg:self-stretch flex flex-col justify-end">
-            <p className="font-mono text-xs text-tan-dark uppercase tracking-widest">The platform</p>
-            <p className="font-heading text-lg leading-snug mt-3 text-foreground/85">
-              Riding &middot; Training &middot; Adventure &middot; Motorsport &middot; Racing &middot; Experiences &middot; Community &middot; Content &middot; Brands.
-            </p>
-            <p className="font-body text-sm text-muted mt-4 leading-relaxed">
-              The rider is the centre. Everything else is built around that.
-            </p>
-          </aside>
+          <h1 className="font-heading font-bold uppercase text-[3.25rem] sm:text-[5rem] lg:text-[7.5rem] leading-[0.92] tracking-[-0.02em] max-w-5xl">
+            Adventure isn&rsquo;t found.
+            <br />
+            <span className="text-orange">It&rsquo;s earned.</span>
+          </h1>
+
+          <p className="mt-8 text-lg sm:text-xl text-foreground/70 max-w-2xl leading-relaxed">
+            An Indian motorcycle culture &amp; motorsport platform. Racing, training, adventure and community — built around the rider.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-10">
+            <Link href="/events">
+              <Button size="lg" className="uppercase tracking-wider">
+                DRC Ultimate Rider <ArrowRight className="w-5 h-5" />
+              </Button>
+            </Link>
+            <Link href="/rides" className="font-heading uppercase tracking-widest text-sm text-foreground/70 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1">
+              Rides &amp; Training →
+            </Link>
+          </div>
+
+          <div className="mt-16 pt-8 border-t border-border/60 grid grid-cols-2 sm:grid-cols-4 gap-8 max-w-4xl">
+            {[
+              { k: "The Platform", v: "DRC Racing" },
+              { k: "The Calendar", v: "6 Races / Year" },
+              { k: "The Country", v: "India" },
+              { k: "The Flag-off", v: "Dec 12–13, 2026" },
+            ].map((it) => (
+              <div key={it.k}>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-orange">{it.k}</div>
+                <div className="font-heading text-lg sm:text-xl font-bold uppercase mt-2">{it.v}</div>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>
@@ -79,18 +92,18 @@ export function AnimatedHero() {
 export function AnimatedStats() {
   const items = [
     { k: "Official races / year", v: "6" },
-    { k: "Prize pool — Ultimate Rider", v: "₹5L" },
+    { k: "Ultimate Rider prize pool", v: "₹5L" },
     { k: "Flag-off", v: "Dec\u00A012\u201313" },
     { k: "Country", v: "India" },
   ];
   return (
-    <section className="bg-surface border-y border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border/60">
+    <section className="bg-background border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border">
           {items.map((it) => (
-            <div key={it.k} className="px-2 py-4 md:py-2 md:px-6 first:pl-0 last:pr-0">
-              <div className="font-heading text-3xl sm:text-4xl font-semibold text-foreground">{it.v}</div>
-              <div className="font-mono text-[11px] text-tan-dark uppercase tracking-widest mt-1">{it.k}</div>
+            <div key={it.k} className="py-8 md:py-10 md:px-8 first:md:pl-0">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-orange">{it.k}</div>
+              <div className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold uppercase mt-3 leading-none">{it.v}</div>
             </div>
           ))}
         </div>
@@ -101,71 +114,83 @@ export function AnimatedStats() {
 
 export function UltimateRiderSpotlight() {
   return (
-    <section className="relative border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+    <section className="relative border-b border-border bg-surface overflow-hidden">
+      <div className="absolute top-0 right-0 w-2 h-full bg-orange" />
+      <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           <div className="lg:col-span-7">
-            <span className="eyebrow">The first official DRC race</span>
-            <h2 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-semibold mt-3 leading-[1.02]">
-              DRC Ultimate Rider.
+            <div className="flex items-center gap-3 mb-4">
+              <span className="h-px w-10 bg-orange" />
+              <span className="eyebrow">The first official DRC race</span>
+            </div>
+            <h2 className="font-heading font-bold uppercase text-4xl sm:text-6xl lg:text-7xl leading-[0.95] tracking-[-0.02em]">
+              DRC <span className="text-orange">Ultimate</span> Rider.
             </h2>
-            <p className="font-heading italic text-xl text-tan-dark mt-4 max-w-2xl">
+            <p className="mt-6 text-lg sm:text-xl text-foreground/70 max-w-2xl leading-relaxed">
               Two days. Every surface. Not just a race — a test of everything.
             </p>
 
-            <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl">
-              <div>
-                <div className="font-mono text-[10px] text-tan-dark uppercase tracking-widest">Dates</div>
-                <div className="font-heading text-lg mt-1">12 &ndash; 13 Dec 2026</div>
-              </div>
-              <div>
-                <div className="font-mono text-[10px] text-tan-dark uppercase tracking-widest">City</div>
-                <div className="font-heading text-lg mt-1">Bengaluru</div>
-              </div>
-              <div>
-                <div className="font-mono text-[10px] text-tan-dark uppercase tracking-widest">Prize pool</div>
-                <div className="font-heading text-lg mt-1 text-orange">₹5,00,000</div>
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-2">
+            <div className="mt-10 flex flex-wrap gap-2">
               {["Enduro", "Rock Garden", "Hill Climb", "Slush", "Mud", "Technical"].map((s) => (
-                <span key={s} className="font-mono text-[11px] uppercase tracking-widest px-3 py-1.5 border border-border rounded-sm text-foreground/80">
+                <span key={s} className="font-mono text-[11px] uppercase tracking-widest px-3 py-1.5 border border-border text-foreground/80">
                   {s}
                 </span>
               ))}
             </div>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Link href="/events">
-                <Button size="lg">Race details <ArrowRight className="w-5 h-5" /></Button>
+                <Button size="lg" className="uppercase tracking-wider">Race details <ArrowRight className="w-5 h-5" /></Button>
               </Link>
               <a
                 href="/magazine/DRC-Ultimate-Rider.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-heading text-lg underline decoration-tan-dark/40 underline-offset-4 hover:text-orange hover:decoration-orange transition-colors"
+                className="font-heading uppercase tracking-widest text-sm text-foreground/70 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1"
               >
-                Sponsor / partner deck →
+                Sponsor / Partner Deck →
               </a>
             </div>
           </div>
 
-          <aside className="lg:col-span-5 border-t-2 border-tan-dark/40 pt-6 lg:border-t-0 lg:border-l-2 lg:pt-0 lg:pl-8">
-            <p className="font-mono text-xs text-tan-dark uppercase tracking-widest">Format</p>
-            <div className="mt-3 space-y-4">
+          <aside className="lg:col-span-5 lg:pl-8 lg:border-l border-border">
+            <div className="grid grid-cols-3 gap-6 pb-8 border-b border-border">
               <div>
-                <p className="font-heading text-lg"><span className="text-orange">Sat</span> &mdash; Qualification &middot; Elimination &middot; Challenges</p>
-                <p className="text-sm text-muted mt-1">The proving ground. The riders who last the day have not won. They have only earned Sunday.</p>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-orange">Dates</div>
+                <div className="font-heading text-xl font-bold uppercase mt-1">Dec 12–13</div>
+                <div className="font-mono text-xs text-muted">2026</div>
               </div>
               <div>
-                <p className="font-heading text-lg"><span className="text-orange">Sun</span> &mdash; The Final</p>
-                <p className="text-sm text-muted mt-1">Smaller field. Same dirt. This is where the weekend is decided.</p>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-orange">City</div>
+                <div className="font-heading text-xl font-bold uppercase mt-1">Bengaluru</div>
+              </div>
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-orange">Prize Pool</div>
+                <div className="font-heading text-xl font-bold uppercase mt-1 text-orange">₹5 Lakh</div>
               </div>
             </div>
-            <p className="font-body text-sm text-muted leading-relaxed mt-6 border-t border-border/60 pt-4">
-              The flag-off lands on ground that already knows how to hold a championship — in partnership with <strong className="text-foreground">Dev Venkat</strong> (3× National Champion) and Tribal Adventure.
-            </p>
+
+            <div className="mt-6 space-y-6">
+              <div>
+                <div className="flex items-baseline gap-3">
+                  <span className="font-heading text-2xl font-bold text-orange">SAT</span>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted">The proving ground</span>
+                </div>
+                <p className="text-sm text-foreground/70 mt-2 leading-relaxed">Qualification, elimination and challenges across every surface. The riders who last the day have not won. They have only earned Sunday.</p>
+              </div>
+              <div>
+                <div className="flex items-baseline gap-3">
+                  <span className="font-heading text-2xl font-bold text-orange">SUN</span>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted">The final</span>
+                </div>
+                <p className="text-sm text-foreground/70 mt-2 leading-relaxed">The field is smaller. The surfaces still change. This is where the weekend is decided.</p>
+              </div>
+              <p className="text-xs text-muted pt-4 border-t border-border/50 leading-relaxed">
+                In partnership with <span className="text-foreground font-semibold">Dev Venkat</span> (3× National Champion) and Tribal Adventure — ground that already knows how to hold a championship.
+              </p>
+            </div>
           </aside>
         </div>
       </div>
@@ -175,23 +200,30 @@ export function UltimateRiderSpotlight() {
 
 export function AnimatedFeatures() {
   return (
-    <section className="bg-surface border-y border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <section className="relative bg-background border-b border-border">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
         <FadeIn>
-          <div className="mb-12 max-w-3xl">
-            <span className="eyebrow">The platform</span>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-semibold mt-3 leading-[1.05]">
-              A world around the rider &mdash; not a single weekend, and not a single start line.
+          <div className="mb-16 max-w-3xl">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="h-px w-10 bg-orange" />
+              <span className="eyebrow">The platform</span>
+            </div>
+            <h2 className="font-heading font-bold uppercase text-4xl sm:text-5xl lg:text-6xl leading-[0.95] tracking-[-0.02em]">
+              A world around the <span className="text-orange">rider</span>.
             </h2>
+            <p className="mt-6 text-lg text-foreground/70 max-w-2xl leading-relaxed">
+              Not a single weekend. Not a single start line. DRC is a motorcycle culture platform where riding, training, adventure, motorsport, racing, experiences, community, content and brands belong together.
+            </p>
           </div>
         </FadeIn>
-        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" staggerDelay={0.12}>
-          {pillars.map((f) => (
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 border-t border-l border-border" staggerDelay={0.08}>
+          {pillars.map((f, i) => (
             <StaggerItem key={f.title}>
-              <div className="h-full p-6 border-t-2 border-tan-dark/40 bg-surface/40 hover:border-orange transition-colors">
-                <f.icon className="w-6 h-6 text-tan-dark" strokeWidth={1.4} />
-                <h3 className="font-heading text-lg font-semibold mt-4 leading-snug">{f.title}</h3>
-                <p className="text-sm text-muted leading-relaxed mt-2">{f.desc}</p>
+              <div className="group h-full p-8 border-r border-b border-border bg-background hover:bg-surface transition-colors relative">
+                <div className="font-mono text-xs uppercase tracking-widest text-orange">0{i + 1}</div>
+                <f.icon className="w-8 h-8 text-foreground/60 group-hover:text-orange transition-colors mt-6" strokeWidth={1.5} />
+                <h3 className="font-heading text-2xl font-bold uppercase mt-6 leading-tight">{f.title}</h3>
+                <p className="text-sm text-foreground/70 leading-relaxed mt-3">{f.desc}</p>
               </div>
             </StaggerItem>
           ))}

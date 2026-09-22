@@ -88,10 +88,7 @@ export function Navbar() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 xl:px-8">
         <div className={cn("flex items-center justify-between transition-all duration-300", scrolled ? "h-16" : "h-16 sm:h-20")}>
           <Link href="/" className="flex items-center shrink-0" aria-label="DRC Motorsports — home">
-            <Logo
-              variant="compact"
-              className={cn("transition-all duration-300", scrolled ? "text-3xl" : "text-3xl sm:text-4xl")}
-            />
+            <Logo variant="compact" priority />
           </Link>
 
           {/* Desktop nav links - only on xl (1280px+) */}

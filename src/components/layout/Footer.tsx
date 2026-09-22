@@ -13,7 +13,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <Logo variant="full" className="text-5xl" />
+            <Logo variant="full" />
             <p className="text-sm text-muted leading-relaxed mt-6">
               DRC Motorsports Pvt Ltd — an Indian motorcycle culture &amp; motorsport platform. Racing, training, adventure and community, out of Bengaluru.
             </p>

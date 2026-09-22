@@ -1,79 +1,100 @@
 @import "tailwindcss";
 
-/* Vintage adventure palette — aged paper, warm ink, muted rust & olive. */
+/* DRC Motorsports — dark racing palette. Bold, industrial, high-contrast. */
 @theme inline {
-  --color-background: #EFE7D4;
-  --color-foreground: #1E1A14;
-  --color-orange: #B4471F;
-  --color-orange-dark: #8E3616;
-  --color-orange-light: #D26B3E;
-  --color-tan: #A89B7A;
-  --color-tan-light: #C8BC9C;
-  --color-tan-dark: #6E6247;
-  --color-surface: #E6DBC0;
-  --color-surface-light: #DED2B4;
-  --color-surface-lighter: #D3C6A2;
-  --color-muted: #6B6350;
-  --color-border: #C3B694;
-  --color-success: #5C7A3A;
-  --color-error: #A83A2C;
-  --color-warning: #C88A2E;
+  --color-background: #0A0A0A;
+  --color-foreground: #F5F5F5;
+  --color-orange: #E8622C;
+  --color-orange-dark: #B4471F;
+  --color-orange-light: #FF7A44;
+  --color-tan: #8A8A8A;
+  --color-tan-light: #B3B3B3;
+  --color-tan-dark: #4A4A4A;
+  --color-surface: #141414;
+  --color-surface-light: #1F1F1F;
+  --color-surface-lighter: #2A2A2A;
+  --color-muted: #8A8A8A;
+  --color-border: #262626;
+  --color-success: #22C55E;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
 
-  --font-heading: var(--font-heading-family), "Georgia", "Times New Roman", serif;
-  --font-body: var(--font-body-family), "Georgia", serif;
-  --font-mono: var(--font-mono-family), "Courier New", monospace;
+  --font-heading: var(--font-heading-family), "Oswald", "Impact", "Arial Narrow", sans-serif;
+  --font-body: var(--font-body-family), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: var(--font-mono-family), "JetBrains Mono", "SF Mono", "Consolas", monospace;
 }
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--color-background);
 }
 
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-body);
-  /* subtle paper grain */
-  background-image:
-    radial-gradient(rgba(30, 26, 20, 0.045) 1px, transparent 1px),
-    radial-gradient(rgba(30, 26, 20, 0.025) 1px, transparent 1px);
-  background-size: 3px 3px, 7px 7px;
-  background-position: 0 0, 1px 2px;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--color-foreground);
+  text-transform: uppercase;
 }
 
-/* Small caps eyebrow labels — restrained, mono, not shouty gradients */
+/* Editorial eyebrow — small mono metadata label above headings. */
 .eyebrow {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-tan-dark);
+  color: var(--color-orange);
+  font-weight: 500;
+}
+
+/* Subtle industrial grid pattern for hero backgrounds. */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Diagonal stripe accent used behind key numbers/CTAs. */
+.bg-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--color-orange) 0,
+    var(--color-orange) 2px,
+    transparent 2px,
+    transparent 12px
+  );
 }
 
 ::selection {
   background-color: var(--color-orange);
-  color: #F4EDDF;
+  color: #0A0A0A;
 }
 
 ::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-surface);
+  background: var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-tan-dark);
+  background: var(--color-surface-lighter);
   border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-orange);
 }
+
