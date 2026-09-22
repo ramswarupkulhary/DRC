@@ -14,7 +14,7 @@ import { NotificationBell } from "@/components/ui/NotificationBell";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/programs", label: "Programs" },
-  { href: "/rides", label: "Rides" },
+  { href: "/rides", label: "Rides", requiresRides: true as const },
   { href: "/trainings", label: "Training" },
   { href: "/events", label: "Events" },
   { href: "/calendar", label: "Calendar" },
@@ -32,13 +32,15 @@ const userMenuLinks = [
   { href: "/write-review", label: "Write a Review", icon: Star },
 ];
 
-export function Navbar() {
+export function Navbar({ hasUpcomingRides = false }: { hasUpcomingRides?: boolean } = {}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { data: session } = useSession();
   const userMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+
+  const visibleLinks = navLinks.filter((l) => !("requiresRides" in l) || hasUpcomingRides);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -93,7 +95,7 @@ export function Navbar() {
 
           {/* Desktop nav links - only on xl (1280px+) */}
           <div className="hidden xl:flex items-center gap-0.5">
-            {navLinks.map((link) => (
+            {visibleLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -257,7 +259,7 @@ export function Navbar() {
             className="xl:hidden overflow-y-auto max-h-[calc(100vh-4rem)] bg-surface border-t border-border"
           >
             <div className="px-4 py-4 space-y-1">
-              {navLinks.map((link, i) => (
+              {visibleLinks.map((link, i) => (
                 <motion.div
                   key={link.href}
                   initial={{ opacity: 0, x: -20 }}

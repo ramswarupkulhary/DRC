@@ -3,46 +3,38 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.dirtridecamp.c
 export function OrganizationJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": ["Organization", "SportsActivityLocation"],
-    name: "Dirt Ride Camp",
-    alternateName: ["DRC", "DirtRideCamp", "Off Road Academy Bangalore", "Offroad Academy Bangalore", "Offroad Academy India"],
+    "@type": ["Organization", "SportsOrganization"],
+    name: "DRC Motorsports",
+    legalName: "DRC Motorsports Pvt Ltd",
+    alternateName: ["DRC", "DRC Racing", "Dirt Ride Camp", "DirtRideCamp"],
     url: BASE_URL,
-    logo: `${BASE_URL}/opengraph-image`,
+    logo: `${BASE_URL}/brand/drc-logo-main.png`,
     image: `${BASE_URL}/opengraph-image`,
     description:
-      "Bangalore's premier off-road academy offering adventure bike trips, off-road training classes, motorcycle camping trips & trail riding across Karnataka and India.",
+      "DRC Motorsports Pvt Ltd — an Indian motorcycle culture and motorsport platform. Racing, training, adventure and community. Six official races every year, across India.",
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Bangalore",
+      addressLocality: "Bengaluru",
       addressRegion: "Karnataka",
       addressCountry: "IN",
     },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: 12.9716,
-      longitude: 77.5946,
-    },
-    areaServed: [
-      { "@type": "City", name: "Bangalore" },
-      { "@type": "State", name: "Karnataka" },
-      { "@type": "Country", name: "India" },
-    ],
+    areaServed: { "@type": "Country", name: "India" },
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+91-94148-70102",
+      email: "info@dirtridecamp.com",
       contactType: "customer service",
       availableLanguage: ["English", "Hindi"],
     },
     sameAs: ["https://instagram.com/dirtridecamp", "https://wa.me/919414870102"],
-    priceRange: "₹₹",
-    openingHoursSpecification: {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Saturday", "Sunday"],
-      opens: "06:00",
-      closes: "18:00",
+    founder: {
+      "@type": "Person",
+      name: "Ramswarup Kulhary",
+      jobTitle: "Founder & MD",
     },
+    sport: "Off-road motorcycling",
     keywords:
-      "off road academy, off road academy bangalore, offroad academy bangalore, offroad bangalore, offroad india, offroad training bangalore, off road training, off road training bangalore, dirt ride camp, DRC, dirtridecamp, bangalore riding group, off-road bike, offroad bike, adventure motorcycle, camping rides, trail riding, motorcycle academy bangalore, bike trip bangalore, bike trip near bangalore, adventure bike trip, camping trip bangalore, off road classes, riding classes bangalore, motorcycle trip karnataka, adventure camping bangalore",
+      "DRC Motorsports, DRC Racing, DRC Ultimate Rider, Dirt Ride Camp, Indian motorsport, off road racing India, enduro India, adventure motorcycle India, motorcycle training India, motorcycle culture India, Bengaluru motorsport",
   };
 
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;

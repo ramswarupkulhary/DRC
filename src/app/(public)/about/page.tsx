@@ -1,94 +1,161 @@
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { Mountain, Flame, Users, Shield, Target, Heart } from "lucide-react";
+import { Trophy, GraduationCap, Compass, Users, Camera, Handshake, ArrowRight } from "lucide-react";
 import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection, AnimatedSlide, HoverCard } from "@/components/ui/AnimatedPage";
+import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About DRC — Bangalore's Off-Road Academy & Adventure Riding Community",
-  description: "Who we are, how DRC started, and why we cap every ride at six people. A short story from the crew.",
-  keywords: ["off road academy bangalore", "about dirt ride camp", "bangalore riding community", "adventure bike group bangalore", "motorcycle camping community", "off road riding group india"],
+  title: "About DRC Motorsports — An Indian Motorcycle Culture &amp; Motorsport Platform",
+  description: "DRC Motorsports Pvt Ltd is an Indian motorcycle culture and motorsport platform — racing, training, adventure and community. Six official races every year, across India. Flag-off: DRC Ultimate Rider, Bengaluru, Dec 12\u201313 2026.",
+  keywords: ["DRC Motorsports", "DRC Racing", "Indian motorsport", "motorcycle racing India", "off road racing India", "enduro India", "DRC Ultimate Rider", "Dirt Ride Camp", "Ramswarup Kulhary"],
   openGraph: {
-    title: "About Dirt Ride Camp — Off-Road Academy Bangalore",
-    description: "Bangalore's off-road academy. Adventure bike trips, camping rides & off-road training classes.",
+    title: "About DRC Motorsports",
+    description: "An Indian motorcycle culture and motorsport platform. Racing, training, adventure and community — built around the rider.",
   },
 };
 
-const values = [
-  { icon: Mountain, title: "Adventure", desc: "We seek the road less traveled. Every trail is a new story." },
-  { icon: Users, title: "Community", desc: "Riding solo is fun. Riding together is an experience." },
-  { icon: Shield, title: "Safety", desc: "We never compromise on safety. First aid, support vehicles, experienced leads." },
-  { icon: Flame, title: "Passion", desc: "Born from a love for dirt, dust, and the open trail." },
-  { icon: Target, title: "Skill Building", desc: "We believe every rider can improve. Our trainings are designed for growth." },
-  { icon: Heart, title: "Inclusivity", desc: "All bikes, all experience levels, all genders. If you ride, you belong." },
+const pillars = [
+  { icon: Trophy, title: "Racing", desc: "DRC Racing — six official races every year, across India. Flag-off: DRC Ultimate Rider, Bengaluru." },
+  { icon: GraduationCap, title: "Training", desc: "Structured, coach-led off-road progression — from first time on dirt to enduro and hill-climb ready." },
+  { icon: Compass, title: "Adventure", desc: "Curated expeditions across India. On the horizon: DRC Mini Dakar, a five-day desert endurance in Rajasthan." },
+  { icon: Users, title: "Community", desc: "A home for Indian motorcycle culture — riders, brands, content and experiences under one platform." },
+  { icon: Camera, title: "Content", desc: "Race films, rider stories, product integrations. The platform documents what the platform runs." },
+  { icon: Handshake, title: "Brands", desc: "Category-exclusive partnerships across race, experience, content, community and hospitality." },
 ];
 
 export default function AboutPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
-      <AnimatedPageHeader>
-        <SectionHeader accent="Our story" title="About DRC" />
-      </AnimatedPageHeader>
+    <div>
+      {/* Hero */}
+      <section className="relative border-b border-border overflow-hidden">
+        <div className="absolute inset-0 bg-grid opacity-40 pointer-events-none" />
+        <div className="absolute -top-40 -right-40 w-[520px] h-[520px] rounded-full bg-orange/10 blur-3xl pointer-events-none" />
 
-      <div className="mt-12 space-y-8 text-foreground/80 leading-relaxed text-lg">
-        <AnimatedSlide from="left">
-          <p>
-            <strong className="text-foreground">Dirt Ride Camp (DRC)</strong> was born from a simple idea: that off-road riding shouldn&apos;t
-            be a solo pursuit. It should be shared — around campfires, on dusty trails, and through
-            experiences that push you just beyond your comfort zone.
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28 pb-16 sm:pb-24">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="h-px w-10 bg-orange" />
+            <span className="eyebrow">DRC Motorsports Pvt Ltd</span>
+          </div>
+          <h1 className="font-heading font-bold uppercase text-5xl sm:text-7xl lg:text-8xl leading-[0.92] tracking-[-0.02em] max-w-5xl">
+            We are not building <br /><span className="text-orange">just another race.</span>
+          </h1>
+          <p className="mt-8 text-lg sm:text-xl text-foreground/70 max-w-2xl leading-relaxed">
+            Indian motorcycle culture has always been larger than the space it was given. What was missing was a home &mdash; a world around the rider, not a single weekend, and not a single start line.
           </p>
-        </AnimatedSlide>
-
-        <AnimatedSlide from="right">
-          <p>
-            We organize <strong className="text-foreground">curated off-road rides</strong> across South India — from the rocky
-            terrains of Krishnagiri to the misty trails of Coorg. Each ride is limited to a small group,
-            ensuring quality, safety, and a personal touch that mass events can&apos;t offer.
-          </p>
-        </AnimatedSlide>
-
-        <AnimatedSlide from="left">
-          <p>
-            Beyond rides, we run <strong className="text-foreground">structured training programs</strong> for riders at every level.
-            Whether you&apos;re a street rider curious about dirt or an experienced off-roader looking to sharpen
-            technique, our programs are designed to build confidence one skill at a time.
-          </p>
-        </AnimatedSlide>
-
-        <AnimatedSlide from="right">
-          <p>
-            DRC is more than a company — it&apos;s a crew. A community of riders who share a love for
-            adventure, the outdoors, and the freedom that comes with riding through untouched terrain.
-          </p>
-        </AnimatedSlide>
-      </div>
-
-      <AnimatedSection className="mt-16">
-        <div className="text-center border-y border-border py-10">
-          <p className="font-heading text-3xl sm:text-4xl font-bold text-orange tracking-wider">
-            RIDE &middot; EXPLORE &middot; CONNECT
-          </p>
-          <p className="text-muted mt-2">Bangalore, India</p>
         </div>
-      </AnimatedSection>
+      </section>
 
-      <div className="mt-16">
-        <AnimatedPageHeader>
-          <SectionHeader accent="What drives us" title="Our Values" />
-        </AnimatedPageHeader>
-        <AnimatedGrid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-          {values.map((v) => (
-            <AnimatedGridItem key={v.title}>
-              <HoverCard>
-                <div className="p-6 border border-border rounded-sm hover:border-orange/30 transition-colors h-full">
-                  <v.icon className="w-8 h-8 text-orange mb-3" />
-                  <h3 className="font-heading text-lg font-semibold mb-2">{v.title}</h3>
-                  <p className="text-sm text-muted">{v.desc}</p>
-                </div>
-              </HoverCard>
-            </AnimatedGridItem>
-          ))}
-        </AnimatedGrid>
-      </div>
+      {/* The story */}
+      <section className="border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-4">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="h-px w-10 bg-orange" />
+              <span className="eyebrow">The story</span>
+            </div>
+            <h2 className="font-heading font-bold uppercase text-3xl sm:text-4xl leading-[1] tracking-[-0.01em]">
+              Adventure isn&rsquo;t found. <span className="text-orange">It&rsquo;s earned.</span>
+            </h2>
+          </div>
+
+          <div className="lg:col-span-8 space-y-6 text-lg text-foreground/80 leading-relaxed">
+            <p>
+              <strong className="text-foreground">DRC Motorsports Pvt Ltd</strong> is an Indian motorcycle culture and motorsport platform. Registered in India. Operating across India. Built around the rider.
+            </p>
+            <p>
+              DRC exists because a serious rider in this country should not have to choose between a weekend club, a training school and a race organiser. That splintering is what we're closing. Under one platform: <strong className="text-foreground">racing, training, adventure, motorsport, experiences, community, content and brands</strong>. Nine verticals, one home.
+            </p>
+            <p>
+              Our flag-off is <strong className="text-foreground">DRC Ultimate Rider</strong> — the first official DRC race, 12&ndash;13 December 2026, Bengaluru. A two-day motorsport event across enduro, rock garden, hill climb, slush, mud and technical surfaces, with a &#8377;5 Lakh overall prize pool. Held on ground that already knows how to hold a championship, in partnership with <strong className="text-foreground">Dev Venkat</strong> (3× National Champion) and Tribal Adventure.
+            </p>
+            <p>
+              Ultimate Rider is not a finale. It is the start of <strong className="text-foreground">DRC Racing</strong> — six official races every year, across India. On the horizon: <strong className="text-foreground">DRC Mini Dakar</strong>, a five-day desert endurance in Rajasthan.
+            </p>
+            <p>
+              The rider is the centre. Everything else is built around that.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Platform pillars */}
+      <section className="border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
+          <div className="mb-14 max-w-3xl">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="h-px w-10 bg-orange" />
+              <span className="eyebrow">Nine verticals, one platform</span>
+            </div>
+            <h2 className="font-heading font-bold uppercase text-4xl sm:text-5xl leading-[0.95] tracking-[-0.01em]">
+              What we <span className="text-orange">actually run</span>.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-border">
+            {pillars.map((p, i) => (
+              <div key={p.title} className="group p-8 border-r border-b border-border bg-background hover:bg-surface transition-colors">
+                <div className="font-mono text-xs uppercase tracking-widest text-orange">0{i + 1}</div>
+                <p.icon className="w-8 h-8 text-foreground/60 group-hover:text-orange transition-colors mt-6" strokeWidth={1.5} />
+                <h3 className="font-heading text-2xl font-bold uppercase mt-6 leading-tight">{p.title}</h3>
+                <p className="text-sm text-foreground/70 leading-relaxed mt-3">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Leadership */}
+      <section className="border-b border-border bg-surface">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
+          <div className="mb-14">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="h-px w-10 bg-orange" />
+              <span className="eyebrow">Brains behind the machines</span>
+            </div>
+            <h2 className="font-heading font-bold uppercase text-4xl sm:text-5xl leading-[0.95] tracking-[-0.01em]">
+              Built by people who <span className="text-orange">ride</span>.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-8 border border-border bg-background">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-orange">Founder &amp; MD</div>
+              <h3 className="font-heading text-3xl font-bold uppercase mt-3">Ramswarup Kulhary</h3>
+              <p className="font-mono text-xs uppercase tracking-widest text-muted mt-2">Enduro rider</p>
+              <p className="text-sm text-foreground/70 leading-relaxed mt-5">
+                Building DRC around a simple belief: adventure isn&rsquo;t found, it&rsquo;s earned. DRC Motorsports is a world around the rider &mdash; riding, training, adventure, motorsport, racing and community, in one place.
+              </p>
+            </div>
+
+            <div className="p-8 border border-border bg-background">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-orange">Race partner · Ultimate Rider</div>
+              <h3 className="font-heading text-3xl font-bold uppercase mt-3">Dev Venkat</h3>
+              <p className="font-mono text-xs uppercase tracking-widest text-muted mt-2">3× National Champion · Tribal Adventure</p>
+              <p className="text-sm text-foreground/70 leading-relaxed mt-5">
+                Dev built Tribal Adventure into a home for serious off-road riding. Ultimate Rider is here because the dirt, the people and the standard already exist.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="border-b border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <h2 className="font-heading font-bold uppercase text-3xl sm:text-5xl leading-[0.95] tracking-[-0.01em] max-w-3xl mx-auto">
+            This is not the finish line. <br /><span className="text-orange">It&rsquo;s the flag-off.</span>
+          </h2>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/events">
+              <Button size="lg" className="uppercase tracking-wider">DRC Ultimate Rider <ArrowRight className="w-5 h-5" /></Button>
+            </Link>
+            <Link href="/contact" className="font-heading uppercase tracking-widest text-sm text-foreground/70 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1">
+              Partner with DRC →
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

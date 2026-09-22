@@ -108,13 +108,13 @@ export const metadata: Metadata = {
     siteName: "Dirt Ride Camp (DRC)",
     title: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides in Bangalore",
     description:
-      "A small Bangalore off-road riding club and academy — small-group adventure rides, hands-on dirt-bike training, and camping trips.",
+      "An Indian motorcycle culture & motorsport platform — racing, training, adventure and community. Six official races every year, across India.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides",
+    title: "DRC Motorsports — Racing, Training & Adventure Across India",
     description:
-      "Six riders per group. Real terrain. A support jeep and a real fire at camp. Rides & training out of Bangalore.",
+      "Flag-off: DRC Ultimate Rider, Bengaluru, 12\u201313 December 2026. Six official races every year, across India.",
   },
   alternates: {
     canonical: BASE_URL,

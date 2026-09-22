@@ -128,7 +128,7 @@ export function Footer() {
 
         <div className="border-t border-border mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted">
-            &copy; {new Date().getFullYear()} Dirt Ride Camp — made in Bangalore.
+            &copy; {new Date().getFullYear()} DRC Motorsports Pvt Ltd · India.
           </p>
           <div className="flex gap-4 text-xs text-muted">
             <Link href="/contact" className="hover:text-orange transition-colors">
