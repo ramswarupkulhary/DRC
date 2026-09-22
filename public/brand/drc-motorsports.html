@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DRC Motorsports — logo</title>
+  <style>
+    @font-face {
+      font-family: "Oswald";
+      src: url("../magazine/ultimate-rider/fonts/Oswald.ttf") format("truetype");
+      font-weight: 200 700;
+      font-style: normal;
+      font-display: block;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #cfc8bc; }
+    .stage { padding: 40px; display: flex; flex-direction: column; gap: 40px; align-items: flex-start; }
+
+    .mark {
+      position: relative;
+      overflow: hidden;
+      width: 1480px;
+      height: 640px;
+      font-family: "Oswald", sans-serif;
+    }
+    .mark.light { background: #FFFFFF; color: #0B0B0B; }
+    .mark.dark { background: #0B0B0B; color: #F3EEE4; }
+
+    .words {
+      position: absolute;
+      left: 56px;
+      top: 78px;
+      transform: skewX(-14deg);
+      z-index: 1;
+      line-height: 0.78;
+    }
+    .drc {
+      font-size: 292px;
+      font-weight: 700;
+      letter-spacing: -0.055em;
+      line-height: 0.76;
+    }
+    .mark.light .d { color: #0B0B0B; }
+    .mark.light .c { color: #0B0B0B; }
+    .mark.dark .d { color: #F3EEE4; }
+    .mark.dark .c { color: #F3EEE4; }
+    .r { color: #E8622C; }
+    .ms {
+      margin-top: 2px;
+      margin-left: 6px;
+      font-size: 84px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: #E8622C;
+      line-height: 0.9;
+    }
+
+    .rider {
+      position: absolute;
+      z-index: 2;
+      left: 455px;
+      top: 18px;
+      height: 600px;
+      width: auto;
+    }
+    .mark.dark .rider {
+      filter: invert(1) brightness(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <article class="mark light" id="light">
+      <div class="words">
+        <div class="drc"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+        <div class="ms">MOTORSPORTS</div>
+      </div>
+      <img class="rider" src="drc-rider-mark.png" alt="" />
+    </article>
+    <article class="mark dark" id="dark">
+      <div class="words">
+        <div class="drc"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+        <div class="ms">MOTORSPORTS</div>
+      </div>
+      <img class="rider" src="drc-rider-mark.png" alt="" />
+    </article>
+  </div>
+</body>
+</html>

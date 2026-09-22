@@ -28,14 +28,8 @@ export function AnimatedSlide({ children, from = "left", className = "" }: { chi
 }
 
 export function HoverCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return (
-    <motion.div
-      className={className}
-      whileHover={{ y: -6, transition: { duration: 0.25 } }}
-    >
-      {children}
-    </motion.div>
-  );
+  // Kept as a passthrough for API compatibility; hover lift removed to feel less templated.
+  return <div className={className}>{children}</div>;
 }
 
 export function PageTransition({ children }: { children: React.ReactNode }) {

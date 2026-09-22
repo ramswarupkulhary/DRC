@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X, User, LogOut, ChevronDown, Crown, Bell, Calendar, Shield, MapPinned, Star, Gift } from "lucide-react";
@@ -86,17 +87,15 @@ export function Navbar() {
     >
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 xl:px-8">
         <div className={cn("flex items-center justify-between transition-all duration-300", scrolled ? "h-16" : "h-16 sm:h-20")}>
-          <Link href="/" className="flex items-center gap-3 shrink-0">
-            <div className="flex flex-col">
-              <span className="font-heading text-2xl sm:text-3xl font-bold tracking-tight leading-none">
-                <span className="text-foreground">D</span>
-                <span className="text-orange">R</span>
-                <span className="text-foreground">C</span>
-              </span>
-              <span className="text-[9px] sm:text-[10px] text-tan tracking-[0.25em] uppercase">
-                Dirt Ride Camp
-              </span>
-            </div>
+          <Link href="/" className="flex items-center gap-3 shrink-0" aria-label="DRC Motorsports — home">
+            <Image
+              src="/brand/drc-motorsports.png"
+              alt="DRC Motorsports"
+              width={160}
+              height={160}
+              priority
+              className={cn("w-auto transition-all duration-300", scrolled ? "h-11" : "h-12 sm:h-14")}
+            />
           </Link>
 
           {/* Desktop nav links - only on xl (1280px+) */}

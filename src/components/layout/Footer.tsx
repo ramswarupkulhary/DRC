@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { useSession } from "next-auth/react";
 
@@ -12,21 +13,15 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <div>
-              <span className="font-heading text-3xl font-bold tracking-tight">
-                <span className="text-foreground">D</span>
-                <span className="text-orange">R</span>
-                <span className="text-foreground">C</span>
-              </span>
-              <p className="text-[10px] text-tan tracking-[0.25em] uppercase mt-1">
-                Dirt Ride Camp
-              </p>
-            </div>
+            <Image
+              src="/brand/drc-motorsports.png"
+              alt="DRC Motorsports"
+              width={220}
+              height={220}
+              className="h-24 w-auto"
+            />
             <p className="text-sm text-muted leading-relaxed">
-              Ride &middot; Explore &middot; Connect
-            </p>
-            <p className="text-sm text-muted leading-relaxed">
-              Off-road adventures, camping rides & off-road riding training across India.
+              Bangalore-based off-road academy. We run small-group adventure rides, hands-on dirt-bike training, and camping trips across Karnataka &amp; India.
             </p>
             <div className="flex gap-3 pt-2">
               <a

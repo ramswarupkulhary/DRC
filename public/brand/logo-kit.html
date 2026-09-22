@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DRC logo options</title>
+  <style>
+    @font-face {
+      font-family: "Oswald";
+      src: url("../magazine/ultimate-rider/fonts/Oswald.ttf") format("truetype");
+      font-weight: 200 700;
+      font-style: normal;
+      font-display: block;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #b7b0a6; }
+    .col {
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      width: 1160px;
+    }
+    .tile {
+      width: 1080px;
+      height: 720px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "Oswald", sans-serif;
+      overflow: hidden;
+    }
+    .tile.light { background: #FFFFFF; }
+    .tile.dark { background: #0B0B0B; }
+    .stack { display: flex; flex-direction: column; align-items: center; }
+    .italic { transform: skewX(-12deg); }
+
+    .wm {
+      font-size: 210px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      line-height: 0.8;
+    }
+    .d { color: #0B0B0B; }
+    .r { color: #E8622C; }
+    .c { color: #0B0B0B; }
+    .tile.dark .d, .tile.dark .c { color: #F3EEE4; }
+
+    .sub {
+      margin-top: 10px;
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: 0.42em;
+      color: #E8622C;
+    }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .rule {
+      width: 3px;
+      height: 92px;
+      background: #E8622C;
+    }
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .side b {
+      font-size: 22px;
+      letter-spacing: 0.28em;
+      font-weight: 500;
+      color: #E8622C;
+    }
+    .side span {
+      font-size: 16px;
+      letter-spacing: 0.22em;
+      color: #8A8276;
+      font-weight: 500;
+    }
+    .tile.dark .side span { color: #B9A886; }
+
+    .icon {
+      width: 420px;
+      height: 420px;
+      background: #0B0B0B;
+      border-radius: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon .wm { font-size: 148px; }
+    .icon .d, .icon .c { color: #F3EEE4; }
+
+    .geom { width: 640px; height: auto; display: block; }
+
+    .rider-lock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .rider-lock img {
+      height: 340px;
+      width: auto;
+      margin-left: -20px;
+    }
+    .seal svg { width: 520px; height: 520px; }
+  </style>
+</head>
+<body>
+  <div class="col">
+
+    <section class="tile light" id="geom">
+      <svg class="geom" viewBox="0 0 664 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#0B0B0B" fill-rule="evenodd" d="M40 40 H168 L216 88 V192 L168 240 H40 Z M96 92 H148 L162 106 V174 L148 188 H96 Z"/>
+        <path fill="#E8622C" fill-rule="evenodd" d="M244 40 H362 L406 84 V140 H362 L420 212 V240 H352 L300 176 V240 H244 Z M300 86 H354 L366 98 V128 H300 Z"/>
+        <path fill="#0B0B0B" d="M448 40 H576 L624 88 V110 H570 V106 L556 92 H504 V188 H556 L570 174 V170 H624 V192 L576 240 H448 Z"/>
+      </svg>
+    </section>
+
+    <section class="tile dark" id="geom-dark">
+      <svg class="geom" viewBox="0 0 664 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#F3EEE4" fill-rule="evenodd" d="M40 40 H168 L216 88 V192 L168 240 H40 Z M96 92 H148 L162 106 V174 L148 188 H96 Z"/>
+        <path fill="#E8622C" fill-rule="evenodd" d="M244 40 H362 L406 84 V140 H362 L420 212 V240 H352 L300 176 V240 H244 Z M300 86 H354 L366 98 V128 H300 Z"/>
+        <path fill="#F3EEE4" d="M448 40 H576 L624 88 V110 H570 V106 L556 92 H504 V188 H556 L570 174 V170 H624 V192 L576 240 H448 Z"/>
+      </svg>
+    </section>
+
+    <section class="tile light" id="italic">
+      <div class="stack italic">
+        <div class="wm"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+        <div class="sub">MOTORSPORTS</div>
+      </div>
+    </section>
+
+    <section class="tile dark" id="italic-dark">
+      <div class="stack italic">
+        <div class="wm"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+        <div class="sub">MOTORSPORTS</div>
+      </div>
+    </section>
+
+    <section class="tile light" id="seal">
+      <div class="seal">
+        <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="250" cy="250" r="242" fill="none" stroke="#0B0B0B" stroke-width="6"/>
+          <circle cx="250" cy="250" r="226" fill="none" stroke="#E8622C" stroke-width="3"/>
+          <circle cx="250" cy="250" r="168" fill="none" stroke="#0B0B0B" stroke-width="2"/>
+          <path id="arcTop" fill="none" d="M90,250 A160,160 0 0,1 410,250"/>
+          <path id="arcBot" fill="none" d="M90,250 A160,160 0 0,0 410,250"/>
+          <text fill="#0B0B0B" font-family="Oswald, sans-serif" font-size="22" font-weight="600" letter-spacing="6">
+            <textPath href="#arcTop" startOffset="50%" text-anchor="middle">MOTORSPORTS</textPath>
+          </text>
+          <text fill="#E8622C" font-family="Oswald, sans-serif" font-size="20" font-weight="500" letter-spacing="5">
+            <textPath href="#arcBot" startOffset="50%" text-anchor="middle">OFF-ROAD · INDIA</textPath>
+          </text>
+          <text x="250" y="278" text-anchor="middle" font-family="Oswald, sans-serif" font-size="92" font-weight="700" letter-spacing="-4">
+            <tspan fill="#0B0B0B">D</tspan><tspan fill="#E8622C">R</tspan><tspan fill="#0B0B0B">C</tspan>
+          </text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="tile light" id="icon">
+      <div class="icon">
+        <div class="wm italic"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+      </div>
+    </section>
+
+    <section class="tile light" id="badge">
+      <div class="badge italic">
+        <div class="wm" style="font-size: 120px;"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+        <div class="rule"></div>
+        <div class="side">
+          <b>MOTORSPORTS</b>
+          <span>OFF-ROAD · INDIA</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="tile light" id="rider">
+      <div class="rider-lock italic">
+        <div>
+          <div class="wm" style="font-size: 150px;"><span class="d">D</span><span class="r">R</span><span class="c">C</span></div>
+          <div class="sub" style="letter-spacing: 0.22em; font-size: 24px; text-align: left;">MOTORSPORTS</div>
+        </div>
+        <img src="drc-rider-mark.png" alt="" />
+      </div>
+    </section>
+
+  </div>
+  <script>
+    (function () {
+      var id = new URLSearchParams(window.location.search).get("id");
+      if (!id) return;
+      var tiles = document.querySelectorAll(".tile");
+      tiles.forEach(function (el) {
+        el.style.display = el.id === id ? "flex" : "none";
+      });
+      var col = document.querySelector(".col");
+      col.style.padding = "0";
+      col.style.gap = "0";
+      col.style.width = "1080px";
+      document.body.style.background = "#000";
+    })();
+  </script>
+</body>
+</html>

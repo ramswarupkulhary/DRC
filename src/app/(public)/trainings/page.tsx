@@ -149,7 +149,7 @@ export default async function TrainingsPage() {
       {specialTrails.length > 0 && (
         <section className="mt-24">
           <AnimatedSection>
-            <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">Explore new ground</span>
+            <span className="eyebrow">Explore new ground</span>
             <h2 className="font-heading text-3xl sm:text-4xl font-bold mt-2">Special Trails</h2>
             <div className="w-16 h-1 bg-orange rounded-full mt-3" />
             <p className="text-muted mt-4 max-w-2xl">Guided off-road trails at hand-picked locations. New destinations added regularly.</p>
@@ -178,7 +178,7 @@ export default async function TrainingsPage() {
       {/* Skill progression */}
       <section className="mt-24">
         <div className="text-center max-w-2xl mx-auto">
-          <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">What you&apos;ll learn</span>
+          <span className="eyebrow">What you&apos;ll learn</span>
           <h2 className="font-heading text-3xl sm:text-4xl font-bold mt-2">Skill Progression</h2>
           <div className="w-20 h-1 bg-orange rounded-full mt-4 mx-auto" />
         </div>
@@ -206,7 +206,7 @@ export default async function TrainingsPage() {
       {/* Rider journey */}
       <section className="mt-24">
         <div className="text-center max-w-2xl mx-auto">
-          <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">Your DRC path</span>
+          <span className="eyebrow">Your DRC path</span>
           <h2 className="font-heading text-3xl sm:text-4xl font-bold mt-2">The Rider Journey</h2>
           <div className="w-20 h-1 bg-orange rounded-full mt-4 mx-auto" />
         </div>

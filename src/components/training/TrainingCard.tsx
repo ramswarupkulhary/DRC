@@ -30,7 +30,7 @@ export function TrainingCard({
 }: TrainingCardProps) {
   return (
     <Link href={`/trainings/${slug}`} className="group block">
-      <div className="relative bg-surface border border-border rounded-sm overflow-hidden hover:border-orange/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-orange/5 h-full flex flex-col">
+      <div className="relative bg-surface border border-border rounded-sm overflow-hidden hover:border-orange/50 transition-colors duration-300 h-full flex flex-col">
         <div className="relative bg-surface-light overflow-hidden">
           {coverImage ? (
             <Image src={coverImage} alt={title} width={640} height={420} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-auto block group-hover:scale-105 transition-transform duration-500" />

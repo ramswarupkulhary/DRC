@@ -17,18 +17,16 @@ export function LandingPage({ data }: { data: LandingPageData }) {
             <FAQJsonLd faqs={data.faqs.map((f) => ({ question: f.q, answer: f.a }))} />
 
             {/* Hero */}
-            <section className="relative overflow-hidden border-b border-border">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange/15 via-background to-background" />
-                <div className="absolute inset-0 opacity-[0.04] bg-[radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:22px_22px]" />
-                <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
-                    <span className="text-orange text-sm font-semibold tracking-[0.3em] uppercase">{data.accent}</span>
-                    <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold mt-4">{data.h1}</h1>
-                    <p className="text-foreground/75 text-lg mt-5 leading-relaxed">{data.intro}</p>
+            <section className="relative border-b border-border">
+                <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+                    <span className="eyebrow">{data.accent}</span>
+                    <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-semibold mt-4 leading-[1.05]">{data.h1}</h1>
+                    <p className="text-foreground/75 text-lg mt-5 leading-relaxed max-w-2xl">{data.intro}</p>
                     <div className="flex flex-wrap gap-3 mt-8">
-                        <Link href="/programs" className="inline-flex items-center gap-1.5 bg-orange text-white font-heading font-semibold uppercase tracking-wider px-6 py-3 rounded-sm hover:bg-orange-dark transition-colors">
+                        <Link href="/programs" className="inline-flex items-center gap-1.5 bg-orange text-white font-heading font-semibold px-6 py-3 rounded-sm hover:bg-orange-dark transition-colors">
                             Book Now <ChevronRight className="w-4 h-4" />
                         </Link>
-                        <a href="https://wa.me/919414870102" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 border border-border text-foreground font-heading font-semibold uppercase tracking-wider px-6 py-3 rounded-sm hover:border-orange/50 transition-colors">
+                        <a href="https://wa.me/919414870102" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 border border-border text-foreground font-heading font-semibold px-6 py-3 rounded-sm hover:border-orange/50 transition-colors">
                             Ask on WhatsApp
                         </a>
                     </div>
