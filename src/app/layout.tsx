@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     template: "%s | DRC Dirt Ride Camp",
   },
   description:
-    "Bangalore's premier off-road academy & riding group. Off-road training classes, adventure bike trips, camping rides & trail riding. Join DRC — Dirt Ride Camp for limited-slot adventure trips across Karnataka & India.",
+    "A small Bangalore off-road riding club and academy. We run limited-slot adventure rides, hands-on dirt-bike training, and camping trips across Karnataka and India — six riders per group, a support jeep, a real fire at camp.",
   keywords: [
     "off road academy",
     "off road academy bangalore",
@@ -100,13 +100,13 @@ export const metadata: Metadata = {
     siteName: "Dirt Ride Camp (DRC)",
     title: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides in Bangalore",
     description:
-      "Bangalore's premier off-road academy & riding group. Off-road training, dirt bike rides, adventure camping & trail riding.",
+      "A small Bangalore off-road riding club and academy — small-group adventure rides, hands-on dirt-bike training, and camping trips.",
   },
   twitter: {
     card: "summary_large_image",
     title: "DRC — Dirt Ride Camp | Off-Road Academy & Adventure Rides",
     description:
-      "Bangalore's premier off-road academy & riding group. Off-road training, dirt bike rides, adventure camping.",
+      "Six riders per group. Real terrain. A support jeep and a real fire at camp. Rides & training out of Bangalore.",
   },
   alternates: {
     canonical: BASE_URL,

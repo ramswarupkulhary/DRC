@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About DRC — Bangalore's Off-Road Academy & Adventure Riding Community",
-  description: "Dirt Ride Camp (DRC) is Bangalore's premier off-road academy & riding group. Built by riders, for riders — adventure bike trips, camping rides, off-road training classes & motorcycle tours since day one.",
+  description: "Who we are, how DRC started, and why we cap every ride at six people. A short story from the crew.",
   keywords: ["off road academy bangalore", "about dirt ride camp", "bangalore riding community", "adventure bike group bangalore", "motorcycle camping community", "off road riding group india"],
   openGraph: {
     title: "About Dirt Ride Camp — Off-Road Academy Bangalore",

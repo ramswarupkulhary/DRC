@@ -46,9 +46,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-heading text-sm font-semibold text-tan tracking-wider mb-4">
-              Quick Links
-            </h4>
+            <h4 className="eyebrow mb-4">Quick links</h4>
             <ul className="space-y-2">
               {[
                 { href: "/programs", label: "Programs" },
@@ -80,9 +78,7 @@ export function Footer() {
 
           {/* For Riders */}
           <div>
-            <h4 className="font-heading text-sm font-semibold text-tan tracking-wider mb-4">
-              For Riders
-            </h4>
+            <h4 className="eyebrow mb-4">For riders</h4>
             <ul className="space-y-2">
               {(session
                 ? [
@@ -114,9 +110,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-heading text-sm font-semibold text-tan tracking-wider mb-4">
-              Get in Touch
-            </h4>
+            <h4 className="eyebrow mb-4">Get in touch</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-muted">
                 <MapPin className="w-4 h-4 text-orange mt-0.5 shrink-0" />
@@ -140,7 +134,7 @@ export function Footer() {
 
         <div className="border-t border-border mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted">
-            &copy; {new Date().getFullYear()} Dirt Ride Camp. All rights reserved.
+            &copy; {new Date().getFullYear()} Dirt Ride Camp — made in Bangalore.
           </p>
           <div className="flex gap-4 text-xs text-muted">
             <Link href="/contact" className="hover:text-orange transition-colors">
