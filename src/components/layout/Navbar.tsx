@@ -83,11 +83,11 @@ export function Navbar({ hasUpcomingRides = false }: { hasUpcomingRides?: boolea
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-background/95 backdrop-blur-md border-b border-border shadow-lg shadow-black/20"
+          ? "bg-background/95 backdrop-blur-md border-b border-border"
           : "bg-background/80 backdrop-blur-sm border-b border-transparent"
       )}
     >
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 xl:px-8">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10">
         <div className={cn("flex items-center justify-between transition-all duration-300", scrolled ? "h-16" : "h-16 sm:h-20")}>
           <Link href="/" className="flex items-center shrink-0" aria-label="DRC Motorsports — home">
             <Logo variant="compact" priority />

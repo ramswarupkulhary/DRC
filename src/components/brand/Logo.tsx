@@ -27,7 +27,7 @@ export function Logo({ variant = "compact", className, priority, title = "DRC Mo
 
     return (
         <Image
-            src="/brand/drc-logo-main.png"
+            src="/brand/drc-logo-light.png"
             alt={title}
             width={1000}
             height={1000}
