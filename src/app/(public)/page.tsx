@@ -13,7 +13,6 @@ import {
   AnimatedTrainingsSection,
   AnimatedCard,
   AnimatedFAQ,
-  UltimateRiderSpotlight,
 } from "@/components/home/AnimatedSections";
 
 async function getHomeData() {
@@ -91,7 +90,6 @@ export default async function HomePage() {
       {reviews.length > 0 && <AggregateRatingJsonLd ratingValue={Math.round(avgRating * 10) / 10} reviewCount={reviews.length} />}
       <AnimatedHero />
       <AnimatedStats />
-      <UltimateRiderSpotlight />
 
       <AnimatedRidesSection>
         {rides.map((ride) => (

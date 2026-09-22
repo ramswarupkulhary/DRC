@@ -34,141 +34,58 @@ const pillars = [
 export function AnimatedHero() {
   return (
     <section className="relative border-b border-border overflow-hidden bg-background">
-      {/* Ticker rail — data-forward, corporate cue. */}
-      <div className="border-b border-border bg-background/95">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-3 flex items-center justify-between gap-6 font-mono text-[10px] uppercase tracking-[0.2em]">
-          <div className="flex items-center gap-2 text-foreground/60">
-            <span className="w-1.5 h-1.5 rounded-full bg-orange animate-pulse" />
-            <span>Live &middot; DRC Racing calendar &middot; 2026</span>
-          </div>
-          <div className="hidden md:flex items-center gap-6 text-foreground/50">
-            <span>Round 01 &mdash; Ultimate Rider &middot; Bengaluru &middot; Dec 12&ndash;13</span>
-          </div>
-          <div className="text-foreground/50 hidden sm:block">
-            DRC Motorsports Pvt Ltd
-          </div>
+      {/* Cinematic full-bleed hero */}
+      <div className="relative min-h-[calc(100vh-5rem)] flex items-end">
+        <Image
+          src="/magazine/ultimate-rider/cover.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center pointer-events-none"
+        />
+        {/* Gradient wash for legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/85 via-background/20 to-transparent pointer-events-none" />
+
+        {/* Top corner marker */}
+        <div className="absolute top-6 left-4 sm:left-6 lg:left-10 flex items-center gap-3 z-20 font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/60">
+          <span className="w-1.5 h-1.5 bg-orange" />
+          <span>DRC Motorsports</span>
         </div>
-      </div>
 
-      {/* Main hero: split panel — statement (left) / brand mark (right). */}
-      <div className="relative">
-        <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-[58%_42%] items-stretch min-h-[calc(100vh-9rem)]">
-          {/* Left panel — statement */}
-          <motion.div
-            className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:pl-10 lg:pr-16 flex flex-col justify-between lg:border-r border-border"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div>
-              <div className="flex items-center gap-4 mb-8">
-                <span className="font-mono text-xs uppercase tracking-[0.28em] text-orange">01</span>
-                <span className="h-px flex-1 max-w-[3rem] bg-orange" />
-                <span className="font-mono text-xs uppercase tracking-[0.28em] text-foreground/60">The Platform</span>
-              </div>
-
-              <h1 className="font-heading font-bold uppercase text-[3.5rem] sm:text-[5.5rem] lg:text-[7.5rem] xl:text-[8.5rem] leading-[0.88] tracking-[-0.025em]">
-                Adventure
-                <br />
-                <span className="text-orange">isn&rsquo;t found.</span>
-                <br />
-                It&rsquo;s <span className="border-b-4 border-orange">earned</span>.
-              </h1>
-
-              <p className="mt-10 max-w-xl text-lg sm:text-xl text-foreground/70 leading-relaxed">
-                <span className="text-foreground">DRC Motorsports Pvt Ltd</span> is an Indian motorcycle culture and motorsport platform. Racing, training, adventure and community &mdash; built around the rider.
-              </p>
-
-              <div className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <Link href="/events">
-                  <Button size="lg" className="uppercase tracking-widest text-sm">
-                    DRC Ultimate Rider <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
-                <Link href="/about" className="font-heading uppercase tracking-widest text-sm text-foreground/70 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1">
-                  About the Platform &rarr;
-                </Link>
-              </div>
-            </div>
-
-            {/* Ledger strip pinned to bottom of left panel */}
-            <div className="mt-16 lg:mt-0 pt-10 border-t border-border grid grid-cols-3 gap-6 sm:gap-8">
-              {[
-                { k: "Calendar", v: "6", u: "Races / year" },
-                { k: "Coverage", v: "India", u: "Nationwide" },
-                { k: "Prize Pool", v: "₹5L", u: "Ultimate Rider" },
-              ].map((it) => (
-                <div key={it.k}>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange">{it.k}</div>
-                  <div className="font-heading text-3xl sm:text-4xl font-bold uppercase mt-3 leading-none tracking-tight">{it.v}</div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mt-2">{it.u}</div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Right panel — brand mark, treated like a keynote / product page. */}
-          <motion.div
-            className="relative border-t lg:border-t-0 border-border px-4 sm:px-6 lg:pl-16 lg:pr-10 py-16 sm:py-20 lg:py-28 flex flex-col justify-between bg-surface/40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-          >
-            {/* Corner label */}
-            <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/50">
-              <span>&#8213; The Mark</span>
-              <span>DRC / MSPT / 2026</span>
-            </div>
-
-            {/* Logo, huge, treated as the visual */}
-            <div className="flex items-center justify-center py-10 lg:py-16 relative">
-              {/* Corner brackets like a keynote frame */}
-              <span className="absolute top-0 left-0 w-8 h-8 border-t border-l border-orange" />
-              <span className="absolute top-0 right-0 w-8 h-8 border-t border-r border-orange" />
-              <span className="absolute bottom-0 left-0 w-8 h-8 border-b border-l border-orange" />
-              <span className="absolute bottom-0 right-0 w-8 h-8 border-b border-r border-orange" />
-
-              <Image
-                src="/brand/drc-logo-main.png"
-                alt="DRC Motorsports"
-                width={1000}
-                height={1000}
-                priority
-                className="w-full max-w-md h-auto object-contain"
-              />
-            </div>
-
-            {/* Footer strip */}
-            <div className="pt-8 border-t border-border">
-              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/50">Rider &middot; Training &middot; Adventure &middot; Motorsport &middot; Racing</div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/50 mt-1">Experiences &middot; Community &middot; Content &middot; Brands</div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Bottom category rail — Cisco / Ferrari style secondary nav */}
-      <div className="border-t border-border bg-background">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border">
-            {[
-              { href: "/events", label: "Racing", sub: "DRC Racing calendar" },
-              { href: "/trainings", label: "Training", sub: "Academy programs" },
-              { href: "/programs", label: "Adventure", sub: "Expeditions & camps" },
-              { href: "/contact", label: "Partner", sub: "Sponsor DRC" },
-            ].map((c) => (
-              <Link
-                key={c.href}
-                href={c.href}
-                className="group px-4 md:px-8 py-6 hover:bg-surface transition-colors relative"
-              >
-                <div className="font-heading text-xl font-bold uppercase tracking-tight group-hover:text-orange transition-colors">{c.label}</div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mt-1">{c.sub}</div>
-                <ArrowRight className="w-4 h-4 text-foreground/40 group-hover:text-orange group-hover:translate-x-1 transition-all absolute top-6 right-4 md:right-8" />
-              </Link>
-            ))}
+        {/* Bottom content */}
+        <motion.div
+          className="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 pb-16 sm:pb-20 pt-32"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="flex items-center gap-3 mb-5">
+            <span className="h-px w-10 bg-orange" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/70">An Indian motorcycle culture &amp; motorsport platform</span>
           </div>
-        </div>
+
+          <h1 className="font-heading font-bold uppercase text-white text-4xl sm:text-5xl lg:text-6xl leading-[0.95] tracking-[-0.02em] max-w-3xl">
+            Adventure isn&rsquo;t found.<br />
+            It&rsquo;s <span className="text-orange">earned</span>.
+          </h1>
+
+          <p className="mt-6 max-w-xl text-base sm:text-lg text-foreground/85 leading-relaxed">
+            <span className="text-foreground font-semibold">DRC Motorsports Pvt Ltd</span> — racing, training, adventure and community, built around the rider.
+          </p>
+
+          <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <Link href="/events">
+              <Button size="lg" className="uppercase tracking-widest text-sm">
+                Explore <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/about" className="font-heading uppercase tracking-widest text-xs text-foreground/80 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1 self-center">
+              About DRC &rarr;
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
