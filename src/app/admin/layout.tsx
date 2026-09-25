@@ -14,6 +14,7 @@ const sidebarLinks = [
   { href: "/admin/bikes", label: "Rental Bikes", icon: BikeIcon },
   { href: "/admin/program-bookings", label: "Program Bookings", icon: MapPinned },
   { href: "/admin/events", label: "Events", icon: Trophy },
+  { href: "/admin/event-registrations", label: "Event Registrations", icon: UserCheck },
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/riders", label: "Riders", icon: Users },
   { href: "/admin/memberships", label: "Memberships", icon: Crown },

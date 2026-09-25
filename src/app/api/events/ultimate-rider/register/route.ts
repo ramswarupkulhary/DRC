@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
 
 const CATEGORIES: Record<string, { name: string; fee: number }> = {
@@ -12,6 +15,11 @@ const ADMIN_INBOX = "info@dirtridecamp.com";
 
 export async function POST(req: Request) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
+            return NextResponse.json({ error: "Please sign in to register." }, { status: 401 });
+        }
+
         const body = await req.json();
         const { name, email, phone, city, bikeMake, bikeModel, experience, notes, category, agree } = body ?? {};
 
@@ -25,6 +33,28 @@ export async function POST(req: Request) {
         if (!cat) {
             return NextResponse.json({ error: "Invalid category." }, { status: 400 });
         }
+
+        // Persist a pending record so admin can see it before payment.
+        const userId = (session.user as { id: string }).id;
+        await prisma.eventRegistration.create({
+            data: {
+                userId,
+                eventSlug: "drc-ultimate-rider",
+                category,
+                categoryName: cat.name,
+                amount: cat.fee,
+                currency: "INR",
+                paymentStatus: "pending",
+                name: String(name),
+                email: String(email),
+                phone: String(phone),
+                city: String(city),
+                bikeMake: String(bikeMake),
+                bikeModel: String(bikeModel),
+                experience: String(experience),
+                notes: notes ? String(notes) : null,
+            },
+        });
 
         const summaryRows = [
             ["Category", cat.name],

@@ -64,6 +64,31 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid payment signature." }, { status: 400 });
         }
 
+        // Persist to the database so admin can see it.
+        const userId = (session.user as { id: string }).id;
+        const registration = await prisma.eventRegistration.create({
+            data: {
+                userId,
+                eventSlug: "drc-ultimate-rider",
+                category,
+                categoryName: cat.name,
+                amount: cat.fee,
+                currency: "INR",
+                paymentStatus: "paid",
+                razorpayOrderId: razorpay_order_id,
+                razorpayPaymentId: razorpay_payment_id,
+                razorpaySignature: razorpay_signature,
+                name: String(name || session.user.name || ""),
+                email: String(email || session.user.email || ""),
+                phone: String(phone || ""),
+                city: city ? String(city) : null,
+                bikeMake: bikeMake ? String(bikeMake) : null,
+                bikeModel: bikeModel ? String(bikeModel) : null,
+                experience: experience ? String(experience) : null,
+                notes: notes ? String(notes) : null,
+            },
+        });
+
         const rows = [
             ["Category", cat.name],
             ["Paid", `₹${cat.fee.toLocaleString("en-IN")}`],

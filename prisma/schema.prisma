@@ -75,6 +75,7 @@ model User {
   giftVouchersRedeemed  GiftVoucher[] @relation("redeemer")
   programBookings ProgramBooking[]
   pushSubscriptions PushSubscription[]
+  eventRegistrations EventRegistration[]
 }
 
 model Account {
@@ -604,6 +605,36 @@ model Event {
   prizes      String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model EventRegistration {
+  id                 String   @id @default(cuid())
+  userId             String
+  eventSlug          String
+  category           String
+  categoryName       String
+  amount             Int
+  currency           String   @default("INR")
+  paymentStatus      String   @default("pending") // pending | paid | cancelled
+  razorpayOrderId    String?
+  razorpayPaymentId  String?
+  razorpaySignature  String?
+  name               String
+  email              String
+  phone              String
+  city               String?
+  bikeMake           String?
+  bikeModel          String?
+  experience         String?
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([eventSlug])
+  @@index([userId])
+  @@index([paymentStatus])
 }
 
 model Notification {
