@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const event = await prisma.event.findUnique({ where: { slug } });
   if (!event) return { title: "Event Not Found" };
-  const description = event.description?.slice(0, 160) || `${event.title} — an off-road event by Dirt Ride Camp (DRC) in Bangalore.`;
+  const description = event.description?.slice(0, 160) || `${event.title} — an off-road event by DRC Motorsports.`;
   return {
     title: event.title,
     description,
