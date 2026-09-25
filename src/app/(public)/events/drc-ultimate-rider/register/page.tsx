@@ -12,7 +12,26 @@ const categories = [
   { id: "big-bikes", name: "Big Bikes", fee: 7999, note: "Adventure & big-capacity motorcycles." },
 ];
 
-type Status = "idle" | "submitting" | "success" | "error";
+type Status = "idle" | "submitting" | "paying" | "success" | "success-paid" | "error";
+
+declare global {
+  interface Window {
+    Razorpay: new (options: Record<string, unknown>) => { open: () => void };
+  }
+}
+
+async function ensureRazorpay(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  if (window.Razorpay) return true;
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 export default function UltimateRiderRegisterPage() {
   const [category, setCategory] = useState<string>("");
@@ -32,17 +51,22 @@ export default function UltimateRiderRegisterPage() {
 
   const selected = categories.find((c) => c.id === category);
 
+  function validate(): string | null {
+    if (!category) return "Please select a category.";
+    if (!form.name || !form.email || !form.phone || !form.city) return "Please fill in all rider details.";
+    if (!form.bikeMake || !form.bikeModel) return "Please add your bike make and model.";
+    if (!form.experience) return "Please select your experience level.";
+    if (!form.agree) return "Please acknowledge the entry terms to continue.";
+    return null;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!category) {
-      setErrorMessage("Please select a category.");
+    const err = validate();
+    if (err) {
+      setErrorMessage(err);
       return;
     }
-    if (!form.agree) {
-      setErrorMessage("Please acknowledge the entry terms to continue.");
-      return;
-    }
-
     setStatus("submitting");
     setErrorMessage("");
 
@@ -63,20 +87,114 @@ export default function UltimateRiderRegisterPage() {
     }
   }
 
-  if (status === "success") {
+  async function handlePayNow() {
+    const err = validate();
+    if (err) {
+      setErrorMessage(err);
+      return;
+    }
+    if (!selected) return;
+    setStatus("paying");
+    setErrorMessage("");
+
+    try {
+      const orderRes = await fetch("/api/events/ultimate-rider/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ category, name: form.name, email: form.email, phone: form.phone }),
+      });
+      if (!orderRes.ok) {
+        const data = await orderRes.json().catch(() => ({}));
+        throw new Error(data?.error || "Could not create payment order.");
+      }
+      const { orderId, amount, key, categoryName } = await orderRes.json();
+
+      const ready = await ensureRazorpay();
+      if (!ready) throw new Error("Payment library failed to load. Please try again or check your connection.");
+
+      const options: Record<string, unknown> = {
+        key,
+        amount: amount * 100,
+        currency: "INR",
+        name: "DRC Motorsports",
+        description: `DRC Ultimate Rider — ${categoryName}`,
+        order_id: orderId,
+        theme: { color: "#E8622C" },
+        prefill: {
+          name: form.name,
+          email: form.email,
+          contact: form.phone,
+        },
+        notes: {
+          event: "drc-ultimate-rider",
+          category,
+        },
+        handler: async (response: {
+          razorpay_order_id: string;
+          razorpay_payment_id: string;
+          razorpay_signature: string;
+        }) => {
+          try {
+            const verifyRes = await fetch("/api/events/ultimate-rider/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...response,
+                ...form,
+                category,
+              }),
+            });
+            if (!verifyRes.ok) {
+              const data = await verifyRes.json().catch(() => ({}));
+              throw new Error(data?.error || "Payment verification failed.");
+            }
+            setStatus("success-paid");
+          } catch (err) {
+            setStatus("error");
+            setErrorMessage(err instanceof Error ? err.message : "Payment verification failed.");
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setStatus("idle");
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      setStatus("error");
+      setErrorMessage(err instanceof Error ? err.message : "Something went wrong.");
+    }
+  }
+
+  if (status === "success" || status === "success-paid") {
+    const paid = status === "success-paid";
     return (
       <div className="max-w-3xl mx-auto px-6 lg:px-10 py-20 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange/10 mb-6">
           <Check className="w-8 h-8 text-orange" strokeWidth={2.5} />
         </div>
         <h1 className="font-heading font-bold uppercase text-3xl sm:text-4xl leading-[1] tracking-[-0.01em]">
-          Registration received.
+          {paid ? "You're in." : "Registration received."}
         </h1>
         <p className="mt-4 text-muted leading-relaxed max-w-xl mx-auto">
-          Thank you, <span className="text-foreground font-semibold">{form.name}</span>. We&rsquo;ve received your entry for{" "}
-          <span className="text-foreground font-semibold">DRC Ultimate Rider</span> in the{" "}
-          <span className="text-orange font-semibold">{selected?.name}</span> category. Our team will confirm your slot
-          and share payment instructions via email and WhatsApp shortly.
+          {paid ? (
+            <>
+              Payment received. Your slot for <span className="text-foreground font-semibold">DRC Ultimate Rider</span>{" "}
+              in the <span className="text-orange font-semibold">{selected?.name}</span> category is{" "}
+              <span className="text-foreground font-semibold">confirmed</span>. A receipt has been sent to{" "}
+              <span className="text-foreground">{form.email}</span>.
+            </>
+          ) : (
+            <>
+              Thank you, <span className="text-foreground font-semibold">{form.name}</span>. We&rsquo;ve received your entry
+              for <span className="text-foreground font-semibold">DRC Ultimate Rider</span> in the{" "}
+              <span className="text-orange font-semibold">{selected?.name}</span> category. Our team will confirm your
+              slot and share payment instructions via email and WhatsApp shortly.
+            </>
+          )}
         </p>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/events/drc-ultimate-rider">
@@ -112,7 +230,7 @@ export default function UltimateRiderRegisterPage() {
             Rider <span className="text-orange">registration</span>.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-muted">
-            Pick your category, fill in the details, and we&rsquo;ll confirm your slot with payment instructions.
+            Pick your category, fill in your details, and pay to confirm your slot instantly &mdash; or submit and pay later.
           </p>
         </div>
       </section>
@@ -282,8 +400,7 @@ export default function UltimateRiderRegisterPage() {
                 className="mt-1 accent-orange w-4 h-4"
               />
               <span className="text-xs text-muted leading-relaxed">
-                I confirm the details above are correct and understand that my slot is confirmed only after payment is
-                received and DRC Motorsports issues a confirmation.
+                I confirm the details above are correct and understand my slot is confirmed only after payment is received.
               </span>
             </label>
 
@@ -292,16 +409,27 @@ export default function UltimateRiderRegisterPage() {
             )}
 
             <Button
-              type="submit"
+              type="button"
               size="lg"
               className="w-full mt-6 uppercase tracking-widest text-sm"
-              loading={status === "submitting"}
+              loading={status === "paying"}
+              disabled={status === "submitting"}
+              onClick={handlePayNow}
             >
-              Submit registration <ArrowRight className="w-4 h-4" />
+              Pay {selected ? `₹${selected.fee.toLocaleString("en-IN")}` : "now"} &amp; confirm
+              <ArrowRight className="w-4 h-4" />
             </Button>
 
+            <button
+              type="submit"
+              disabled={status === "submitting" || status === "paying"}
+              className="w-full mt-3 font-heading uppercase tracking-widest text-xs text-foreground/70 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {status === "submitting" ? "Submitting…" : "Or submit & pay later →"}
+            </button>
+
             <p className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted text-center">
-              Payment instructions follow by email &amp; WhatsApp
+              Secure payment via Razorpay &middot; UPI, cards, netbanking
             </p>
           </div>
         </aside>
@@ -353,3 +481,4 @@ function Row({ k, v, highlight }: { k: string; v: string; highlight?: boolean })
     </div>
   );
 }
+
