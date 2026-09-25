@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
-import { ArrowRight, Check, Lock } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 const categories = [
     { id: "amateurs", name: "Amateurs", fee: 4999, note: "First-timers & club-level riders." },
@@ -163,49 +163,6 @@ export default function UltimateRiderRegisterPage() {
         }
     }
 
-    // Login gate — riders must be signed in before they can register.
-    if (authStatus === "loading") {
-        return (
-            <div className="max-w-3xl mx-auto px-6 lg:px-10 py-32 text-center">
-                <p className="font-mono text-xs uppercase tracking-widest text-muted">Checking session…</p>
-            </div>
-        );
-    }
-    if (authStatus === "unauthenticated") {
-        return (
-            <div className="max-w-3xl mx-auto px-6 lg:px-10 py-24 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange/10 mb-6">
-                    <Lock className="w-7 h-7 text-orange" strokeWidth={2} />
-                </div>
-                <div className="flex items-center justify-center gap-3 mb-4">
-                    <span className="h-px w-10 bg-orange" />
-                    <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange">Sign in required</span>
-                    <span className="h-px w-10 bg-orange" />
-                </div>
-                <h1 className="font-heading font-bold uppercase text-3xl sm:text-5xl leading-[1] tracking-[-0.01em]">
-                    Sign in to register.
-                </h1>
-                <p className="mt-5 text-muted leading-relaxed max-w-xl mx-auto">
-                    Rider registration for <span className="text-foreground font-semibold">DRC Ultimate Rider</span> requires a
-                    DRC account &mdash; it&rsquo;s how we confirm your slot, share race-week details and issue your receipt.
-                </p>
-                <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
-                        <Button size="lg" className="uppercase tracking-widest text-sm">
-                            Sign in <ArrowRight className="w-4 h-4" />
-                        </Button>
-                    </Link>
-                    <Link
-                        href={`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-                        className="font-heading uppercase tracking-widest text-xs text-foreground/70 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1"
-                    >
-                        Create an account &rarr;
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
     if (status === "success-paid") {
         const paid = status === "success-paid";
         return (
@@ -289,8 +246,8 @@ export default function UltimateRiderRegisterPage() {
                                     <label
                                         key={c.id}
                                         className={`block p-6 border cursor-pointer transition-colors ${isSelected
-                                                ? "border-orange bg-orange/5"
-                                                : "border-border bg-background hover:border-tan-dark"
+                                            ? "border-orange bg-orange/5"
+                                            : "border-border bg-background hover:border-tan-dark"
                                             }`}
                                     >
                                         <input
@@ -451,7 +408,9 @@ export default function UltimateRiderRegisterPage() {
                             loading={status === "paying"}
                             onClick={handlePayNow}
                         >
-                            Pay {selected ? `₹${selected.fee.toLocaleString("en-IN")}` : "now"} &amp; confirm
+                            {authStatus === "authenticated"
+                                ? <>Pay {selected ? `₹${selected.fee.toLocaleString("en-IN")}` : "now"} &amp; confirm</>
+                                : <>Sign in to pay {selected ? `₹${selected.fee.toLocaleString("en-IN")}` : ""}</>}
                             <ArrowRight className="w-4 h-4" />
                         </Button>
 
