@@ -81,8 +81,8 @@ export async function POST(req: Request) {
             html: drcEmailTemplate({
                 title: "New Ultimate Rider registration",
                 body: `<table style="width:100%;border-collapse:collapse;">${rowsHtml}</table>${notes
-                        ? `<p style="margin-top:16px;color:#B9A886;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Notes</p><p style="color:#F1E9DD;font-size:14px;line-height:1.6;">${escapeHtml(notes)}</p>`
-                        : ""
+                    ? `<p style="margin-top:16px;color:#B9A886;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Notes</p><p style="color:#F1E9DD;font-size:14px;line-height:1.6;">${escapeHtml(notes)}</p>`
+                    : ""
                     }`,
             }),
         });
