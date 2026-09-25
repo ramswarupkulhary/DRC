@@ -15,12 +15,12 @@ export const metadata: Metadata = {
 
 export default async function EventsPage() {
   const upcoming = await prisma.event.findMany({
-    where: { status: "upcoming", date: { gte: new Date() } },
+    where: { status: "upcoming", date: { gte: new Date() }, slug: { not: "drc-ultimate-rider" } },
     orderBy: { date: "asc" },
   });
 
   const past = await prisma.event.findMany({
-    where: { status: { in: ["completed", "upcoming"] }, date: { lt: new Date() } },
+    where: { status: { in: ["completed", "upcoming"] }, date: { lt: new Date() }, slug: { not: "drc-ultimate-rider" } },
     orderBy: { date: "desc" },
     take: 6,
   });
