@@ -83,7 +83,7 @@ export default function UltimateRiderPage() {
             {/* Hero */}
             <section className="relative border-b border-border overflow-hidden">
                 <Image
-                    src="/magazine/ultimate-rider/mx.png"
+                    src="/magazine/ultimate-rider/mx.webp"
                     alt=""
                     fill
                     priority

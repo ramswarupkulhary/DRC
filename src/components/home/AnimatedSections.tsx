@@ -37,7 +37,7 @@ export function AnimatedHero() {
       {/* Cinematic full-bleed hero */}
       <div className="relative min-h-[calc(100vh-5rem)] flex items-end">
         <Image
-          src="/magazine/ultimate-rider/cover.png"
+          src="/magazine/ultimate-rider/cover.webp"
           alt=""
           fill
           priority
