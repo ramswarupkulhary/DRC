@@ -2,15 +2,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { resolveEventCategory } from "@/lib/eventCategories";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
 import crypto from "crypto";
-
-const CATEGORY_FEES: Record<string, { name: string; fee: number }> = {
-    amateurs: { name: "Amateurs", fee: 4999 },
-    professionals: { name: "Professionals", fee: 7999 },
-    women: { name: "Women Category", fee: 4999 },
-    "big-bikes": { name: "Big Bikes", fee: 7999 },
-};
 
 const ADMIN_INBOX = "info@dirtridecamp.com";
 
@@ -45,10 +39,11 @@ export async function POST(req: Request) {
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return NextResponse.json({ error: "Missing payment identifiers." }, { status: 400 });
         }
-        const cat = CATEGORY_FEES[category];
-        if (!cat) {
-            return NextResponse.json({ error: "Invalid category." }, { status: 400 });
+        const resolved = await resolveEventCategory("drc-ultimate-rider", String(category));
+        if (!resolved) {
+            return NextResponse.json({ error: "Invalid or inactive category." }, { status: 400 });
         }
+        const cat = resolved.category;
 
         const secret = await getRazorpaySecret();
         if (!secret) {

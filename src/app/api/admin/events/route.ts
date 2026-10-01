@@ -3,11 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// Idempotently ensure the flagship Ultimate Rider event exists in the Event table
-// so the admin panel and public /events listing always show it, even though the
-// rich detail page at /events/drc-ultimate-rider is a hardcoded route.
+// Idempotently ensure the flagship Ultimate Rider event + its 4 categories exist.
 async function ensureUltimateRider() {
-  await prisma.event.upsert({
+  const event = await prisma.event.upsert({
     where: { slug: "drc-ultimate-rider" },
     create: {
       title: "DRC Ultimate Rider",
@@ -38,6 +36,21 @@ async function ensureUltimateRider() {
     },
     update: {},
   });
+
+  const defaultCategories = [
+    { slug: "amateurs", name: "Amateurs", description: "First-timers & club-level riders.", fee: 4999, sortOrder: 1 },
+    { slug: "professionals", name: "Professionals", description: "Championship & podium-level riders.", fee: 7999, sortOrder: 2 },
+    { slug: "women", name: "Women Category", description: "Open to all women riders across skill levels.", fee: 4999, sortOrder: 3 },
+    { slug: "big-bikes", name: "Big Bikes", description: "Adventure & big-capacity motorcycles.", fee: 7999, sortOrder: 4 },
+  ];
+
+  for (const cat of defaultCategories) {
+    await prisma.eventCategory.upsert({
+      where: { eventId_slug: { eventId: event.id, slug: cat.slug } },
+      create: { ...cat, eventId: event.id, active: true },
+      update: {},
+    });
+  }
 }
 
 export async function GET() {

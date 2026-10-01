@@ -2,14 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { resolveEventCategory } from "@/lib/eventCategories";
 import Razorpay from "razorpay";
-
-const CATEGORY_FEES: Record<string, { name: string; fee: number }> = {
-    amateurs: { name: "Amateurs", fee: 4999 },
-    professionals: { name: "Professionals", fee: 7999 },
-    women: { name: "Women Category", fee: 4999 },
-    "big-bikes": { name: "Big Bikes", fee: 7999 },
-};
 
 async function getRazorpayInstance() {
     const settings = await prisma.siteSetting.findMany({
@@ -41,10 +35,11 @@ export async function POST(req: Request) {
         if (!category || !name || !email || !phone) {
             return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
         }
-        const cat = CATEGORY_FEES[category];
-        if (!cat) {
-            return NextResponse.json({ error: "Invalid category." }, { status: 400 });
+        const resolved = await resolveEventCategory("drc-ultimate-rider", String(category));
+        if (!resolved) {
+            return NextResponse.json({ error: "Invalid or inactive category." }, { status: 400 });
         }
+        const cat = resolved.category;
 
         const rz = await getRazorpayInstance();
         if (!rz) {
@@ -60,7 +55,7 @@ export async function POST(req: Request) {
             receipt: `ur_${category}_${Date.now()}`,
             notes: {
                 event: "drc-ultimate-rider",
-                category,
+                category: cat.slug,
                 categoryName: cat.name,
                 name,
                 email,

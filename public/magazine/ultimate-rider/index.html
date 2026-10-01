@@ -293,41 +293,55 @@
     .part-inner { padding: 10mm 14mm 11mm; height: 297mm; display: flex; flex-direction: column; }
     .part-inner h1 { font-size: 8.2mm; line-height: 0.94; margin: 3.2mm 0 2.6mm; max-width: 186mm; }
     .part-lead { font-size: 9.4pt; font-style: italic; line-height: 1.4; max-width: 176mm; margin-bottom: 4mm; color: #2A2A2A; }
-    .part-photo { margin: 0 -14mm 5mm; height: 38mm; overflow: hidden; }
-    .part-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
-    .channels {
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 2.2mm; margin-bottom: 4.5mm;
+    .world-line {
+      font-family: "Oswald", sans-serif; font-size: 7.4pt; letter-spacing: 0.14em;
+      text-transform: uppercase; color: #4A4A4A; margin-bottom: 5mm; line-height: 1.55;
     }
-    .channels div {
-      background: var(--black); color: var(--paper); text-align: center;
-      padding: 2.6mm 1mm; font-family: "Oswald", sans-serif;
-      font-size: 7.4pt; letter-spacing: 0.16em; text-transform: uppercase;
+    .world-line b { color: var(--orange); font-weight: 600; margin-right: 2.5mm; }
+    .packages {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3.8mm 6mm;
+      margin-bottom: 4.5mm;
     }
-    .roles {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm;
-      border-top: 1.15pt solid var(--black); padding-top: 4mm; margin-bottom: 4.5mm;
+    .pkg {
+      border: 1.05pt solid var(--black); padding: 4.2mm 5mm 4.6mm;
+      min-height: 44mm;
     }
-    .roles h3 { font-size: 8.5pt; letter-spacing: 0.16em; color: var(--orange); margin-bottom: 1.6mm; }
-    .roles p { font-size: 7.6pt; line-height: 1.42; color: #333; }
-    .cats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 8mm; margin-bottom: 5mm; }
-    .cat {
-      display: grid; grid-template-columns: 7mm 1fr; gap: 2mm;
-      border-top: 0.35pt solid var(--rule-dark); padding: 1.55mm 0;
-      font-family: "Oswald", sans-serif; font-size: 6.5pt; letter-spacing: 0.08em;
-      text-transform: uppercase; color: #4A4A4A;
+    .pkg.title-pkg { background: var(--black); color: var(--paper); border-color: var(--black); }
+    .pkg.support-pkg {
+      grid-column: 1 / -1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8mm;
+      align-items: center;
+      padding: 3.8mm 5.5mm;
     }
-    .cat i { font-style: normal; color: var(--orange); }
+    .pkg.support-pkg .price { margin: 0; font-size: 16pt; }
+    .pkg .num {
+      font-family: "Oswald", sans-serif; font-size: 7pt; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--orange); margin-bottom: 1.6mm;
+    }
+    .pkg h3 { font-size: 13pt; letter-spacing: 0.08em; margin-bottom: 1mm; }
+    .pkg .price {
+      font-family: "Oswald", sans-serif; font-size: 18pt; letter-spacing: 0.02em;
+      color: var(--orange); line-height: 1; margin: 1.5mm 0 2.4mm;
+    }
+    .pkg p { font-size: 8pt; line-height: 1.42; color: #333; }
+    .pkg.title-pkg p { color: rgba(241,233,221,0.84); }
     .include-kicker {
       font-family: "Oswald", sans-serif; font-size: 7.5pt; letter-spacing: 0.32em;
       text-transform: uppercase; color: var(--orange); margin-bottom: 2.4mm;
     }
     .include {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3.5mm 6mm;
-      margin-bottom: 4mm;
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 3.5mm 5mm;
+      margin-bottom: 4.5mm;
     }
     .include article { border-top: 1.05pt solid var(--black); padding-top: 2.2mm; }
     .include h3 { font-size: 8pt; letter-spacing: 0.14em; margin-bottom: 1.2mm; }
     .include p { font-size: 7.2pt; line-height: 1.38; color: #3A3A3A; }
+    .after {
+      font-size: 8.6pt; line-height: 1.48; color: #2A2A2A; max-width: 178mm; margin-bottom: 3mm;
+    }
     .closer { margin-top: auto; border-top: 1.2pt solid var(--black); padding-top: 4mm; }
     .closer p {
       font-family: "Oswald", sans-serif; font-size: 7.6mm; line-height: 0.94;
@@ -597,7 +611,7 @@
           </article>
           <article>
             <h2>Play</h2>
-            <p>ATV rides. Kids activities. Rider experiences on the ground.</p>
+            <p>ATV rides for spectators. Kids activities. Rider experiences on the ground.</p>
           </article>
           <article>
             <h2>Eat</h2>
@@ -609,10 +623,10 @@
           </article>
           <article>
             <h2>Celebrate</h2>
-            <p>A DJ night party after the engines quiet.</p>
+            <p>Live music. DJ. Band. A night after the engines quiet.</p>
           </article>
         </div>
-        <div class="on-ground"><b>On ground</b> ATV · Food · DJ Night · Kids Activities · Rider Experience · Community · Brand Activations · Motorsport</div>
+        <div class="on-ground"><b>On ground</b> ATV · Live Music · DJ · Band · Food · Kids Activities · Rider Experience · Community · Brand Activations · Motorsport</div>
         <div class="exp-foot">Watch · Play · Eat · Connect · Celebrate</div>
       </div>
     </article>
@@ -625,75 +639,62 @@
           <span>A role, not a banner</span>
         </div>
         <h1>Your brand doesn’t need a banner.<br />It needs a role.</h1>
-        <p class="part-lead">If you put a motorcycle, a tyre, a helmet or a table into this weekend, you should know exactly what that buys.</p>
-        <div class="part-photo">
-          <img src="../drc-editorial/drc-editorial-08-tyre.jpg" alt="Tyre and machine in the dirt" />
-        </div>
-        <div class="roles">
-          <article>
-            <h3>Title Partner</h3>
-            <p>Naming association with DRC Ultimate Rider. Lead presence across racing, riders, experiences, content and community.</p>
+        <p class="part-lead">This is not only a race. It is a full two-day motorsport weekend — racing, ATV rides, live music, DJ, band, food, community. You should know exactly what a role buys.</p>
+        <div class="world-line"><b>The weekend</b> Race · ATV · Live music · DJ · Band · Food · Community · Stall · Content</div>
+        <div class="packages">
+          <article class="pkg title-pkg">
+            <div class="num">01 · Title Sponsor</div>
+            <h3>Title</h3>
+            <div class="price">₹10 LAKH</div>
+            <p>Naming on DRC Ultimate Rider. Lead presence across the racing and the two-day world around it. Prime stall. Lead placement on both reels and the Instagram poster.</p>
           </article>
-          <article>
-            <h3>Motorcycle Partner</h3>
-            <p>Official motorcycle of the flag-off. The machine across enduro, rock garden, hill climb, slush, mud and technical ground.</p>
+          <article class="pkg">
+            <div class="num">02 · Powered By Sponsor</div>
+            <h3>Powered By</h3>
+            <div class="price">₹7 LAKH</div>
+            <p>Powered-by association with the flag-off weekend. Strong presence on race day and in the live world around it. Stall close to the track. Both reels. Instagram poster.</p>
           </article>
-          <article>
-            <h3>Experience Partner</h3>
-            <p>A live role inside what already exists: ATV, food, DJ night, kids activities, rider experiences, community.</p>
+          <article class="pkg">
+            <div class="num">03 · Co-sponsor</div>
+            <h3>Co-sponsor</h3>
+            <div class="price">₹5 LAKH</div>
+            <p>Official partner on the first DRC Race. Stall on the ground. Both reels. Instagram poster. A role inside the two-day weekend, not only the start gate.</p>
+          </article>
+          <article class="pkg">
+            <div class="num">04 · General Sponsor</div>
+            <h3>General</h3>
+            <div class="price">₹3 LAKH</div>
+            <p>Brand on the weekend. Stall. Both reels. Instagram poster. A clear, honest role at the flag-off of DRC Racing.</p>
+          </article>
+          <article class="pkg support-pkg">
+            <div>
+              <div class="num">05 · Supporting Sponsor</div>
+              <h3>Supporting</h3>
+              <p>Brand on the DRC Instagram sponsor poster, and a presence at the flag-off weekend. The open door into the calendar.</p>
+            </div>
+            <div class="price">₹1 LAKH</div>
           </article>
         </div>
-        <div class="cats">
-          <div class="cat"><i>01</i> Title Partner</div>
-          <div class="cat"><i>02</i> Powered By Partner</div>
-          <div class="cat"><i>03</i> Official Motorcycle Partner</div>
-          <div class="cat"><i>04</i> Official Tyre Partner</div>
-          <div class="cat"><i>05</i> Official Lubricant Partner</div>
-          <div class="cat"><i>06</i> Official Riding Gear Partner</div>
-          <div class="cat"><i>07</i> Official Helmet Partner</div>
-          <div class="cat"><i>08</i> Official Performance Partner</div>
-          <div class="cat"><i>09</i> Official Hydration Partner</div>
-          <div class="cat"><i>10</i> Official Energy Partner</div>
-          <div class="cat"><i>11</i> Official Nutrition Partner</div>
-          <div class="cat"><i>12</i> Official Technology Partner</div>
-          <div class="cat"><i>13</i> Official Content &amp; Camera Partner</div>
-          <div class="cat"><i>14</i> Official Safety &amp; Medical Partner</div>
-          <div class="cat"><i>15</i> Official Media Partner</div>
-        </div>
-        <div class="channels">
-          <div>Race</div>
-          <div>Experience</div>
-          <div>Content</div>
-          <div>Community</div>
-          <div>Hospitality</div>
-        </div>
-        <div class="include-kicker">Partnership can include</div>
+        <div class="include-kicker">From ₹3 lakh, every package includes</div>
         <div class="include">
           <article>
-            <h3>Brand visibility</h3>
-            <p>Race zones · Podium · Event branding</p>
+            <h3>Track-side stall</h3>
+            <p>Easy for spectators to reach. Close to the track. Built to show your product.</p>
           </article>
           <article>
-            <h3>Product integration</h3>
-            <p>Rider use · Product display · Demonstration</p>
+            <h3>Reel before</h3>
+            <p>One Instagram reel on the DRC page before the event.</p>
           </article>
           <article>
-            <h3>Content</h3>
-            <p>Race films · Social integration · Rider stories</p>
+            <h3>Reel after</h3>
+            <p>One Instagram reel on the DRC page after the event.</p>
           </article>
           <article>
-            <h3>Activation</h3>
-            <p>Consumer experiences · Challenges · Product trials</p>
-          </article>
-          <article>
-            <h3>Hospitality</h3>
-            <p>VIP · Dealers · Customers · Corporate</p>
-          </article>
-          <article>
-            <h3>Exclusivity</h3>
-            <p>One category. One official partner.</p>
+            <h3>Sponsor poster</h3>
+            <p>A sponsor poster on the DRC Instagram page.</p>
           </article>
         </div>
+        <p class="after">Bengaluru is the first official DRC Race. You see how we run the weekend. From that, we build the longer partnership: six races every year, across India.</p>
         <div class="closer">
           <p>Don’t sponsor the race.<br />Own a part of the experience.</p>
         </div>

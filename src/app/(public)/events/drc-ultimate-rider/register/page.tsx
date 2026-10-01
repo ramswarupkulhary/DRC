@@ -7,12 +7,13 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { ArrowRight, Check } from "lucide-react";
 
-const categories = [
-    { id: "amateurs", name: "Amateurs", fee: 4999, note: "First-timers & club-level riders." },
-    { id: "professionals", name: "Professionals", fee: 7999, note: "Championship & podium-level riders." },
-    { id: "women", name: "Women Category", fee: 4999, note: "Open to all women riders across skill levels." },
-    { id: "big-bikes", name: "Big Bikes", fee: 7999, note: "Adventure & big-capacity motorcycles." },
-];
+interface Category {
+    id: string;
+    slug: string;
+    name: string;
+    fee: number;
+    description: string | null;
+}
 
 type Status = "idle" | "paying" | "success-paid" | "error";
 
@@ -40,6 +41,7 @@ export default function UltimateRiderRegisterPage() {
     const router = useRouter();
     const callbackUrl = "/events/drc-ultimate-rider/register";
 
+    const [categories, setCategories] = useState<Category[]>([]);
     const [category, setCategory] = useState<string>("");
     const [form, setForm] = useState({
         name: "",
@@ -55,6 +57,14 @@ export default function UltimateRiderRegisterPage() {
     const [status, setStatus] = useState<Status>("idle");
     const [errorMessage, setErrorMessage] = useState<string>("");
 
+    // Fetch categories from DB so admin edits (name/fee/order) propagate here instantly.
+    useEffect(() => {
+        fetch("/api/events/drc-ultimate-rider/categories")
+            .then((r) => (r.ok ? r.json() : Promise.reject()))
+            .then((data) => setCategories((data?.categories ?? []).map((c: { id: string; slug: string; name: string; fee: number; description: string | null }) => c)))
+            .catch(() => setCategories([]));
+    }, []);
+
     // Prefill name/email from the session so riders don't retype them.
     useEffect(() => {
         if (session?.user) {
@@ -66,7 +76,7 @@ export default function UltimateRiderRegisterPage() {
         }
     }, [session]);
 
-    const selected = categories.find((c) => c.id === category);
+    const selected = categories.find((c) => c.slug === category);
 
     function validate(): string | null {
         if (!category) return "Please select a category.";
@@ -241,10 +251,10 @@ export default function UltimateRiderRegisterPage() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {categories.map((c) => {
-                                const isSelected = category === c.id;
+                                const isSelected = category === c.slug;
                                 return (
                                     <label
-                                        key={c.id}
+                                        key={c.slug}
                                         className={`block p-6 border cursor-pointer transition-colors ${isSelected
                                             ? "border-orange bg-orange/5"
                                             : "border-border bg-background hover:border-tan-dark"
@@ -253,15 +263,15 @@ export default function UltimateRiderRegisterPage() {
                                         <input
                                             type="radio"
                                             name="category"
-                                            value={c.id}
+                                            value={c.slug}
                                             checked={isSelected}
-                                            onChange={() => setCategory(c.id)}
+                                            onChange={() => setCategory(c.slug)}
                                             className="sr-only"
                                         />
                                         <div className="flex items-start justify-between gap-4">
                                             <div>
                                                 <h3 className="font-heading text-xl font-bold uppercase leading-tight">{c.name}</h3>
-                                                <p className="text-sm text-muted mt-2 leading-relaxed">{c.note}</p>
+                                                <p className="text-sm text-muted mt-2 leading-relaxed">{c.description}</p>
                                             </div>
                                             {isSelected && (
                                                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange text-white shrink-0">

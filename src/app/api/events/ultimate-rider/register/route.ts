@@ -2,14 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { resolveEventCategory } from "@/lib/eventCategories";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
-
-const CATEGORIES: Record<string, { name: string; fee: number }> = {
-    amateurs: { name: "Amateurs", fee: 4999 },
-    professionals: { name: "Professionals", fee: 7999 },
-    women: { name: "Women Category", fee: 4999 },
-    "big-bikes": { name: "Big Bikes", fee: 7999 },
-};
 
 const ADMIN_INBOX = "info@dirtridecamp.com";
 
@@ -29,10 +23,11 @@ export async function POST(req: Request) {
         if (!agree) {
             return NextResponse.json({ error: "Entry terms must be accepted." }, { status: 400 });
         }
-        const cat = CATEGORIES[category];
-        if (!cat) {
-            return NextResponse.json({ error: "Invalid category." }, { status: 400 });
+        const resolved = await resolveEventCategory("drc-ultimate-rider", String(category));
+        if (!resolved) {
+            return NextResponse.json({ error: "Invalid or inactive category." }, { status: 400 });
         }
+        const cat = resolved.category;
 
         // Persist a pending record so admin can see it before payment.
         const userId = (session.user as { id: string }).id;
@@ -40,7 +35,7 @@ export async function POST(req: Request) {
             data: {
                 userId,
                 eventSlug: "drc-ultimate-rider",
-                category,
+                category: cat.slug,
                 categoryName: cat.name,
                 amount: cat.fee,
                 currency: "INR",

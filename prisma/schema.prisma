@@ -605,6 +605,27 @@ model Event {
   prizes      String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  categories EventCategory[]
+}
+
+model EventCategory {
+  id          String   @id @default(cuid())
+  eventId     String
+  slug        String
+  name        String
+  description String?
+  fee         Int
+  totalSlots  Int?
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, slug])
+  @@index([eventId])
 }
 
 model EventRegistration {

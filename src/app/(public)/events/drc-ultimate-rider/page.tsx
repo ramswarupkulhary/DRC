@@ -2,19 +2,39 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { SportsEventJsonLd } from "@/components/seo/SportsEventJsonLd";
 import { ArrowRight, Calendar, MapPin, Trophy, Flag, Users } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "DRC Ultimate Rider — Race Brief | Bengaluru, 12–13 Dec 2026",
+    title: "DRC Ultimate Rider — India's Biggest Multi-Surface Off-Road Race | Bengaluru, 12–13 Dec 2026",
     description:
-        "DRC Ultimate Rider — the first official DRC race. Two-day motorsport event across enduro, rock garden, hill climb, slush, mud and technical. ₹5 Lakh prize pool. Bengaluru, 12–13 December 2026.",
+        "DRC Ultimate Rider — India's biggest multi-surface off-road motorcycle race. 12–13 December 2026, Bengaluru. Enduro, rock garden, hill climb, slush, mud and technical surfaces. ₹5 Lakh prize pool. Amateurs, Professionals, Women and Big Bikes categories. The first official DRC Race.",
+    keywords: [
+        "India's biggest off road event",
+        "India's biggest off road race",
+        "biggest motorsport event India",
+        "off road race Bengaluru",
+        "off road race Bangalore",
+        "enduro race India",
+        "motorcycle race India 2026",
+        "DRC Ultimate Rider",
+        "DRC Racing",
+        "Dirt Ride Camp race",
+        "off road championship Karnataka",
+        "motocross event India",
+        "adventure motorcycle race India",
+        "off road event Bengaluru December 2026",
+        "India motorsport championship",
+        "Dakar India",
+        "DRC Mini Dakar",
+    ],
     alternates: { canonical: "/events/drc-ultimate-rider" },
     openGraph: {
         type: "website",
-        title: "DRC Ultimate Rider — Race Brief",
+        title: "DRC Ultimate Rider — India's Biggest Multi-Surface Off-Road Race",
         description:
-            "Two days. Every surface. Not just a race — a test of everything. Bengaluru, 12–13 December 2026. ₹5 Lakh prize pool.",
+            "Two days. Every surface. The first official DRC Race. Bengaluru, 12–13 December 2026. ₹5 Lakh prize pool.",
         url: "/events/drc-ultimate-rider",
     },
 };
@@ -47,6 +67,17 @@ export default function UltimateRiderPage() {
                     { name: "Events", url: `${BASE_URL}/events` },
                     { name: "DRC Ultimate Rider", url: `${BASE_URL}/events/drc-ultimate-rider` },
                 ]}
+            />
+            <SportsEventJsonLd
+                name="DRC Ultimate Rider"
+                description="India's biggest multi-surface off-road motorcycle race. Two days, every surface — enduro, rock garden, hill climb, slush, mud and technical. The first official DRC Race, and the flag-off of DRC Racing: six races every year, across India."
+                slug="drc-ultimate-rider"
+                startDate="2026-12-12T06:00:00+05:30"
+                endDate="2026-12-13T22:00:00+05:30"
+                location="Tribal Adventure, Bengaluru"
+                city="Bengaluru"
+                minPrice={4999}
+                maxPrice={7999}
             />
 
             {/* Hero */}

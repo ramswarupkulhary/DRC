@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Tag } from "lucide-react";
+import { EventCategoriesManager } from "@/components/admin/EventCategoriesManager";
 
 interface EventData {
   id: string;
@@ -28,6 +29,7 @@ export default function AdminEventsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<EventData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [categoriesFor, setCategoriesFor] = useState<EventData | null>(null);
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -156,13 +158,22 @@ export default function AdminEventsPage() {
               <p className="text-xs text-muted">{new Date(e.date).toLocaleDateString("en-IN")} · {e.location} · ₹{e.price}</p>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => startEdit(e)} className="p-2 hover:text-orange"><Pencil className="w-4 h-4" /></button>
-              <button onClick={() => handleDelete(e.id)} className="p-2 hover:text-error"><Trash2 className="w-4 h-4" /></button>
+              <button onClick={() => setCategoriesFor(e)} className="p-2 hover:text-orange" title="Categories & fees"><Tag className="w-4 h-4" /></button>
+              <button onClick={() => startEdit(e)} className="p-2 hover:text-orange" title="Edit event"><Pencil className="w-4 h-4" /></button>
+              <button onClick={() => handleDelete(e.id)} className="p-2 hover:text-error" title="Delete event"><Trash2 className="w-4 h-4" /></button>
             </div>
           </div>
         ))}
         {events.length === 0 && <p className="text-muted text-sm">No events yet.</p>}
       </div>
+
+      {categoriesFor && (
+        <EventCategoriesManager
+          eventId={categoriesFor.id}
+          eventTitle={categoriesFor.title}
+          onClose={() => setCategoriesFor(null)}
+        />
+      )}
     </div>
   );
 }
