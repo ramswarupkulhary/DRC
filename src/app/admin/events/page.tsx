@@ -139,6 +139,20 @@ export default function AdminEventsPage() {
             <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
             Featured
           </label>
+
+          {editing && (
+            <div className="border-t border-border pt-5 mt-2">
+              <p className="text-xs text-muted mb-1 uppercase tracking-wider font-mono">Categories &amp; entry fees</p>
+              <p className="text-sm text-muted mb-3">
+                Add rider categories (e.g. Amateurs, Professionals, Big Bikes) with their entry fees and slot limits.
+                These show up on the public registration page.
+              </p>
+              <Button type="button" variant="outline" onClick={() => setCategoriesFor(editing)}>
+                <Tag className="w-4 h-4" /> Manage Categories
+              </Button>
+            </div>
+          )}
+
           <div className="flex gap-3">
             <Button onClick={handleSubmit}>{editing ? "Update" : "Create"}</Button>
             <Button variant="outline" onClick={resetForm}>Cancel</Button>
@@ -157,8 +171,14 @@ export default function AdminEventsPage() {
               </div>
               <p className="text-xs text-muted">{new Date(e.date).toLocaleDateString("en-IN")} · {e.location} · ₹{e.price}</p>
             </div>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setCategoriesFor(e)} className="p-2 hover:text-orange" title="Categories & fees"><Tag className="w-4 h-4" /></button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setCategoriesFor(e)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border border-orange text-orange hover:bg-orange hover:text-white transition-colors"
+                title="Manage categories & entry fees"
+              >
+                <Tag className="w-3.5 h-3.5" /> Categories
+              </button>
               <button onClick={() => startEdit(e)} className="p-2 hover:text-orange" title="Edit event"><Pencil className="w-4 h-4" /></button>
               <button onClick={() => handleDelete(e.id)} className="p-2 hover:text-error" title="Delete event"><Trash2 className="w-4 h-4" /></button>
             </div>
