@@ -59,7 +59,7 @@ export default function UltimateRiderRegisterPage() {
 
     // Fetch categories from DB so admin edits (name/fee/order) propagate here instantly.
     useEffect(() => {
-        fetch("/api/events/drc-ultimate-rider/categories")
+        fetch("/api/events/drc-ultimate-rider/categories", { cache: "no-store" })
             .then((r) => (r.ok ? r.json() : Promise.reject()))
             .then((data) => setCategories((data?.categories ?? []).map((c: { id: string; slug: string; name: string; fee: number; description: string | null }) => c)))
             .catch(() => setCategories([]));

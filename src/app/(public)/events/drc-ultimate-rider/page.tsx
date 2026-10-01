@@ -7,6 +7,10 @@ import { ArrowRight, Calendar, MapPin, Trophy, Flag, Users } from "lucide-react"
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
+// Always SSR fresh so admin edits to categories, fees and copy show up instantly.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
     title: "DRC Ultimate Rider — India's Biggest Multi-Surface Off-Road Race | Bengaluru, 12–13 Dec 2026",
     description:
