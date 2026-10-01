@@ -38,11 +38,16 @@ async function ensureUltimateRider() {
   });
 
   const defaultCategories = [
-    { slug: "amateurs", name: "Amateurs", description: "First-timers & club-level riders.", fee: 4999, sortOrder: 1 },
-    { slug: "professionals", name: "Professionals", description: "Championship & podium-level riders.", fee: 7999, sortOrder: 2 },
-    { slug: "women", name: "Women Category", description: "Open to all women riders across skill levels.", fee: 4999, sortOrder: 3 },
-    { slug: "big-bikes", name: "Big Bikes", description: "Adventure & big-capacity motorcycles.", fee: 7999, sortOrder: 4 },
+    { slug: "amateurs-upto-260cc", name: "Amateurs — Up to 260cc", description: "Amateur class · up to 260cc engine capacity.", fee: 4999, sortOrder: 1 },
+    { slug: "amateurs-upto-460cc", name: "Amateurs — Up to 460cc", description: "Amateur class · up to 460cc engine capacity.", fee: 4999, sortOrder: 2 },
+    { slug: "pro-upto-260cc", name: "Professionals — Up to 260cc", description: "Championship / podium-level · up to 260cc.", fee: 7999, sortOrder: 3 },
+    { slug: "pro-upto-460cc", name: "Professionals — Up to 460cc", description: "Championship / podium-level · up to 460cc.", fee: 7999, sortOrder: 4 },
+    { slug: "women", name: "Women Category", description: "Open to all women riders — any engine capacity.", fee: 4999, sortOrder: 5 },
+    { slug: "big-bikes", name: "Big Bikes", description: "Above 460cc engine capacity.", fee: 7999, sortOrder: 6 },
+    { slug: "foreign-bikes", name: "Foreign Bikes", description: "Imported motorcycles · up to 500cc.", fee: 7999, sortOrder: 7 },
   ];
+
+  const defaultSlugs = defaultCategories.map((c) => c.slug);
 
   for (const cat of defaultCategories) {
     await prisma.eventCategory.upsert({
@@ -51,6 +56,14 @@ async function ensureUltimateRider() {
       update: {},
     });
   }
+
+  // Deactivate any legacy categories that aren't in the new structure (e.g. the old
+  // "amateurs" and "professionals" slugs). Keeps rows for history so prior
+  // registrations stay traceable; admin can delete them from the manager if desired.
+  await prisma.eventCategory.updateMany({
+    where: { eventId: event.id, slug: { notIn: defaultSlugs }, active: true },
+    data: { active: false },
+  });
 }
 
 export async function GET() {

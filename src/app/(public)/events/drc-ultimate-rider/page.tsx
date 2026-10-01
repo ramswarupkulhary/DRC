@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { SportsEventJsonLd } from "@/components/seo/SportsEventJsonLd";
 import { ArrowRight, Calendar, MapPin, Trophy, Flag, Users } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -41,11 +42,17 @@ export const metadata: Metadata = {
 
 const surfaces = ["Enduro", "Rock Garden", "Hill Climb", "Slush", "Mud", "Technical"];
 
-const categories = [
-    { name: "Amateurs", fee: 4999, note: "First-timers & club-level riders." },
-    { name: "Professionals", fee: 7999, note: "Championship & podium-level riders." },
-    { name: "Women Category", fee: 4999, note: "Open to all women riders across skill levels." },
-    { name: "Big Bikes", fee: 7999, note: "Adventure & big-capacity motorcycles." },
+// Fallback used only on the very first server-render before any admin visits
+// /admin/events (which triggers the Ultimate Rider auto-seed). Once seeded,
+// the page reads live data from the DB.
+const fallbackCategories = [
+    { name: "Amateurs — Up to 260cc", fee: 4999, description: "Amateur class · up to 260cc engine capacity." },
+    { name: "Amateurs — Up to 460cc", fee: 4999, description: "Amateur class · up to 460cc engine capacity." },
+    { name: "Professionals — Up to 260cc", fee: 7999, description: "Championship / podium-level · up to 260cc." },
+    { name: "Professionals — Up to 460cc", fee: 7999, description: "Championship / podium-level · up to 460cc." },
+    { name: "Women Category", fee: 4999, description: "Open to all women riders — any engine capacity." },
+    { name: "Big Bikes", fee: 7999, description: "Above 460cc engine capacity." },
+    { name: "Foreign Bikes", fee: 7999, description: "Imported motorcycles · up to 500cc." },
 ];
 
 const experienceItems = [
@@ -58,7 +65,24 @@ const experienceItems = [
 
 const BASE_URL = "https://www.dirtridecamp.com";
 
-export default function UltimateRiderPage() {
+async function getCategories() {
+    try {
+        const event = await prisma.event.findUnique({ where: { slug: "drc-ultimate-rider" } });
+        if (!event) return fallbackCategories;
+        const rows = await prisma.eventCategory.findMany({
+            where: { eventId: event.id, active: true },
+            orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+            select: { name: true, fee: true, description: true },
+        });
+        if (rows.length === 0) return fallbackCategories;
+        return rows.map((r) => ({ name: r.name, fee: r.fee, description: r.description }));
+    } catch {
+        return fallbackCategories;
+    }
+}
+
+export default async function UltimateRiderPage() {
+    const categories = await getCategories();
     return (
         <div>
             <BreadcrumbJsonLd
@@ -227,22 +251,25 @@ export default function UltimateRiderPage() {
                     </h2>
 
                     <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 border-t border-l border-border">
-                        {categories.map((c, i) => (
-                            <div
-                                key={c.name}
-                                className="p-8 border-r border-b border-border bg-background hover:bg-surface transition-colors flex flex-col"
-                            >
-                                <div className="font-mono text-[10px] uppercase tracking-widest text-orange">0{i + 1}</div>
-                                <h3 className="font-heading text-2xl font-bold uppercase mt-4 leading-tight">{c.name}</h3>
-                                <p className="text-sm text-muted mt-3 leading-relaxed flex-1">{c.note}</p>
-                                <div className="mt-6 pt-6 border-t border-border">
-                                    <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Entry fee</div>
-                                    <div className="font-heading text-3xl font-bold uppercase mt-1 text-orange">
-                                        ₹{c.fee.toLocaleString("en-IN")}
+                        {categories.map((c, i) => {
+                            const idx = String(i + 1).padStart(2, "0");
+                            return (
+                                <div
+                                    key={c.name}
+                                    className="p-8 border-r border-b border-border bg-background hover:bg-surface transition-colors flex flex-col"
+                                >
+                                    <div className="font-mono text-[10px] uppercase tracking-widest text-orange">{idx}</div>
+                                    <h3 className="font-heading text-2xl font-bold uppercase mt-4 leading-tight">{c.name}</h3>
+                                    <p className="text-sm text-muted mt-3 leading-relaxed flex-1">{c.description}</p>
+                                    <div className="mt-6 pt-6 border-t border-border">
+                                        <div className="font-mono text-[10px] uppercase tracking-widest text-muted">Entry fee</div>
+                                        <div className="font-heading text-3xl font-bold uppercase mt-1 text-orange">
+                                            ₹{c.fee.toLocaleString("en-IN")}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     <div className="mt-10 flex flex-col sm:flex-row gap-4">
