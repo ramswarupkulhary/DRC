@@ -22,6 +22,12 @@ interface EventRegistrationRow {
     bikeModel: string | null;
     experience: string | null;
     notes: string | null;
+    stayBooked: boolean;
+    stayAmount: number;
+    registrationType: string;
+    attendanceDays: string | null;
+    foodPackage: string | null;
+    foodAmount: number;
     createdAt: string;
     user: { id: string; name: string | null; email: string; phone: string | null };
 }
@@ -117,6 +123,9 @@ export default function AdminEventRegistrationsPage() {
                                 <Th>Rider</Th>
                                 <Th>Contact</Th>
                                 <Th>Category</Th>
+                                <Th>Registration</Th>
+                                <Th>Food</Th>
+                                <Th>Stay</Th>
                                 <Th>Amount</Th>
                                 <Th>Status</Th>
                                 <Th>Bike</Th>
@@ -153,6 +162,26 @@ export default function AdminEventRegistrationsPage() {
                                     <Td>
                                         <Badge variant="orange">{r.categoryName}</Badge>
                                         <div className="text-xs text-muted mt-1">{r.experience ?? "—"}</div>
+                                    </Td>
+                                    <Td>
+                                        <div className="capitalize">{r.registrationType}</div>
+                                        {r.attendanceDays && <div className="text-xs text-muted mt-1">{r.attendanceDays}</div>}
+                                    </Td>
+                                    <Td>
+                                        {r.foodPackage ? (
+                                            <>
+                                                <div>{r.foodPackage}</div>
+                                                <div className="text-xs text-muted mt-1">{formatPrice(r.foodAmount)}</div>
+                                            </>
+                                        ) : <span className="text-xs text-muted">No food</span>}
+                                    </Td>
+                                    <Td>
+                                        {r.stayBooked ? (
+                                            <>
+                                                <Badge variant="success">Tent booked</Badge>
+                                                <div className="text-xs text-muted mt-1">{formatPrice(r.stayAmount)}</div>
+                                            </>
+                                        ) : <span className="text-xs text-muted">No stay</span>}
                                     </Td>
                                     <Td>
                                         <span className="font-heading font-bold">{formatPrice(r.amount)}</span>

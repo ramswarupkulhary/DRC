@@ -605,6 +605,19 @@ model Event {
   prizes      String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  stayEnabled     Boolean @default(false)
+  stayPrice       Int     @default(1599)
+  stayTotalTents  Int     @default(50)
+  stayConfigured  Boolean @default(false)
+  spectatorSaturdayFee Int @default(499)
+  spectatorSundayFee   Int @default(499)
+  spectatorWeekendFee  Int @default(999)
+  spectatorFullMealName    String @default("Two-day meal package")
+  spectatorFullMealDetails String @default("2 breakfasts, 2 lunches and 1 dinner")
+  spectatorFullMealFee     Int    @default(1999)
+  spectatorDayMealName     String @default("Day meal package")
+  spectatorDayMealDetails  String @default("1 breakfast and 1 lunch")
+  spectatorDayMealFee      Int    @default(599)
 
   categories EventCategory[]
 }
@@ -648,6 +661,13 @@ model EventRegistration {
   bikeModel          String?
   experience         String?
   notes              String?
+  registrationType   String   @default("rider")
+  attendanceDays     String?
+  foodPackage        String?
+  foodAmount         Int      @default(0)
+  stayBooked         Boolean  @default(false)
+  stayAmount         Int      @default(0)
+  reservationExpiresAt DateTime?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 

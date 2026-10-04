@@ -20,6 +20,19 @@ async function ensureUltimateRider() {
       totalSlots: 200,
       status: "upcoming",
       featured: true,
+      stayEnabled: true,
+      stayPrice: 1599,
+      stayTotalTents: 50,
+      stayConfigured: true,
+      spectatorSaturdayFee: 499,
+      spectatorSundayFee: 499,
+      spectatorWeekendFee: 999,
+      spectatorFullMealName: "Two-day meal package",
+      spectatorFullMealDetails: "2 breakfasts, 2 lunches and 1 dinner",
+      spectatorFullMealFee: 1999,
+      spectatorDayMealName: "Day meal package",
+      spectatorDayMealDetails: "1 breakfast and 1 lunch",
+      spectatorDayMealFee: 599,
       prizes: JSON.stringify([
         "Overall prize pool ₹5,00,000",
         "Amateurs — ₹4,999 entry",
@@ -35,6 +48,25 @@ async function ensureUltimateRider() {
       ]),
     },
     update: {},
+  });
+
+  await prisma.event.updateMany({
+    where: { id: event.id, stayConfigured: false },
+    data: {
+      stayEnabled: true,
+      stayPrice: 1599,
+      stayTotalTents: 50,
+      stayConfigured: true,
+      spectatorSaturdayFee: 499,
+      spectatorSundayFee: 499,
+      spectatorWeekendFee: 999,
+      spectatorFullMealName: "Two-day meal package",
+      spectatorFullMealDetails: "2 breakfasts, 2 lunches and 1 dinner",
+      spectatorFullMealFee: 1999,
+      spectatorDayMealName: "Day meal package",
+      spectatorDayMealDetails: "1 breakfast and 1 lunch",
+      spectatorDayMealFee: 599,
+    },
   });
 
   const defaultCategories = [
@@ -73,7 +105,20 @@ export async function GET() {
   }
   await ensureUltimateRider();
   const events = await prisma.event.findMany({ orderBy: { date: "desc" } });
-  return NextResponse.json(events);
+  const eventsWithStayAvailability = await Promise.all(events.map(async (event) => {
+    const reservedTents = await prisma.eventRegistration.count({
+      where: {
+        eventSlug: event.slug,
+        stayBooked: true,
+        OR: [
+          { paymentStatus: "paid" },
+          { paymentStatus: "pending", reservationExpiresAt: { gt: new Date() } },
+        ],
+      },
+    });
+    return { ...event, stayBookedTents: reservedTents, stayAvailableTents: Math.max(0, event.stayTotalTents - reservedTents) };
+  }));
+  return NextResponse.json(eventsWithStayAvailability);
 }
 
 export async function POST(req: Request) {
@@ -96,6 +141,19 @@ export async function POST(req: Request) {
       featured: body.featured || false,
       prizes: body.prizes || null,
       rules: body.rules || null,
+      stayEnabled: body.stayEnabled === true,
+      stayPrice: Number.isInteger(body.stayPrice) && body.stayPrice >= 0 ? body.stayPrice : 1599,
+      stayTotalTents: Number.isInteger(body.stayTotalTents) && body.stayTotalTents >= 0 ? body.stayTotalTents : 50,
+      stayConfigured: true,
+      spectatorSaturdayFee: Number.isInteger(body.spectatorSaturdayFee) && body.spectatorSaturdayFee >= 0 ? body.spectatorSaturdayFee : 499,
+      spectatorSundayFee: Number.isInteger(body.spectatorSundayFee) && body.spectatorSundayFee >= 0 ? body.spectatorSundayFee : 499,
+      spectatorWeekendFee: Number.isInteger(body.spectatorWeekendFee) && body.spectatorWeekendFee >= 0 ? body.spectatorWeekendFee : 999,
+      spectatorFullMealName: body.spectatorFullMealName || "Two-day meal package",
+      spectatorFullMealDetails: body.spectatorFullMealDetails || "2 breakfasts, 2 lunches and 1 dinner",
+      spectatorFullMealFee: Number.isInteger(body.spectatorFullMealFee) && body.spectatorFullMealFee >= 0 ? body.spectatorFullMealFee : 1999,
+      spectatorDayMealName: body.spectatorDayMealName || "Day meal package",
+      spectatorDayMealDetails: body.spectatorDayMealDetails || "1 breakfast and 1 lunch",
+      spectatorDayMealFee: Number.isInteger(body.spectatorDayMealFee) && body.spectatorDayMealFee >= 0 ? body.spectatorDayMealFee : 599,
     },
   });
   return NextResponse.json(event, { status: 201 });
