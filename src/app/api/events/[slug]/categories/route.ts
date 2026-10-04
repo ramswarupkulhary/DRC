@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
+import { isActiveMember } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -24,12 +27,20 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
         });
         event = await prisma.event.findUniqueOrThrow({ where: { id: event.id } });
     }
+    if (slug === "drc-ultimate-rider" && !event.registrationUrl) {
+        await prisma.event.updateMany({
+            where: { id: event.id, registrationUrl: null },
+            data: { registrationUrl: "/events/drc-ultimate-rider/register" },
+        });
+    }
 
     const categories = await prisma.eventCategory.findMany({
         where: { eventId: event.id, active: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
         select: { id: true, slug: true, name: true, description: true, fee: true, totalSlots: true },
     });
+    const session = await getServerSession(authOptions);
+    const member = session?.user ? await isActiveMember((session.user as { id: string }).id) : false;
     const reservedTents = event.stayEnabled
         ? await prisma.eventRegistration.count({
             where: {
@@ -67,6 +78,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
                     fee: event.spectatorDayMealFee,
                 },
             },
+            memberDiscountPercent: member ? 10 : 0,
         },
         { headers: { "Cache-Control": "no-store, must-revalidate" } },
     );

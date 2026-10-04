@@ -61,6 +61,7 @@ export default function UltimateRiderRegisterPage() {
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [stay, setStay] = useState<StayOption | null>(null);
+    const [membershipDiscountPercent, setMembershipDiscountPercent] = useState(0);
     const [spectatorFees, setSpectatorFees] = useState<SpectatorFees>({
         saturdayFee: 499,
         sundayFee: 499,
@@ -87,6 +88,12 @@ export default function UltimateRiderRegisterPage() {
     const [status, setStatus] = useState<Status>("idle");
     const [errorMessage, setErrorMessage] = useState<string>("");
 
+    useEffect(() => {
+        if (new URLSearchParams(window.location.search).get("type") === "spectator") {
+            setRegistrationType("spectator");
+        }
+    }, []);
+
     // Fetch categories from DB so admin edits (name/fee/order) propagate here instantly.
     useEffect(() => {
         fetch("/api/events/drc-ultimate-rider/categories", { cache: "no-store" })
@@ -94,6 +101,7 @@ export default function UltimateRiderRegisterPage() {
             .then((data) => {
                 setCategories((data?.categories ?? []).map((c: { id: string; slug: string; name: string; fee: number; description: string | null }) => c));
                 setStay(data?.stay ?? null);
+                setMembershipDiscountPercent(data?.memberDiscountPercent ?? 0);
                 if (data?.spectator) setSpectatorFees(data.spectator);
             })
             .catch(() => { setCategories([]); setStay(null); });
@@ -119,7 +127,8 @@ export default function UltimateRiderRegisterPage() {
         ? spectatorFees.fullMeal
         : foodSelection === "day" ? spectatorFees.dayMeal : null;
     const foodAmount = registrationType === "spectator" ? selectedFood?.fee ?? 0 : 0;
-    const total = entryFee + foodAmount + (bookStay && stay ? stay.price : 0);
+    const memberSavings = Math.round(entryFee * membershipDiscountPercent / 100);
+    const total = entryFee - memberSavings + foodAmount + (bookStay && stay ? stay.price : 0);
     const attendanceLabel = attendanceDays === "both" ? "Saturday + Sunday" : attendanceDays === "saturday" ? "Saturday only" : "Sunday only";
 
     function validate(): string | null {
@@ -301,8 +310,6 @@ export default function UltimateRiderRegisterPage() {
                 <div className="lg:col-span-7 space-y-10">
                     <fieldset>
                         <legend className="flex items-center gap-3 mb-6">
-                            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange">Step 01</span>
-                            <span className="h-px w-10 bg-orange" />
                             <span className="font-heading text-lg font-bold uppercase tracking-tight">Choose your booking</span>
                         </legend>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -317,59 +324,55 @@ export default function UltimateRiderRegisterPage() {
                     </fieldset>
 
                     {registrationType === "rider" ? (
-                    <fieldset>
-                        <legend className="flex items-center gap-3 mb-6">
-                            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange">Step 02</span>
-                            <span className="h-px w-10 bg-orange" />
-                            <span className="font-heading text-lg font-bold uppercase tracking-tight">Select category</span>
-                        </legend>
+                        <fieldset>
+                            <legend className="flex items-center gap-3 mb-6">
+                                <span className="font-heading text-lg font-bold uppercase tracking-tight">Select category</span>
+                            </legend>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {categories.map((c) => {
-                                const isSelected = category === c.slug;
-                                return (
-                                    <label
-                                        key={c.slug}
-                                        className={`block p-6 border cursor-pointer transition-colors ${isSelected
-                                            ? "border-orange bg-orange/5"
-                                            : "border-border bg-background hover:border-tan-dark"
-                                            }`}
-                                    >
-                                        <input
-                                            type="radio"
-                                            name="category"
-                                            value={c.slug}
-                                            checked={isSelected}
-                                            onChange={() => setCategory(c.slug)}
-                                            className="sr-only"
-                                        />
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div>
-                                                <h3 className="font-heading text-xl font-bold uppercase leading-tight">{c.name}</h3>
-                                                <p className="text-sm text-muted mt-2 leading-relaxed">{c.description}</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {categories.map((c) => {
+                                    const isSelected = category === c.slug;
+                                    return (
+                                        <label
+                                            key={c.slug}
+                                            className={`block p-6 border cursor-pointer transition-colors ${isSelected
+                                                ? "border-orange bg-orange/5"
+                                                : "border-border bg-background hover:border-tan-dark"
+                                                }`}
+                                        >
+                                            <input
+                                                type="radio"
+                                                name="category"
+                                                value={c.slug}
+                                                checked={isSelected}
+                                                onChange={() => setCategory(c.slug)}
+                                                className="sr-only"
+                                            />
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <h3 className="font-heading text-xl font-bold uppercase leading-tight">{c.name}</h3>
+                                                    <p className="text-sm text-muted mt-2 leading-relaxed">{c.description}</p>
+                                                </div>
+                                                {isSelected && (
+                                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange text-white shrink-0">
+                                                        <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                                                    </span>
+                                                )}
                                             </div>
-                                            {isSelected && (
-                                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange text-white shrink-0">
-                                                    <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                                            <div className="mt-5 pt-5 border-t border-border flex items-baseline justify-between">
+                                                <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Entry fee</span>
+                                                <span className="font-heading text-2xl font-bold text-orange">
+                                                    ₹{c.fee.toLocaleString("en-IN")}
                                                 </span>
-                                            )}
-                                        </div>
-                                        <div className="mt-5 pt-5 border-t border-border flex items-baseline justify-between">
-                                            <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Entry fee</span>
-                                            <span className="font-heading text-2xl font-bold text-orange">
-                                                ₹{c.fee.toLocaleString("en-IN")}
-                                            </span>
-                                        </div>
-                                    </label>
-                                );
-                            })}
-                        </div>
-                    </fieldset>
+                                            </div>
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                        </fieldset>
                     ) : (
                         <fieldset>
                             <legend className="flex items-center gap-3 mb-6">
-                                <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange">Step 02</span>
-                                <span className="h-px w-10 bg-orange" />
                                 <span className="font-heading text-lg font-bold uppercase tracking-tight">Select spectator pass</span>
                             </legend>
                             <p className="font-mono text-[10px] uppercase tracking-widest text-orange mb-3">Early Bird</p>
@@ -419,39 +422,9 @@ export default function UltimateRiderRegisterPage() {
                         </fieldset>
                     )}
 
-                    {stay?.enabled && (
-                        <fieldset>
-                            <legend className="flex items-center gap-3 mb-6">
-                                <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange">Optional</span>
-                                <span className="h-px w-10 bg-orange" />
-                                <span className="font-heading text-lg font-bold uppercase tracking-tight">Tent stay</span>
-                            </legend>
-                            <label className={`flex items-start justify-between gap-4 border p-5 ${bookStay ? "border-orange bg-orange/5" : "border-border"} ${stay.availableTents < 1 ? "opacity-60" : "cursor-pointer"}`}>
-                                <span className="flex items-start gap-3">
-                                    <input
-                                        type="checkbox"
-                                        checked={bookStay}
-                                        disabled={stay.availableTents < 1}
-                                        onChange={(e) => setBookStay(e.target.checked)}
-                                        className="mt-1 accent-orange w-4 h-4"
-                                    />
-                                    <span>
-                                        <span className="block font-heading text-lg font-bold uppercase">Reserve one tent</span>
-                                        <span className="block text-sm text-muted mt-1">
-                                            {stay.availableTents > 0 ? `${stay.availableTents} of ${stay.totalTents} tents available` : "Sold out"}
-                                        </span>
-                                    </span>
-                                </span>
-                                <span className="font-heading text-xl font-bold text-orange whitespace-nowrap">₹{stay.price.toLocaleString("en-IN")}</span>
-                            </label>
-                        </fieldset>
-                    )}
-
                     {/* Rider details */}
                     <fieldset>
                         <legend className="flex items-center gap-3 mb-6">
-                            <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange">Step 03</span>
-                            <span className="h-px w-10 bg-orange" />
                             <span className="font-heading text-lg font-bold uppercase tracking-tight">{registrationType === "rider" ? "Rider details" : "Spectator details"}</span>
                         </legend>
 
@@ -544,13 +517,25 @@ export default function UltimateRiderRegisterPage() {
                             12&ndash;13 December 2026 &middot; Bengaluru
                         </p>
 
+                        {stay?.enabled && (
+                            <label className={`flex items-start justify-between gap-3 mt-6 border p-4 ${bookStay ? "border-orange bg-orange/5" : "border-border"} ${stay.availableTents < 1 ? "opacity-60" : "cursor-pointer"}`}>
+                                <span className="flex items-start gap-3">
+                                    <input type="checkbox" checked={bookStay} disabled={stay.availableTents < 1} onChange={(e) => setBookStay(e.target.checked)} className="mt-1 accent-orange w-4 h-4" />
+                                    <span>
+                                        <span className="block font-heading text-sm font-bold uppercase">Add tent stay</span>
+                                        <span className="block text-xs text-muted mt-1">{stay.availableTents > 0 ? `${stay.availableTents} tents available` : "Sold out"}</span>
+                                    </span>
+                                </span>
+                                <span className="font-heading text-lg font-bold text-orange whitespace-nowrap">₹{stay.price.toLocaleString("en-IN")}</span>
+                            </label>
+                        )}
+
                         <div className="mt-6 pt-6 border-t border-border space-y-4">
                             <Row k={registrationType === "rider" ? "Category" : "Spectator pass"} v={registrationType === "rider" ? selected?.name ?? "—" : attendanceLabel} />
                             <Row k={registrationType === "rider" ? "Entry fee" : "Early Bird pass"} v={`₹${entryFee.toLocaleString("en-IN")}`} highlight />
+                            {membershipDiscountPercent > 0 && memberSavings > 0 && <Row k={`Member discount (${membershipDiscountPercent}%)`} v={`−₹${memberSavings.toLocaleString("en-IN")}`} />}
                             {selectedFood && <Row k={selectedFood.name} v={`₹${foodAmount.toLocaleString("en-IN")}`} />}
                             {bookStay && stay && <Row k="Tent stay" v={`₹${stay.price.toLocaleString("en-IN")}`} />}
-                            <Row k="Format" v="2 days · Sat + Sun" />
-                            <Row k="Prize pool" v="₹5,00,000 overall" />
                             <div className="pt-4 border-t border-border">
                                 <Row k="Total" v={`₹${total.toLocaleString("en-IN")}`} highlight />
                             </div>

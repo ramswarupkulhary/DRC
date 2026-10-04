@@ -89,6 +89,7 @@ export async function POST(req: Request) {
             ["Pass / category", registration.categoryName],
             ...(registration.attendanceDays ? [["Attendance", registration.attendanceDays]] : []),
             ["Entry", `₹${entryAmount.toLocaleString("en-IN")}`],
+            ...(registration.membershipDiscount ? [["Member discount", `−₹${registration.membershipDiscount.toLocaleString("en-IN")}`]] : []),
             ...(registration.foodPackage ? [["Food package", registration.foodPackage]] : []),
             ...(foodAmount ? [["Food amount", `₹${foodAmount.toLocaleString("en-IN")}`]] : []),
             ...(stayAmount ? [["Tent stay", `₹${stayAmount.toLocaleString("en-IN")}`]] : []),

@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
 import { Plus, Pencil, Trash2, Tag } from "lucide-react";
 import { EventCategoriesManager } from "@/components/admin/EventCategoriesManager";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface EventData {
   id: string;
@@ -15,7 +16,10 @@ interface EventData {
   description: string;
   type: string;
   date: string;
+  endDate: string | null;
   location: string;
+  coverImage: string | null;
+  registrationUrl: string | null;
   price: number;
   totalSlots: number;
   status: string;
@@ -50,7 +54,10 @@ export default function AdminEventsPage() {
   const [description, setDescription] = useState("");
   const [type, setType] = useState("race");
   const [date, setDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [location, setLocation] = useState("");
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [registrationUrl, setRegistrationUrl] = useState("");
   const [price, setPrice] = useState("0");
   const [totalSlots, setTotalSlots] = useState("50");
   const [status, setStatus] = useState("upcoming");
@@ -80,7 +87,7 @@ export default function AdminEventsPage() {
 
   const resetForm = () => {
     setTitle(""); setSlug(""); setDescription(""); setType("race");
-    setDate(""); setLocation(""); setPrice("0"); setTotalSlots("50");
+    setDate(""); setEndDate(""); setLocation(""); setCoverImage(null); setRegistrationUrl(""); setPrice("0"); setTotalSlots("50");
     setStatus("upcoming"); setFeatured(false); setPrizes(""); setRules("");
     setStayEnabled(false); setStayPrice("1599"); setStayTotalTents("50");
     setSpectatorSaturdayFee("499"); setSpectatorSundayFee("499"); setSpectatorWeekendFee("999");
@@ -91,7 +98,8 @@ export default function AdminEventsPage() {
 
   const startEdit = (e: EventData) => {
     setTitle(e.title); setSlug(e.slug); setDescription(e.description);
-    setType(e.type); setDate(e.date.split("T")[0]); setLocation(e.location);
+    setType(e.type); setDate(e.date.split("T")[0]); setEndDate(e.endDate?.split("T")[0] || ""); setLocation(e.location);
+    setCoverImage(e.coverImage); setRegistrationUrl(e.registrationUrl || "");
     setPrice(String(e.price)); setTotalSlots(String(e.totalSlots));
     setStatus(e.status); setFeatured(e.featured);
     setPrizes(e.prizes ? JSON.parse(e.prizes).join("\n") : "");
@@ -112,7 +120,8 @@ export default function AdminEventsPage() {
   const handleSubmit = async () => {
     const body = {
       title, slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      description, type, date: new Date(date).toISOString(), location,
+      description, type, date: new Date(date).toISOString(), endDate: endDate ? new Date(endDate).toISOString() : null,
+      location, coverImage, registrationUrl,
       price: parseInt(price), totalSlots: parseInt(totalSlots), status, featured,
       prizes: prizes.trim() ? JSON.stringify(prizes.split("\n").filter(Boolean)) : null,
       rules: rules.trim() ? JSON.stringify(rules.split("\n").filter(Boolean)) : null,
@@ -156,7 +165,9 @@ export default function AdminEventsPage() {
             <Input label="Title" value={title} onChange={(e) => { setTitle(e.target.value); if (!editing) setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-")); }} />
             <Input label="Slug" value={slug} onChange={(e) => setSlug(e.target.value)} />
             <Input label="Date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <Input label="End date (optional)" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             <Input label="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
+            <Input label="Register button URL" value={registrationUrl} onChange={(e) => setRegistrationUrl(e.target.value)} placeholder="/contact or a registration URL" />
             <Input label="Price (₹)" type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
             <Input label="Total Slots" type="number" value={totalSlots} onChange={(e) => setTotalSlots(e.target.value)} />
             <div>
@@ -179,6 +190,7 @@ export default function AdminEventsPage() {
             </div>
           </div>
           <Textarea label="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
+          <ImageUpload value={coverImage} onChange={setCoverImage} label="Calendar poster" />
           <Textarea label="Prizes (one per line)" value={prizes} onChange={(e) => setPrizes(e.target.value)} rows={3} />
           <Textarea label="Rules (one per line)" value={rules} onChange={(e) => setRules(e.target.value)} rows={3} />
           {(editing?.slug === "drc-ultimate-rider" || slug === "drc-ultimate-rider") && (

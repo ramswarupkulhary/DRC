@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resolveEventCategory } from "@/lib/eventCategories";
+import { isActiveMember } from "@/lib/pricing";
 import Razorpay from "razorpay";
 
 async function getRazorpayInstance() {
@@ -97,7 +98,9 @@ export async function POST(req: Request) {
         const foodAmount = chosenFood?.fee ?? 0;
         const foodPackageName = chosenFood ? `${chosenFood.name} (${chosenFood.details})` : null;
         const stayAmount = wantsStay ? event.stayPrice : 0;
-        const amount = entryAmount + foodAmount + stayAmount;
+        const userId = (session.user as { id: string }).id;
+        const membershipDiscount = (await isActiveMember(userId)) ? Math.round(entryAmount * 0.1) : 0;
+        const amount = entryAmount - membershipDiscount + foodAmount + stayAmount;
         const reservationExpiresAt = wantsStay ? new Date(Date.now() + 15 * 60 * 1000) : null;
 
         const rz = amount > 0 ? await getRazorpayInstance() : null;
@@ -130,11 +133,12 @@ export async function POST(req: Request) {
             : null;
 
         const registrationData = {
-            userId: (session.user as { id: string }).id,
+            userId,
             eventSlug: event.slug,
             category: categorySlug,
             categoryName,
             amount,
+            membershipDiscount,
             currency: "INR",
             paymentStatus: order ? "pending" : "paid",
             razorpayOrderId: order?.id ?? null,

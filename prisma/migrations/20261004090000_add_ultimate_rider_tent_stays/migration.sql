@@ -11,14 +11,16 @@ ADD COLUMN "spectatorFullMealDetails" TEXT NOT NULL DEFAULT '2 breakfasts, 2 lun
 ADD COLUMN "spectatorFullMealFee" INTEGER NOT NULL DEFAULT 1999,
 ADD COLUMN "spectatorDayMealName" TEXT NOT NULL DEFAULT 'Day meal package',
 ADD COLUMN "spectatorDayMealDetails" TEXT NOT NULL DEFAULT '1 breakfast and 1 lunch',
-ADD COLUMN "spectatorDayMealFee" INTEGER NOT NULL DEFAULT 599;
+ADD COLUMN "spectatorDayMealFee" INTEGER NOT NULL DEFAULT 599,
+ADD COLUMN "registrationUrl" TEXT;
 
 ALTER TABLE "EventRegistration"
 ADD COLUMN "stayBooked" BOOLEAN NOT NULL DEFAULT false,
 ADD COLUMN "stayAmount" INTEGER NOT NULL DEFAULT 0,
 ADD COLUMN "reservationExpiresAt" TIMESTAMP(3),
 ADD COLUMN "registrationType" TEXT NOT NULL DEFAULT 'rider',
-ADD COLUMN "attendanceDays" TEXT;
+ADD COLUMN "attendanceDays" TEXT,
+ADD COLUMN "membershipDiscount" INTEGER NOT NULL DEFAULT 0;
 
 UPDATE "Event"
 SET "stayEnabled" = true, "stayPrice" = 1599, "stayTotalTents" = 50, "stayConfigured" = true,
@@ -28,5 +30,6 @@ SET "stayEnabled" = true, "stayPrice" = 1599, "stayTotalTents" = 50, "stayConfig
 	"spectatorFullMealFee" = 1999,
 	"spectatorDayMealName" = 'Day meal package',
 	"spectatorDayMealDetails" = '1 breakfast and 1 lunch',
-	"spectatorDayMealFee" = 599
+	"spectatorDayMealFee" = 599,
+	"registrationUrl" = '/events/drc-ultimate-rider/register'
 WHERE "slug" = 'drc-ultimate-rider';

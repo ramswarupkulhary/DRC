@@ -10,6 +10,7 @@ interface EventRegistrationRow {
     category: string;
     categoryName: string;
     amount: number;
+    membershipDiscount: number;
     currency: string;
     paymentStatus: string;
     razorpayOrderId: string | null;
@@ -185,6 +186,7 @@ export default function AdminEventRegistrationsPage() {
                                     </Td>
                                     <Td>
                                         <span className="font-heading font-bold">{formatPrice(r.amount)}</span>
+                                        {r.membershipDiscount > 0 && <div className="text-xs text-success mt-1">Member −{formatPrice(r.membershipDiscount)}</div>}
                                     </Td>
                                     <Td>
                                         <Badge variant={PAYMENT_VARIANTS[r.paymentStatus] ?? "muted"}>

@@ -76,7 +76,7 @@ export function AnimatedHero() {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <Link href="/events">
+            <Link href="/trainings">
               <Button size="lg" className="uppercase tracking-widest text-sm">
                 Explore <ArrowRight className="w-4 h-4" />
               </Button>

@@ -19,13 +19,8 @@ export default async function CalendarPage() {
     include: { registrations: { where: { status: { not: "cancelled" } } } },
   });
 
-  const trainings = await prisma.training.findMany({
-    where: { status: "published" },
-    orderBy: { createdAt: "desc" },
-  });
-
   const events = await prisma.event.findMany({
-    where: { status: "upcoming", date: { gte: new Date() } },
+    where: { status: "upcoming", OR: [{ date: { gte: new Date() } }, { endDate: { gte: new Date() } }] },
     orderBy: { date: "asc" },
   });
 
@@ -46,7 +41,7 @@ export default async function CalendarPage() {
       <SectionHeader
         accent="Plan your adventure"
         title="Availability Calendar"
-        subtitle="See all upcoming rides, trainings, and events at a glance."
+        subtitle="Upcoming rides and events, with dates, prices, and registration links."
       />
 
       {/* Rides by month */}
@@ -93,44 +88,38 @@ export default async function CalendarPage() {
       {events.length > 0 && (
         <div className="mt-12">
           <h3 className="font-heading text-xl font-bold text-tan mb-4">Upcoming Events</h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {events.map((event) => (
-              <Link key={event.id} href={`/events/${event.slug}`} className="block">
-                <div className="bg-surface border border-orange/20 rounded-sm p-4 flex items-center gap-4 hover:border-orange/50 transition-colors">
-                  <div className="w-16 text-center shrink-0">
-                    <p className="font-heading text-2xl font-bold text-orange">{event.date.getDate()}</p>
-                    <p className="text-xs text-muted">{event.date.toLocaleDateString("en-IN", { month: "short" })}</p>
-                  </div>
-                  <div className="flex-1">
+              <article key={event.id} className="bg-surface border border-border rounded-sm overflow-hidden sm:flex">
+                {event.coverImage && <img src={event.coverImage} alt={event.title} className="w-full sm:w-48 aspect-[16/9] sm:aspect-auto object-cover" />}
+                <div className="p-4 flex-1 flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1"><Badge variant="orange">{event.type}</Badge></div>
                     <h4 className="font-semibold">{event.title}</h4>
-                    <p className="text-xs text-muted">{event.location}</p>
+                    <p className="text-xs text-muted mt-1">{formatDateRange(event.date, event.endDate)} · {event.location}</p>
                   </div>
-                  <Badge variant="orange">{event.type}</Badge>
+                  <div className="flex items-center gap-4 justify-between sm:justify-end">
+                    <p className="font-heading font-bold text-orange">{event.price > 0 ? `₹${event.price.toLocaleString("en-IN")}` : "Free entry"}</p>
+                    <Link href={event.registrationUrl || (event.slug === "drc-ultimate-rider" ? "/events/drc-ultimate-rider/register" : `/events/${event.slug}`)}>
+                      <Button size="sm">Register</Button>
+                    </Link>
+                  </div>
                 </div>
-              </Link>
+              </article>
             ))}
           </div>
         </div>
       )}
-
-      {/* Trainings */}
-      <div className="mt-12">
-        <h3 className="font-heading text-xl font-bold text-tan mb-4">Training Programs (Always Available)</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {trainings.map((t) => (
-            <Link key={t.id} href={`/trainings/${t.slug}`} className="block">
-              <div className="bg-surface border border-border rounded-sm p-4 hover:border-orange/50 transition-colors">
-                <h4 className="font-semibold">{t.title}</h4>
-                <div className="flex items-center gap-3 mt-2">
-                  <Badge variant={t.level === "beginner" ? "success" : "warning"}>{t.level}</Badge>
-                  <span className="text-sm text-muted">{t.duration}</span>
-                  <span className="text-sm font-semibold text-orange">&#8377;{t.price.toLocaleString("en-IN")}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
     </div>
   );
+}
+
+function formatDateRange(start: Date, end: Date | null) {
+  if (!end || start.toDateString() === end.toDateString()) {
+    return start.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  }
+  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+    return `${start.getDate()}–${end.getDate()} ${end.toLocaleDateString("en-IN", { month: "short", year: "numeric" })}`;
+  }
+  return `${start.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} – ${end.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`;
 }

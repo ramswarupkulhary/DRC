@@ -72,6 +72,12 @@ export default async function EventsPage() {
                 <Link href="/events/drc-ultimate-rider">
                   <Button size="lg" className="uppercase tracking-wider">Full race brief <ArrowRight className="w-5 h-5" /></Button>
                 </Link>
+                <Link href="/events/drc-ultimate-rider/register">
+                  <Button size="lg" variant="outline" className="uppercase tracking-wider">Register for race</Button>
+                </Link>
+                <Link href="/events/drc-ultimate-rider/register?type=spectator">
+                  <Button size="lg" variant="outline" className="uppercase tracking-wider">Spectator passes</Button>
+                </Link>
                 <a href="/magazine/DRC-Ultimate-Rider.pdf" target="_blank" rel="noopener noreferrer" className="font-heading uppercase tracking-widest text-sm text-foreground/70 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1 self-center">
                   Sponsor / Partner Deck →
                 </a>
@@ -129,37 +135,34 @@ export default async function EventsPage() {
               {upcoming.map((event) => (
                 <AnimatedGridItem key={event.id}>
                   <HoverCard>
-                    <Link href={`/events/${event.slug}`} className="block group">
-                      <div className="bg-surface border border-border rounded-sm overflow-hidden hover:border-orange/50 transition-colors h-full flex flex-col">
-                        <div className="aspect-[16/9] bg-surface-light flex items-center justify-center">
-                          <Trophy className="w-12 h-12 text-orange/30" />
+                    <div className="bg-surface border border-border rounded-sm overflow-hidden hover:border-orange/50 transition-colors h-full flex flex-col">
+                      <Link href={`/events/${event.slug}`} className="block group">
+                        <div className="aspect-[16/9] bg-surface-light flex items-center justify-center overflow-hidden">
+                          {event.coverImage ? <img src={event.coverImage} alt={event.title} className="w-full h-full object-cover" /> : <Trophy className="w-12 h-12 text-orange/30" />}
                         </div>
-                        <div className="p-5 flex-1 flex flex-col">
+                        <div className="p-5 pb-2">
                           <div className="flex items-center gap-2 mb-2">
                             <Badge variant="orange">{event.type}</Badge>
                             {event.featured && <Badge variant="warning">Featured</Badge>}
                           </div>
                           <h4 className="font-heading text-lg font-bold group-hover:text-orange transition-colors">{event.title}</h4>
                           <p className="text-sm text-muted mt-2 line-clamp-2">{event.description}</p>
-                          <div className="mt-auto pt-4 space-y-1">
-                            <p className="text-xs text-muted flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5" />
-                              {event.date.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
-                            </p>
-                            <p className="text-xs text-muted flex items-center gap-1.5">
-                              <MapPin className="w-3.5 h-3.5" />
-                              {event.location}
-                            </p>
-                            {event.price > 0 && (
-                              <p className="text-sm font-semibold text-orange mt-2">&#8377;{event.price.toLocaleString("en-IN")}</p>
-                            )}
-                            {event.price === 0 && (
-                              <p className="text-sm font-semibold text-success mt-2">Free Entry</p>
-                            )}
-                          </div>
                         </div>
+                      </Link>
+                      <div className="px-5 pb-5 mt-auto">
+                        <p className="text-xs text-muted flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {formatDateRange(event.date, event.endDate)}
+                        </p>
+                        <p className="text-xs text-muted flex items-center gap-1.5 mt-1">
+                          <MapPin className="w-3.5 h-3.5" />{event.location}
+                        </p>
+                        <p className="text-sm font-semibold text-orange mt-2">{event.price > 0 ? `₹${event.price.toLocaleString("en-IN")}` : "Free Entry"}</p>
+                        <Link href={event.registrationUrl || `/events/${event.slug}`} className="inline-block mt-4">
+                          <Button size="sm" className="uppercase tracking-wider">Register <ArrowRight className="w-4 h-4" /></Button>
+                        </Link>
                       </div>
-                    </Link>
+                    </div>
                   </HoverCard>
                 </AnimatedGridItem>
               ))}
@@ -182,7 +185,7 @@ export default async function EventsPage() {
                     </div>
                     <h4 className="font-heading font-bold">{event.title}</h4>
                     <p className="text-xs text-muted mt-1">
-                      {event.date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} · {event.location}
+                      {formatDateRange(event.date, event.endDate)} · {event.location}
                     </p>
                   </div>
                 </AnimatedGridItem>
@@ -193,4 +196,15 @@ export default async function EventsPage() {
       </div>
     </div>
   );
+}
+
+function formatDateRange(start: Date, end: Date | null) {
+  if (!end || start.toDateString() === end.toDateString()) {
+    return start.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  }
+  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
+  if (sameMonth) {
+    return `${start.getDate()}–${end.getDate()} ${end.toLocaleDateString("en-IN", { month: "short", year: "numeric" })}`;
+  }
+  return `${start.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} – ${end.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}`;
 }
