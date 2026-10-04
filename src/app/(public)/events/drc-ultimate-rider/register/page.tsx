@@ -18,8 +18,7 @@ interface Category {
 interface StayOption {
     enabled: boolean;
     price: number;
-    totalTents: number;
-    availableTents: number;
+    soldOut: boolean;
 }
 
 interface SpectatorFees {
@@ -134,7 +133,7 @@ export default function UltimateRiderRegisterPage() {
     function validate(): string | null {
         if (registrationType === "rider" && !category) return "Please select a race category.";
         if (registrationType === "spectator" && !attendanceDays) return "Please select the day or days you will attend.";
-        if (bookStay && (!stay?.enabled || stay.availableTents < 1)) return "Tent stay is no longer available. Please refresh and try again.";
+        if (bookStay && (!stay?.enabled || stay.soldOut)) return "Tent stay is no longer available. Please refresh and try again.";
         if (!form.name || !form.email || !form.phone || !form.city) return "Please fill in all contact details.";
         if (registrationType === "rider" && (!form.bikeMake || !form.bikeModel)) return "Please add your bike make and model.";
         if (registrationType === "rider" && !form.experience) return "Please select your experience level.";
@@ -517,18 +516,17 @@ export default function UltimateRiderRegisterPage() {
                             12&ndash;13 December 2026 &middot; Bengaluru
                         </p>
 
-                        {stay?.enabled && (
-                            <label className={`flex items-start justify-between gap-3 mt-6 border p-4 ${bookStay ? "border-orange bg-orange/5" : "border-border"} ${stay.availableTents < 1 ? "opacity-60" : "cursor-pointer"}`}>
+                        {stay?.enabled && (stay.soldOut ? (
+                            <p className="mt-6 border border-border p-4 text-sm font-semibold text-muted">Tent stay sold out</p>
+                        ) : (
+                            <label className={`flex items-start justify-between gap-3 mt-6 border p-4 ${bookStay ? "border-orange bg-orange/5" : "border-border cursor-pointer"}`}>
                                 <span className="flex items-start gap-3">
-                                    <input type="checkbox" checked={bookStay} disabled={stay.availableTents < 1} onChange={(e) => setBookStay(e.target.checked)} className="mt-1 accent-orange w-4 h-4" />
-                                    <span>
-                                        <span className="block font-heading text-sm font-bold uppercase">Add tent stay</span>
-                                        <span className="block text-xs text-muted mt-1">{stay.availableTents > 0 ? `${stay.availableTents} tents available` : "Sold out"}</span>
-                                    </span>
+                                    <input type="checkbox" checked={bookStay} onChange={(e) => setBookStay(e.target.checked)} className="mt-1 accent-orange w-4 h-4" />
+                                    <span className="block font-heading text-sm font-bold uppercase">Add tent stay</span>
                                 </span>
                                 <span className="font-heading text-lg font-bold text-orange whitespace-nowrap">₹{stay.price.toLocaleString("en-IN")}</span>
                             </label>
-                        )}
+                        ))}
 
                         <div className="mt-6 pt-6 border-t border-border space-y-4">
                             <Row k={registrationType === "rider" ? "Category" : "Spectator pass"} v={registrationType === "rider" ? selected?.name ?? "—" : attendanceLabel} />

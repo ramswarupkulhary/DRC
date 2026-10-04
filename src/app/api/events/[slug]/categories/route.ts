@@ -60,9 +60,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
             stay: event.stayEnabled ? {
                 enabled: true,
                 price: event.stayPrice,
-                totalTents: event.stayTotalTents,
-                availableTents: Math.max(0, event.stayTotalTents - reservedTents),
-            } : { enabled: false, price: event.stayPrice, totalTents: event.stayTotalTents, availableTents: 0 },
+                soldOut: reservedTents >= event.stayTotalTents,
+            } : { enabled: false, price: event.stayPrice, soldOut: true },
             spectator: {
                 saturdayFee: event.spectatorSaturdayFee,
                 sundayFee: event.spectatorSundayFee,
