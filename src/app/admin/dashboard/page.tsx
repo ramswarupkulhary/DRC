@@ -1,21 +1,22 @@
 export const dynamic = "force-dynamic";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
-import { Bike, GraduationCap, Users, DollarSign, TrendingUp, Crown, ShoppingBag } from "lucide-react";
+import { Bike, GraduationCap, Users, DollarSign, TrendingUp, Crown, ShoppingBag, CalendarDays } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminDashboard() {
   const now = new Date();
-  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
-  const [rideCount, trainingCount, riderCount, registrations, memberships, orders, recentRegistrations] =
+  const [rideCount, trainingCount, riderCount, registrations, memberships, orders, programBookings, eventRegistrations, recentRegistrations] =
     await Promise.all([
       prisma.ride.count({ where: { status: "published" } }),
       prisma.training.count({ where: { status: "published" } }),
       prisma.user.count({ where: { role: "rider" } }),
       prisma.registration.findMany({ where: { paymentStatus: "paid", paymentId: { not: null } }, select: { amount: true, createdAt: true, rideId: true, trainingId: true } }),
-      prisma.membership.findMany({ where: { status: "active" }, select: { createdAt: true, plan: { select: { price: true } } } }),
-      prisma.order.findMany({ where: { status: "completed", paymentId: { not: null } }, select: { total: true, createdAt: true } }),
+      prisma.membership.findMany({ where: { status: "active", paymentProof: { not: null } }, select: { startDate: true, plan: { select: { price: true } } } }),
+      prisma.order.findMany({ where: { paymentId: { not: null } }, select: { total: true, createdAt: true } }),
+      prisma.programBooking.findMany({ where: { paymentStatus: "paid", paymentId: { not: null } }, select: { amount: true, createdAt: true } }),
+      prisma.eventRegistration.findMany({ where: { paymentStatus: "paid", razorpayPaymentId: { not: null } }, select: { amount: true, createdAt: true } }),
       prisma.registration.findMany({
         orderBy: { createdAt: "desc" },
         take: 10,
@@ -27,15 +28,16 @@ export default async function AdminDashboard() {
       }),
     ]);
 
-  const totalRevenue = registrations.reduce((sum, r) => sum + r.amount, 0);
-  const membershipRevenue = 0;
-  const storeRevenue = orders.reduce((sum, o) => sum + o.total, 0);
   const rideRevenue = registrations.filter((r) => r.rideId).reduce((sum, r) => sum + r.amount, 0);
   const trainingRevenue = registrations.filter((r) => r.trainingId).reduce((sum, r) => sum + r.amount, 0);
-  const grandTotal = totalRevenue + membershipRevenue + storeRevenue;
+  const membershipRevenue = memberships.reduce((sum, m) => sum + m.plan.price, 0);
+  const storeRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+  const programRevenue = programBookings.reduce((sum, booking) => sum + booking.amount, 0);
+  const eventRevenue = eventRegistrations.reduce((sum, registration) => sum + registration.amount, 0);
+  const grandTotal = rideRevenue + trainingRevenue + membershipRevenue + storeRevenue + programRevenue + eventRevenue;
 
   // Monthly revenue for last 6 months
-  const months: { label: string; rides: number; trainings: number; memberships: number; store: number }[] = [];
+  const months: { label: string; rides: number; trainings: number; programs: number; events: number; memberships: number; store: number }[] = [];
   for (let i = 5; i >= 0; i--) {
     const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const nextMonth = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
@@ -44,12 +46,15 @@ export default async function AdminDashboard() {
       label,
       rides: registrations.filter((r) => r.rideId && r.createdAt >= month && r.createdAt < nextMonth).reduce((s, r) => s + r.amount, 0),
       trainings: registrations.filter((r) => r.trainingId && r.createdAt >= month && r.createdAt < nextMonth).reduce((s, r) => s + r.amount, 0),
-      memberships: 0,
+      programs: programBookings.filter((booking) => booking.createdAt >= month && booking.createdAt < nextMonth).reduce((s, booking) => s + booking.amount, 0),
+      events: eventRegistrations.filter((registration) => registration.createdAt >= month && registration.createdAt < nextMonth).reduce((s, registration) => s + registration.amount, 0),
+      memberships: memberships.filter((membership) => membership.startDate >= month && membership.startDate < nextMonth).reduce((s, membership) => s + membership.plan.price, 0),
       store: orders.filter((o) => o.createdAt >= month && o.createdAt < nextMonth).reduce((s, o) => s + o.total, 0),
     });
   }
 
-  const maxMonthly = Math.max(...months.map((m) => m.rides + m.trainings + m.memberships + m.store), 1);
+  const monthlyTotal = (month: typeof months[number]) => month.rides + month.trainings + month.programs + month.events + month.memberships + month.store;
+  const maxMonthly = Math.max(...months.map(monthlyTotal), 1);
 
   const stats = [
     { label: "Active Rides", value: rideCount, icon: Bike, color: "text-orange" },
@@ -61,8 +66,10 @@ export default async function AdminDashboard() {
   const breakdown = [
     { label: "Rides", value: rideRevenue, color: "bg-orange", icon: Bike },
     { label: "Trainings", value: trainingRevenue, color: "bg-success", icon: GraduationCap },
+    { label: "Programs", value: programRevenue, color: "bg-blue-500", icon: TrendingUp },
+    { label: "Events", value: eventRevenue, color: "bg-red-500", icon: CalendarDays },
     { label: "Memberships", value: membershipRevenue, color: "bg-tan", icon: Crown },
-    { label: "Store", value: storeRevenue, color: "bg-blue-500", icon: ShoppingBag },
+    { label: "Store", value: storeRevenue, color: "bg-cyan-500", icon: ShoppingBag },
   ];
 
   return (
@@ -114,20 +121,36 @@ export default async function AdminDashboard() {
           <h2 className="font-heading text-lg font-semibold mb-4">Monthly Revenue (6 months)</h2>
           <div className="flex items-end gap-2 h-40">
             {months.map((m) => {
-              const total = m.rides + m.trainings + m.memberships + m.store;
-              const height = (total / maxMonthly) * 100;
+              const total = monthlyTotal(m);
+              const segments = [
+                { key: "rides", value: m.rides, color: "bg-orange" },
+                { key: "trainings", value: m.trainings, color: "bg-success" },
+                { key: "programs", value: m.programs, color: "bg-blue-500" },
+                { key: "events", value: m.events, color: "bg-red-500" },
+                { key: "memberships", value: m.memberships, color: "bg-tan" },
+                { key: "store", value: m.store, color: "bg-cyan-500" },
+              ];
               return (
                 <div key={m.label} className="flex-1 flex flex-col items-center gap-1">
                   <span className="text-[10px] text-muted">{total > 0 ? formatPrice(total) : ""}</span>
                   <div className="w-full bg-background rounded-sm overflow-hidden" style={{ height: "100%" }}>
                     <div className="w-full flex flex-col justify-end h-full">
-                      <div className="bg-orange rounded-t-sm" style={{ height: `${height}%`, minHeight: total > 0 ? "4px" : "0" }} />
+                      {segments.map((segment) => segment.value > 0 && (
+                        <div key={segment.key} className={`w-full ${segment.color}`} style={{ height: `${(segment.value / maxMonthly) * 100}%` }} />
+                      ))}
                     </div>
                   </div>
                   <span className="text-[10px] text-muted">{m.label}</span>
                 </div>
               );
             })}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
+            {breakdown.map((source) => (
+              <span key={source.label} className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted">
+                <span className={`w-2 h-2 ${source.color}`} />{source.label}
+              </span>
+            ))}
           </div>
         </div>
       </div>
@@ -153,9 +176,8 @@ export default async function AdminDashboard() {
                 </p>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className={`text-xs px-2 py-0.5 rounded-sm ${
-                  reg.paymentStatus === "paid" ? "bg-success/20 text-success" : "bg-warning/20 text-warning"
-                }`}>
+                <span className={`text-xs px-2 py-0.5 rounded-sm ${reg.paymentStatus === "paid" ? "bg-success/20 text-success" : "bg-warning/20 text-warning"
+                  }`}>
                   {reg.paymentStatus}
                 </span>
                 <span className="font-heading font-bold text-orange">{formatPrice(reg.amount)}</span>
