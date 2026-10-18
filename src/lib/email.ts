@@ -19,12 +19,14 @@ export async function sendEmail({
   to,
   subject,
   html,
+  attachments,
 }: {
   to: string;
   subject: string;
   html: string;
+  attachments?: { filename: string; content: Buffer; contentType: string }[];
 }) {
-  const info = await transporter.sendMail({ from: FROM, to, subject, html });
+  const info = await transporter.sendMail({ from: FROM, to, subject, html, attachments });
   console.log(`[EMAIL] ✅ Sent "${subject}" to ${to}, ID: ${(info as unknown as Record<string, unknown>)?.messageId}`);
   return info;
 }

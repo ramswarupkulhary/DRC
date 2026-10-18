@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Download } from "lucide-react";
 
 interface Category {
     id: string;
@@ -63,6 +63,8 @@ export default function UltimateRiderRegisterPage() {
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [registrationType, setRegistrationType] = useState<RegistrationType>("rider");
     const [bookStay, setBookStay] = useState(false);
+    const [spectatorPassUrl, setSpectatorPassUrl] = useState<string | null>(null);
+    const [passEmailSent, setPassEmailSent] = useState<boolean | null>(null);
     const [form, setForm] = useState({
         name: "",
         email: "",
@@ -145,7 +147,7 @@ export default function UltimateRiderRegisterPage() {
     }
 
     async function handlePayNow() {
-        if (authStatus !== "authenticated") {
+        if (registrationType === "rider" && authStatus !== "authenticated") {
             router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
             return;
         }
@@ -173,9 +175,11 @@ export default function UltimateRiderRegisterPage() {
                 const data = await orderRes.json().catch(() => ({}));
                 throw new Error(data?.error || "Could not create payment order.");
             }
-            const { orderId, amount, key, categoryName, freeBooking } = await orderRes.json();
+            const { orderId, amount, key, categoryName, freeBooking, passUrl, passEmailSent: emailSent } = await orderRes.json();
 
             if (freeBooking) {
+                setSpectatorPassUrl(passUrl ?? null);
+                setPassEmailSent(emailSent === true);
                 setStatus("success-registered");
                 return;
             }
@@ -263,7 +267,19 @@ export default function UltimateRiderRegisterPage() {
                     <span className="text-orange font-semibold">{confirmation}</span> for DRC Ultimate Rider is confirmed
                     {wantsStay ? ", including your tent stay" : ""}. {paid ? `A receipt has been sent to ${form.email}.` : ""}
                 </p>
+                {registrationType === "spectator" && spectatorPassUrl && (
+                    <p role="status" className="mt-4 text-sm text-muted">
+                        {passEmailSent
+                            ? `Your spectator pass has been emailed to ${form.email}.`
+                            : "Your registration is confirmed, but we couldn't email your pass. You can still download it below."}
+                    </p>
+                )}
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    {registrationType === "spectator" && spectatorPassUrl && (
+                        <a href={spectatorPassUrl} download="drc-ultimate-rider-spectator-pass.png" className="inline-flex items-center justify-center gap-2 bg-orange px-6 py-3 font-heading text-sm font-bold uppercase text-white">
+                            <Download className="h-4 w-4" /> Download pass
+                        </a>
+                    )}
                     <Link href="/events/drc-ultimate-rider">
                         <Button size="lg" className="uppercase tracking-widest text-sm">
                             Back to race brief <ArrowRight className="w-4 h-4" />
@@ -525,7 +541,9 @@ export default function UltimateRiderRegisterPage() {
                                 className="mt-1 accent-orange w-4 h-4"
                             />
                             <span className="text-xs text-muted leading-relaxed">
-                                I confirm these details are correct and understand my booking is confirmed after payment.
+                                {registrationType === "spectator"
+                                    ? "I confirm these details are correct and accept the event entry terms."
+                                    : "I confirm these details are correct and understand my booking is confirmed after payment."}
                             </span>
                         </label>
 
@@ -540,14 +558,16 @@ export default function UltimateRiderRegisterPage() {
                             loading={status === "paying"}
                             onClick={handlePayNow}
                         >
-                            {authStatus === "authenticated"
-                                ? <>{total > 0 ? `Pay ₹${total.toLocaleString("en-IN")}` : "Confirm booking"} &amp; continue</>
-                                : <>Sign in to book · ₹{total.toLocaleString("en-IN")}</>}
+                            {registrationType === "spectator"
+                                ? "Get free spectator pass"
+                                : authStatus === "authenticated"
+                                    ? <>{total > 0 ? `Pay ₹${total.toLocaleString("en-IN")}` : "Confirm booking"} &amp; continue</>
+                                    : <>Sign in to book · ₹{total.toLocaleString("en-IN")}</>}
                             <ArrowRight className="w-4 h-4" />
                         </Button>
 
                         <p className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted text-center">
-                            Secure payment via Razorpay &middot; UPI, cards, netbanking
+                            {registrationType === "spectator" ? "Free admission" : <>Secure payment via Razorpay &middot; UPI, cards, netbanking</>}
                         </p>
                     </div>
                 </aside>

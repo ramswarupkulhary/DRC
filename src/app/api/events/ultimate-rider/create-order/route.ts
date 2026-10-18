@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resolveEventCategory } from "@/lib/eventCategories";
 import { isActiveMember } from "@/lib/pricing";
+import { drcEmailTemplate, sendEmail } from "@/lib/email";
+import { escapePassText, renderSpectatorPass, spectatorPassDownloadUrl } from "@/lib/spectatorPass";
 import Razorpay from "razorpay";
 
 async function getRazorpayInstance() {
@@ -25,11 +27,6 @@ async function getRazorpayInstance() {
 
 export async function POST(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user) {
-            return NextResponse.json({ error: "Please sign in to register." }, { status: 401 });
-        }
-
         const body = await req.json();
         const {
             category,
@@ -46,6 +43,12 @@ export async function POST(req: Request) {
             acknowledgeOrganiser,
             registrationType = "rider",
         } = body ?? {};
+
+        const session = await getServerSession(authOptions);
+        const userId = (session?.user as { id?: string } | undefined)?.id || null;
+        if (registrationType === "rider" && !userId) {
+            return NextResponse.json({ error: "Please sign in to register as a rider." }, { status: 401 });
+        }
 
         // Normalise category input into a de-duplicated, sorted list of slugs.
         const categorySlugs: string[] = Array.from(
@@ -104,8 +107,7 @@ export async function POST(req: Request) {
         const foodAmount = 0;
         const foodPackageName = null;
         const stayAmount = wantsStay ? event.stayPrice : 0;
-        const userId = (session.user as { id: string }).id;
-        const membershipDiscount = (await isActiveMember(userId)) ? Math.round(entryAmount * 0.1) : 0;
+        const membershipDiscount = registrationType === "rider" && userId && (await isActiveMember(userId)) ? Math.round(entryAmount * 0.1) : 0;
         const amount = entryAmount - membershipDiscount + foodAmount + stayAmount;
         const reservationExpiresAt = wantsStay ? new Date(Date.now() + 15 * 60 * 1000) : null;
 
@@ -163,8 +165,9 @@ export async function POST(req: Request) {
             reservationExpiresAt,
         };
 
+        let registrationId: string;
         if (wantsStay) {
-            await prisma.$transaction(async (tx) => {
+            registrationId = await prisma.$transaction(async (tx) => {
                 const now = new Date();
                 const reservedTents = await tx.eventRegistration.count({
                     where: {
@@ -177,14 +180,45 @@ export async function POST(req: Request) {
                     },
                 });
                 if (reservedTents >= event.stayTotalTents) throw new Error("TENT_CAPACITY");
-                await tx.eventRegistration.create({ data: registrationData });
+                const registration = await tx.eventRegistration.create({ data: registrationData });
+                return registration.id;
             }, { isolationLevel: "Serializable" });
         } else {
-            await prisma.eventRegistration.create({ data: registrationData });
+            const registration = await prisma.eventRegistration.create({ data: registrationData });
+            registrationId = registration.id;
+        }
+
+        const passUrl = registrationType === "spectator" ? spectatorPassDownloadUrl(registrationId) : undefined;
+        let passEmailSent: boolean | undefined;
+        if (passUrl) {
+            try {
+                const pass = await renderSpectatorPass({ id: registrationId, name: registrationData.name });
+                await sendEmail({
+                    to: registrationData.email,
+                    subject: "Your DRC Ultimate Rider spectator pass",
+                    html: drcEmailTemplate({
+                        title: "Your spectator pass is confirmed",
+                        body: `<p style="color:#F1E9DD;line-height:1.7;">Hi ${escapePassText(registrationData.name)}, your free general-admission spectator pass for <strong>DRC Ultimate Rider</strong> is confirmed.</p>
+                        <p style="color:#F1E9DD;line-height:1.7;"><strong>12-13 December 2026</strong><br/>Bengaluru</p>
+                        <p style="color:#F1E9DD;line-height:1.7;">Registration reference: ${escapePassText(registrationId)}</p>
+                        <p style="color:#B9A886;line-height:1.7;">Your pass is attached as a PNG image and is also available to download below. Spectator admission only; race entry, meals and tent stay are not included.</p>`,
+                        ctaText: "Download spectator pass",
+                        ctaUrl: passUrl,
+                    }),
+                    attachments: [{ filename: "drc-ultimate-rider-spectator-pass.png", content: pass, contentType: "image/png" }],
+                });
+                passEmailSent = true;
+            } catch (error) {
+                passEmailSent = false;
+                console.error("[ultimate-rider spectator pass email]", error);
+            }
         }
 
         return NextResponse.json({
             freeBooking: !order,
+            registrationId,
+            passUrl,
+            passEmailSent,
             orderId: order?.id,
             amount,
             currency: "INR",

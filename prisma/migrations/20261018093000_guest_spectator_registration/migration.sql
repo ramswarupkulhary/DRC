@@ -1,0 +1,1 @@
+ALTER TABLE "EventRegistration" ALTER COLUMN "userId" DROP NOT NULL;

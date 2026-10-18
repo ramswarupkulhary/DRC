@@ -645,7 +645,7 @@ model EventCategory {
 
 model EventRegistration {
   id                 String   @id @default(cuid())
-  userId             String
+  userId             String?
   eventSlug          String
   category           String
   categoryName       String
@@ -674,7 +674,7 @@ model EventRegistration {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([eventSlug])
   @@index([userId])

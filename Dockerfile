@@ -1,5 +1,5 @@
 FROM node:20-slim AS base
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y openssl fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
 
 # --- deps: install ALL dependencies ---
 FROM base AS deps
