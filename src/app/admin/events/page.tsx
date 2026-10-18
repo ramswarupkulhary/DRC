@@ -31,15 +31,6 @@ interface EventData {
   stayTotalTents: number;
   stayBookedTents: number;
   stayAvailableTents: number;
-  spectatorSaturdayFee: number;
-  spectatorSundayFee: number;
-  spectatorWeekendFee: number;
-  spectatorFullMealName: string;
-  spectatorFullMealDetails: string;
-  spectatorFullMealFee: number;
-  spectatorDayMealName: string;
-  spectatorDayMealDetails: string;
-  spectatorDayMealFee: number;
 }
 
 export default function AdminEventsPage() {
@@ -67,15 +58,6 @@ export default function AdminEventsPage() {
   const [stayEnabled, setStayEnabled] = useState(false);
   const [stayPrice, setStayPrice] = useState("1599");
   const [stayTotalTents, setStayTotalTents] = useState("50");
-  const [spectatorSaturdayFee, setSpectatorSaturdayFee] = useState("0");
-  const [spectatorSundayFee, setSpectatorSundayFee] = useState("0");
-  const [spectatorWeekendFee, setSpectatorWeekendFee] = useState("0");
-  const [spectatorFullMealName, setSpectatorFullMealName] = useState("Two-day meal package");
-  const [spectatorFullMealDetails, setSpectatorFullMealDetails] = useState("2 breakfasts, 2 lunches and 1 dinner");
-  const [spectatorFullMealFee, setSpectatorFullMealFee] = useState("1999");
-  const [spectatorDayMealName, setSpectatorDayMealName] = useState("Day meal package");
-  const [spectatorDayMealDetails, setSpectatorDayMealDetails] = useState("1 breakfast and 1 lunch");
-  const [spectatorDayMealFee, setSpectatorDayMealFee] = useState("599");
 
   const fetchEvents = async () => {
     const res = await fetch("/api/admin/events");
@@ -90,9 +72,6 @@ export default function AdminEventsPage() {
     setDate(""); setEndDate(""); setLocation(""); setCoverImage(null); setRegistrationUrl(""); setPrice("0"); setTotalSlots("50");
     setStatus("upcoming"); setFeatured(false); setPrizes(""); setRules("");
     setStayEnabled(false); setStayPrice("1599"); setStayTotalTents("50");
-    setSpectatorSaturdayFee("0"); setSpectatorSundayFee("0"); setSpectatorWeekendFee("0");
-    setSpectatorFullMealName("Two-day meal package"); setSpectatorFullMealDetails("2 breakfasts, 2 lunches and 1 dinner"); setSpectatorFullMealFee("1999");
-    setSpectatorDayMealName("Day meal package"); setSpectatorDayMealDetails("1 breakfast and 1 lunch"); setSpectatorDayMealFee("599");
     setEditing(null); setShowForm(false);
   };
 
@@ -105,15 +84,6 @@ export default function AdminEventsPage() {
     setPrizes(e.prizes ? JSON.parse(e.prizes).join("\n") : "");
     setRules(e.rules ? JSON.parse(e.rules).join("\n") : "");
     setStayEnabled(e.stayEnabled); setStayPrice(String(e.stayPrice)); setStayTotalTents(String(e.stayTotalTents));
-    setSpectatorSaturdayFee(String(e.spectatorSaturdayFee));
-    setSpectatorSundayFee(String(e.spectatorSundayFee));
-    setSpectatorWeekendFee(String(e.spectatorWeekendFee));
-    setSpectatorFullMealName(e.spectatorFullMealName);
-    setSpectatorFullMealDetails(e.spectatorFullMealDetails);
-    setSpectatorFullMealFee(String(e.spectatorFullMealFee));
-    setSpectatorDayMealName(e.spectatorDayMealName);
-    setSpectatorDayMealDetails(e.spectatorDayMealDetails);
-    setSpectatorDayMealFee(String(e.spectatorDayMealFee));
     setEditing(e); setShowForm(true);
   };
 
@@ -126,11 +96,6 @@ export default function AdminEventsPage() {
       prizes: prizes.trim() ? JSON.stringify(prizes.split("\n").filter(Boolean)) : null,
       rules: rules.trim() ? JSON.stringify(rules.split("\n").filter(Boolean)) : null,
       stayEnabled, stayPrice: parseInt(stayPrice, 10), stayTotalTents: parseInt(stayTotalTents, 10),
-      spectatorSaturdayFee: parseInt(spectatorSaturdayFee, 10),
-      spectatorSundayFee: parseInt(spectatorSundayFee, 10),
-      spectatorWeekendFee: parseInt(spectatorWeekendFee, 10),
-      spectatorFullMealName, spectatorFullMealDetails, spectatorFullMealFee: parseInt(spectatorFullMealFee, 10),
-      spectatorDayMealName, spectatorDayMealDetails, spectatorDayMealFee: parseInt(spectatorDayMealFee, 10),
     };
 
     if (editing) {
@@ -195,23 +160,7 @@ export default function AdminEventsPage() {
           <Textarea label="Rules (one per line)" value={rules} onChange={(e) => setRules(e.target.value)} rows={3} />
           {(editing?.slug === "drc-ultimate-rider" || slug === "drc-ultimate-rider") && (
             <div className="border-t border-border pt-5 space-y-4">
-              <h4 className="font-heading text-sm font-bold uppercase">Spectator passes</h4>
-              <p className="text-xs text-muted">Set admission to ₹0 for free entry. Optional food and tent prices are separate.</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Input label="Saturday admission (₹)" type="number" min="0" value={spectatorSaturdayFee} onChange={(e) => setSpectatorSaturdayFee(e.target.value)} />
-                <Input label="Sunday admission (₹)" type="number" min="0" value={spectatorSundayFee} onChange={(e) => setSpectatorSundayFee(e.target.value)} />
-                <Input label="Both days admission (₹)" type="number" min="0" value={spectatorWeekendFee} onChange={(e) => setSpectatorWeekendFee(e.target.value)} />
-              </div>
-              <h4 className="font-heading text-sm font-bold uppercase pt-2">Spectator food packages</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input label="Two-day package name" value={spectatorFullMealName} onChange={(e) => setSpectatorFullMealName(e.target.value)} />
-                <Input label="Two-day package price (₹)" type="number" min="0" value={spectatorFullMealFee} onChange={(e) => setSpectatorFullMealFee(e.target.value)} />
-                <Input label="Two-day package meals" value={spectatorFullMealDetails} onChange={(e) => setSpectatorFullMealDetails(e.target.value)} />
-                <Input label="Day package name" value={spectatorDayMealName} onChange={(e) => setSpectatorDayMealName(e.target.value)} />
-                <Input label="Day package price (₹)" type="number" min="0" value={spectatorDayMealFee} onChange={(e) => setSpectatorDayMealFee(e.target.value)} />
-                <Input label="Day package meals" value={spectatorDayMealDetails} onChange={(e) => setSpectatorDayMealDetails(e.target.value)} />
-              </div>
-              <h4 className="font-heading text-sm font-bold uppercase pt-2">Tent stay booking</h4>
+              <h4 className="font-heading text-sm font-bold uppercase">Tent stay booking</h4>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={stayEnabled} onChange={(e) => setStayEnabled(e.target.checked)} />
                 Offer tent stays to riders and spectators

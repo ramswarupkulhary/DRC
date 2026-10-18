@@ -45,8 +45,6 @@ export async function POST(req: Request) {
             stayBooked,
             acknowledgeOrganiser,
             registrationType = "rider",
-            attendanceDays,
-            foodPackage = "none",
         } = body ?? {};
 
         // Normalise category input into a de-duplicated, sorted list of slugs.
@@ -92,41 +90,19 @@ export async function POST(req: Request) {
             categoryName = resolvedList.map((r) => r.category.name).join(", ");
             entryAmount = resolvedList.reduce((sum, r) => sum + r.category.fee, 0);
         } else {
-            if (!["saturday", "sunday", "both"].includes(attendanceDays)) {
-                return NextResponse.json({ error: "Please select a spectator pass." }, { status: 400 });
-            }
-            if (foodPackage !== "none" && foodPackage !== "full" && foodPackage !== "day") {
-                return NextResponse.json({ error: "Invalid food package." }, { status: 400 });
-            }
             event = await prisma.event.findUnique({ where: { slug: "drc-ultimate-rider" } });
             if (!event) return NextResponse.json({ error: "Event not found." }, { status: 404 });
-            if (!event.spectatorRatesConfigured) {
-                await prisma.event.updateMany({
-                    where: { id: event.id, spectatorRatesConfigured: false },
-                    data: { spectatorSaturdayFee: 0, spectatorSundayFee: 0, spectatorWeekendFee: 0, spectatorRatesConfigured: true },
-                });
-                event = await prisma.event.findUniqueOrThrow({ where: { id: event.id } });
-            }
             categorySlug = "spectator";
-            categoryName = attendanceDays === "both"
-                ? "Spectator pass — Both days"
-                : `Spectator pass — ${attendanceDays === "saturday" ? "Saturday" : "Sunday"}`;
-            entryAmount = attendanceDays === "saturday"
-                ? event.spectatorSaturdayFee
-                : attendanceDays === "sunday" ? event.spectatorSundayFee : event.spectatorWeekendFee;
+            categoryName = "Spectator pass";
+            entryAmount = 0;
         }
-        const wantsStay = stayBooked === true;
+        const wantsStay = registrationType === "rider" && stayBooked === true;
         if (wantsStay && (!event.stayEnabled || event.stayTotalTents < 1)) {
             return NextResponse.json({ error: "Tent stay is currently unavailable." }, { status: 409 });
         }
 
-        const chosenFood = registrationType === "spectator" && foodPackage !== "none"
-            ? foodPackage === "full"
-                ? { name: event.spectatorFullMealName, details: event.spectatorFullMealDetails, fee: event.spectatorFullMealFee }
-                : { name: event.spectatorDayMealName, details: event.spectatorDayMealDetails, fee: event.spectatorDayMealFee }
-            : null;
-        const foodAmount = chosenFood?.fee ?? 0;
-        const foodPackageName = chosenFood ? `${chosenFood.name} (${chosenFood.details})` : null;
+        const foodAmount = 0;
+        const foodPackageName = null;
         const stayAmount = wantsStay ? event.stayPrice : 0;
         const userId = (session.user as { id: string }).id;
         const membershipDiscount = (await isActiveMember(userId)) ? Math.round(entryAmount * 0.1) : 0;
@@ -152,8 +128,6 @@ export async function POST(req: Request) {
                     registrationType,
                     category: categorySlug,
                     categoryName,
-                    attendanceDays: attendanceDays || "",
-                    foodPackage: foodPackageName || "",
                     name,
                     email,
                     phone,
@@ -177,7 +151,7 @@ export async function POST(req: Request) {
             phone: String(phone),
             city: city ? String(city) : null,
             registrationType,
-            attendanceDays: registrationType === "spectator" ? String(attendanceDays) : null,
+            attendanceDays: null,
             foodPackage: foodPackageName,
             foodAmount,
             bikeMake: registrationType === "rider" && bikeMake ? String(bikeMake) : null,

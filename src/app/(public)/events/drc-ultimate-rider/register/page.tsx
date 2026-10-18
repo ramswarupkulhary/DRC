@@ -21,18 +21,8 @@ interface StayOption {
     soldOut: boolean;
 }
 
-interface SpectatorFees {
-    saturdayFee: number;
-    sundayFee: number;
-    weekendFee: number;
-    fullMeal: { name: string; details: string; fee: number };
-    dayMeal: { name: string; details: string; fee: number };
-}
-
 type Status = "idle" | "paying" | "success-paid" | "success-registered" | "error";
 type RegistrationType = "rider" | "spectator";
-type AttendanceDays = "saturday" | "sunday" | "both";
-type FoodSelection = "none" | "full" | "day";
 type RaceClass = "amateur" | "professional" | null;
 
 function getRaceClass(category: Category): RaceClass {
@@ -70,17 +60,8 @@ export default function UltimateRiderRegisterPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [stay, setStay] = useState<StayOption | null>(null);
     const [membershipDiscountPercent, setMembershipDiscountPercent] = useState(0);
-    const [spectatorFees, setSpectatorFees] = useState<SpectatorFees>({
-        saturdayFee: 0,
-        sundayFee: 0,
-        weekendFee: 0,
-        fullMeal: { name: "Two-day meal package", details: "2 breakfasts, 2 lunches and 1 dinner", fee: 1999 },
-        dayMeal: { name: "Day meal package", details: "1 breakfast and 1 lunch", fee: 599 },
-    });
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [registrationType, setRegistrationType] = useState<RegistrationType>("rider");
-    const [attendanceDays, setAttendanceDays] = useState<AttendanceDays>("both");
-    const [foodSelection, setFoodSelection] = useState<FoodSelection>("none");
     const [bookStay, setBookStay] = useState(false);
     const [form, setForm] = useState({
         name: "",
@@ -126,7 +107,6 @@ export default function UltimateRiderRegisterPage() {
                 setCategories((data?.categories ?? []).map((c: { id: string; slug: string; name: string; fee: number; description: string | null }) => c));
                 setStay(data?.stay ?? null);
                 setMembershipDiscountPercent(data?.memberDiscountPercent ?? 0);
-                if (data?.spectator) setSpectatorFees(data.spectator);
             })
             .catch(() => { setCategories([]); setStay(null); });
     }, []);
@@ -146,24 +126,16 @@ export default function UltimateRiderRegisterPage() {
     const selectedCategoryNames = selectedList.map((c) => c.name).join(", ");
     const hasSelectedAmateur = selectedList.some((category) => getRaceClass(category) === "amateur");
     const hasSelectedProfessional = selectedList.some((category) => getRaceClass(category) === "professional");
-    const spectatorFee = attendanceDays === "saturday"
-        ? spectatorFees.saturdayFee
-        : attendanceDays === "sunday" ? spectatorFees.sundayFee : spectatorFees.weekendFee;
     const entryFee = registrationType === "rider"
         ? selectedList.reduce((sum, c) => sum + c.fee, 0)
-        : spectatorFee;
-    const selectedFood = foodSelection === "full"
-        ? spectatorFees.fullMeal
-        : foodSelection === "day" ? spectatorFees.dayMeal : null;
-    const foodAmount = registrationType === "spectator" ? selectedFood?.fee ?? 0 : 0;
+        : 0;
     const memberSavings = Math.round(entryFee * membershipDiscountPercent / 100);
-    const total = entryFee - memberSavings + foodAmount + (bookStay && stay ? stay.price : 0);
-    const attendanceLabel = attendanceDays === "both" ? "Saturday + Sunday" : attendanceDays === "saturday" ? "Saturday only" : "Sunday only";
+    const wantsStay = registrationType === "rider" && bookStay;
+    const total = entryFee - memberSavings + (wantsStay && stay ? stay.price : 0);
 
     function validate(): string | null {
         if (registrationType === "rider" && selectedCategories.length === 0) return "Please select at least one race category.";
-        if (registrationType === "spectator" && !attendanceDays) return "Please select the day or days you will attend.";
-        if (bookStay && (!stay?.enabled || stay.soldOut)) return "Tent stay is no longer available. Please refresh and try again.";
+        if (wantsStay && (!stay?.enabled || stay.soldOut)) return "Tent stay is no longer available. Please refresh and try again.";
         if (!form.name || !form.email || !form.phone || !form.city) return "Please fill in all contact details.";
         if (registrationType === "rider" && (!form.bikeMake || !form.bikeModel)) return "Please add your bike make and model.";
         if (registrationType === "rider" && !form.experience) return "Please select your experience level.";
@@ -193,10 +165,8 @@ export default function UltimateRiderRegisterPage() {
                 body: JSON.stringify({
                     ...form,
                     registrationType,
-                    attendanceDays: registrationType === "spectator" ? attendanceDays : null,
-                    foodPackage: registrationType === "spectator" ? foodSelection : "none",
                     categories: registrationType === "rider" ? selectedCategories : null,
-                    stayBooked: bookStay,
+                    stayBooked: wantsStay,
                 }),
             });
             if (!orderRes.ok) {
@@ -218,7 +188,7 @@ export default function UltimateRiderRegisterPage() {
                 amount: amount * 100,
                 currency: "INR",
                 name: "DRC Motorsports",
-                description: `DRC Ultimate Rider — ${registrationType === "spectator" ? `Spectator ${attendanceLabel}` : categoryName}${bookStay ? " + Tent Stay" : ""}`,
+                description: `DRC Ultimate Rider — ${registrationType === "spectator" ? "Spectator pass" : categoryName}${wantsStay ? " + Tent Stay" : ""}`,
                 order_id: orderId,
                 theme: { color: "#E8622C" },
                 prefill: {
@@ -230,8 +200,7 @@ export default function UltimateRiderRegisterPage() {
                     event: "drc-ultimate-rider",
                     category: registrationType === "rider" ? selectedCategories.join(",") : "spectator",
                     registrationType,
-                    attendanceDays: registrationType === "spectator" ? attendanceDays : null,
-                    stayBooked: String(bookStay),
+                    stayBooked: String(wantsStay),
                 },
                 handler: async (response: {
                     razorpay_order_id: string;
@@ -247,9 +216,7 @@ export default function UltimateRiderRegisterPage() {
                                 ...form,
                                 categories: registrationType === "rider" ? selectedCategories : null,
                                 registrationType,
-                                attendanceDays: registrationType === "spectator" ? attendanceDays : null,
-                                foodPackage: registrationType === "spectator" ? foodSelection : "none",
-                                stayBooked: bookStay,
+                                stayBooked: wantsStay,
                             }),
                         });
                         if (!verifyRes.ok) {
@@ -280,7 +247,7 @@ export default function UltimateRiderRegisterPage() {
     if (status === "success-paid" || status === "success-registered") {
         const paid = status === "success-paid";
         const confirmation = registrationType === "spectator"
-            ? `Spectator pass for ${attendanceLabel}`
+            ? "spectator pass"
             : `race entry in ${selectedCategoryNames || "your selected categories"}`;
         return (
             <div className="max-w-3xl mx-auto px-6 lg:px-10 py-20 text-center">
@@ -294,7 +261,7 @@ export default function UltimateRiderRegisterPage() {
                     {paid ? "Payment received. " : "Thank you. "}
                     <span className="text-foreground font-semibold">{form.name}</span>, your{" "}
                     <span className="text-orange font-semibold">{confirmation}</span> for DRC Ultimate Rider is confirmed
-                    {selectedFood ? ` with ${selectedFood.name}` : ""}{bookStay ? ", including your tent stay" : ""}. {paid ? `A receipt has been sent to ${form.email}.` : ""}
+                    {wantsStay ? ", including your tent stay" : ""}. {paid ? `A receipt has been sent to ${form.email}.` : ""}
                 </p>
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Link href="/events/drc-ultimate-rider">
@@ -347,7 +314,7 @@ export default function UltimateRiderRegisterPage() {
                                 <label key={type} className={`border p-5 cursor-pointer ${registrationType === type ? "border-orange bg-orange/5" : "border-border"}`}>
                                     <input type="radio" name="registrationType" value={type} checked={registrationType === type} onChange={() => setRegistrationType(type)} className="sr-only" />
                                     <span className="font-heading text-lg font-bold uppercase">{type === "rider" ? "Race rider" : "Spectator"}</span>
-                                    <span className="block text-sm text-muted mt-1">{type === "rider" ? "Enter a race category" : "Choose your event day pass"}</span>
+                                    <span className="block text-sm text-muted mt-1">{type === "rider" ? "Enter a race category" : "Free general admission"}</span>
                                 </label>
                             ))}
                         </div>
@@ -424,51 +391,11 @@ export default function UltimateRiderRegisterPage() {
                     ) : (
                         <fieldset>
                             <legend className="flex items-center gap-3 mb-6">
-                                <span className="font-heading text-lg font-bold uppercase tracking-tight">Select spectator pass</span>
+                                <span className="font-heading text-lg font-bold uppercase tracking-tight">Spectator pass</span>
                             </legend>
-                            <p className="font-mono text-[10px] uppercase tracking-widest text-orange mb-3">Spectator admission</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                {([
-                                    { days: "saturday", label: "Saturday only", fee: spectatorFees.saturdayFee },
-                                    { days: "sunday", label: "Sunday only", fee: spectatorFees.sundayFee },
-                                    { days: "both", label: "Both days", fee: spectatorFees.weekendFee },
-                                ] as const).map((option) => (
-                                    <label key={option.days} className={`border p-5 cursor-pointer ${attendanceDays === option.days ? "border-orange bg-orange/5" : "border-border"}`}>
-                                        <input type="radio" name="attendanceDays" value={option.days} checked={attendanceDays === option.days} onChange={() => setAttendanceDays(option.days)} className="sr-only" />
-                                        <span className="block font-heading text-base font-bold uppercase">{option.label}</span>
-                                        <span className="block font-heading text-2xl font-bold text-orange mt-3">{option.fee === 0 ? "Free" : `₹${option.fee.toLocaleString("en-IN")}`}</span>
-                                        {option.fee > 0 && <span className="block font-mono text-[10px] uppercase tracking-widest text-muted mt-1">Admission</span>}
-                                    </label>
-                                ))}
-                            </div>
-                        </fieldset>
-                    )}
-
-                    {registrationType === "spectator" && (
-                        <fieldset>
-                            <legend className="flex items-center gap-3 mb-6">
-                                <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-orange">Optional</span>
-                                <span className="h-px w-10 bg-orange" />
-                                <span className="font-heading text-lg font-bold uppercase tracking-tight">Food packages</span>
-                            </legend>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <label className={`border p-5 cursor-pointer ${foodSelection === "none" ? "border-orange bg-orange/5" : "border-border"}`}>
-                                    <input type="radio" name="foodPackage" checked={foodSelection === "none"} onChange={() => setFoodSelection("none")} className="sr-only" />
-                                    <span className="block font-heading text-base font-bold uppercase">No food package</span>
-                                    <span className="block font-heading text-2xl font-bold mt-3">No charge</span>
-                                </label>
-                                <label className={`border p-5 cursor-pointer ${foodSelection === "full" ? "border-orange bg-orange/5" : "border-border"}`}>
-                                    <input type="radio" name="foodPackage" checked={foodSelection === "full"} onChange={() => setFoodSelection("full")} className="sr-only" />
-                                    <span className="block font-heading text-base font-bold uppercase">{spectatorFees.fullMeal.name}</span>
-                                    <span className="block text-sm text-muted mt-2">{spectatorFees.fullMeal.details}</span>
-                                    <span className="block font-heading text-2xl font-bold text-orange mt-3">₹{spectatorFees.fullMeal.fee.toLocaleString("en-IN")}</span>
-                                </label>
-                                <label className={`border p-5 cursor-pointer ${foodSelection === "day" ? "border-orange bg-orange/5" : "border-border"}`}>
-                                    <input type="radio" name="foodPackage" checked={foodSelection === "day"} onChange={() => setFoodSelection("day")} className="sr-only" />
-                                    <span className="block font-heading text-base font-bold uppercase">{spectatorFees.dayMeal.name}</span>
-                                    <span className="block text-sm text-muted mt-2">{spectatorFees.dayMeal.details}</span>
-                                    <span className="block font-heading text-2xl font-bold text-orange mt-3">₹{spectatorFees.dayMeal.fee.toLocaleString("en-IN")}</span>
-                                </label>
+                            <div className="border border-border p-5 flex items-center justify-between">
+                                <span className="text-sm text-muted">General admission</span>
+                                <span className="font-heading text-xl font-bold text-orange">Free</span>
                             </div>
                         </fieldset>
                     )}
@@ -568,7 +495,7 @@ export default function UltimateRiderRegisterPage() {
                             12&ndash;13 December 2026 &middot; Bengaluru
                         </p>
 
-                        {stay?.enabled && (stay.soldOut ? (
+                        {registrationType === "rider" && stay?.enabled && (stay.soldOut ? (
                             <p className="mt-6 border border-border p-4 text-sm font-semibold text-muted">Tent stay sold out</p>
                         ) : (
                             <label className={`flex items-start justify-between gap-3 mt-6 border p-4 ${bookStay ? "border-orange bg-orange/5" : "border-border cursor-pointer"}`}>
@@ -581,11 +508,10 @@ export default function UltimateRiderRegisterPage() {
                         ))}
 
                         <div className="mt-6 pt-6 border-t border-border space-y-4">
-                            <Row k={registrationType === "rider" ? (selectedList.length > 1 ? "Categories" : "Category") : "Spectator pass"} v={registrationType === "rider" ? (selectedCategoryNames || "—") : attendanceLabel} />
+                            <Row k={registrationType === "rider" ? (selectedList.length > 1 ? "Categories" : "Category") : "Pass"} v={registrationType === "rider" ? (selectedCategoryNames || "—") : "Spectator pass"} />
                             <Row k={registrationType === "rider" ? "Entry fee" : "Spectator admission"} v={entryFee === 0 ? "Free" : `₹${entryFee.toLocaleString("en-IN")}`} highlight />
                             {membershipDiscountPercent > 0 && memberSavings > 0 && <Row k={`Member discount (${membershipDiscountPercent}%)`} v={`−₹${memberSavings.toLocaleString("en-IN")}`} />}
-                            {selectedFood && <Row k={selectedFood.name} v={`₹${foodAmount.toLocaleString("en-IN")}`} />}
-                            {bookStay && stay && <Row k="Tent stay" v={`₹${stay.price.toLocaleString("en-IN")}`} />}
+                            {wantsStay && stay && <Row k="Tent stay" v={`₹${stay.price.toLocaleString("en-IN")}`} />}
                             <div className="pt-4 border-t border-border">
                                 <Row k="Total" v={`₹${total.toLocaleString("en-IN")}`} highlight />
                             </div>

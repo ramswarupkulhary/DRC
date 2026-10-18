@@ -36,8 +36,6 @@ export async function POST(req: Request) {
             notes,
             stayBooked,
             registrationType = "rider",
-            attendanceDays,
-            foodPackage,
         } = body ?? {};
 
         // Rebuild the same normalised category key used when the order was created.
@@ -75,7 +73,7 @@ export async function POST(req: Request) {
         if (
             registration.registrationType !== registrationType ||
             (registrationType === "rider" && registration.category !== categoryKey) ||
-            (registrationType === "spectator" && registration.attendanceDays !== String(attendanceDays)) ||
+            (registrationType === "spectator" && registration.category !== "spectator") ||
             registration.stayBooked !== (stayBooked === true)
         ) {
             return NextResponse.json({ error: "Order details do not match this registration." }, { status: 400 });

@@ -70,21 +70,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
                 price: event.stayPrice,
                 soldOut: reservedTents >= event.stayTotalTents,
             } : { enabled: false, price: event.stayPrice, soldOut: true },
-            spectator: {
-                saturdayFee: event.spectatorSaturdayFee,
-                sundayFee: event.spectatorSundayFee,
-                weekendFee: event.spectatorWeekendFee,
-                fullMeal: {
-                    name: event.spectatorFullMealName,
-                    details: event.spectatorFullMealDetails,
-                    fee: event.spectatorFullMealFee,
-                },
-                dayMeal: {
-                    name: event.spectatorDayMealName,
-                    details: event.spectatorDayMealDetails,
-                    fee: event.spectatorDayMealFee,
-                },
-            },
             memberDiscountPercent: member ? 10 : 0,
         },
         { headers: { "Cache-Control": "no-store, must-revalidate" } },
