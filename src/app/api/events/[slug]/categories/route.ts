@@ -20,10 +20,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
                 stayPrice: 1599,
                 stayTotalTents: 50,
                 stayConfigured: true,
-                spectatorSaturdayFee: 499,
-                spectatorSundayFee: 499,
-                spectatorWeekendFee: 999,
+                spectatorSaturdayFee: 0,
+                spectatorSundayFee: 0,
+                spectatorWeekendFee: 0,
+                spectatorRatesConfigured: true,
             },
+        });
+        event = await prisma.event.findUniqueOrThrow({ where: { id: event.id } });
+    }
+    if (slug === "drc-ultimate-rider" && !event.spectatorRatesConfigured) {
+        await prisma.event.updateMany({
+            where: { id: event.id, spectatorRatesConfigured: false },
+            data: { spectatorSaturdayFee: 0, spectatorSundayFee: 0, spectatorWeekendFee: 0, spectatorRatesConfigured: true },
         });
         event = await prisma.event.findUniqueOrThrow({ where: { id: event.id } });
     }

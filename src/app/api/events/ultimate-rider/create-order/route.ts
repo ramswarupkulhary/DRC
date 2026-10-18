@@ -100,6 +100,13 @@ export async function POST(req: Request) {
             }
             event = await prisma.event.findUnique({ where: { slug: "drc-ultimate-rider" } });
             if (!event) return NextResponse.json({ error: "Event not found." }, { status: 404 });
+            if (!event.spectatorRatesConfigured) {
+                await prisma.event.updateMany({
+                    where: { id: event.id, spectatorRatesConfigured: false },
+                    data: { spectatorSaturdayFee: 0, spectatorSundayFee: 0, spectatorWeekendFee: 0, spectatorRatesConfigured: true },
+                });
+                event = await prisma.event.findUniqueOrThrow({ where: { id: event.id } });
+            }
             categorySlug = "spectator";
             categoryName = attendanceDays === "both"
                 ? "Spectator pass — Both days"

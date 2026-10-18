@@ -35,6 +35,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       spectatorSaturdayFee: body.spectatorSaturdayFee,
       spectatorSundayFee: body.spectatorSundayFee,
       spectatorWeekendFee: body.spectatorWeekendFee,
+      spectatorRatesConfigured: true,
       spectatorFullMealName: body.spectatorFullMealName,
       spectatorFullMealDetails: body.spectatorFullMealDetails,
       spectatorFullMealFee: body.spectatorFullMealFee,

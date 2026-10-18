@@ -25,9 +25,10 @@ async function ensureUltimateRider() {
       stayPrice: 1599,
       stayTotalTents: 50,
       stayConfigured: true,
-      spectatorSaturdayFee: 499,
-      spectatorSundayFee: 499,
-      spectatorWeekendFee: 999,
+      spectatorSaturdayFee: 0,
+      spectatorSundayFee: 0,
+      spectatorWeekendFee: 0,
+      spectatorRatesConfigured: true,
       spectatorFullMealName: "Two-day meal package",
       spectatorFullMealDetails: "2 breakfasts, 2 lunches and 1 dinner",
       spectatorFullMealFee: 1999,
@@ -58,9 +59,10 @@ async function ensureUltimateRider() {
       stayPrice: 1599,
       stayTotalTents: 50,
       stayConfigured: true,
-      spectatorSaturdayFee: 499,
-      spectatorSundayFee: 499,
-      spectatorWeekendFee: 999,
+      spectatorSaturdayFee: 0,
+      spectatorSundayFee: 0,
+      spectatorWeekendFee: 0,
+      spectatorRatesConfigured: true,
       spectatorFullMealName: "Two-day meal package",
       spectatorFullMealDetails: "2 breakfasts, 2 lunches and 1 dinner",
       spectatorFullMealFee: 1999,
@@ -68,6 +70,11 @@ async function ensureUltimateRider() {
       spectatorDayMealDetails: "1 breakfast and 1 lunch",
       spectatorDayMealFee: 599,
     },
+  });
+
+  await prisma.event.updateMany({
+    where: { id: event.id, spectatorRatesConfigured: false },
+    data: { spectatorSaturdayFee: 0, spectatorSundayFee: 0, spectatorWeekendFee: 0, spectatorRatesConfigured: true },
   });
 
   const defaultCategories = [
@@ -149,9 +156,10 @@ export async function POST(req: Request) {
       stayPrice: Number.isInteger(body.stayPrice) && body.stayPrice >= 0 ? body.stayPrice : 1599,
       stayTotalTents: Number.isInteger(body.stayTotalTents) && body.stayTotalTents >= 0 ? body.stayTotalTents : 50,
       stayConfigured: true,
-      spectatorSaturdayFee: Number.isInteger(body.spectatorSaturdayFee) && body.spectatorSaturdayFee >= 0 ? body.spectatorSaturdayFee : 499,
-      spectatorSundayFee: Number.isInteger(body.spectatorSundayFee) && body.spectatorSundayFee >= 0 ? body.spectatorSundayFee : 499,
-      spectatorWeekendFee: Number.isInteger(body.spectatorWeekendFee) && body.spectatorWeekendFee >= 0 ? body.spectatorWeekendFee : 999,
+      spectatorSaturdayFee: Number.isInteger(body.spectatorSaturdayFee) && body.spectatorSaturdayFee >= 0 ? body.spectatorSaturdayFee : 0,
+      spectatorSundayFee: Number.isInteger(body.spectatorSundayFee) && body.spectatorSundayFee >= 0 ? body.spectatorSundayFee : 0,
+      spectatorWeekendFee: Number.isInteger(body.spectatorWeekendFee) && body.spectatorWeekendFee >= 0 ? body.spectatorWeekendFee : 0,
+      spectatorRatesConfigured: true,
       spectatorFullMealName: body.spectatorFullMealName || "Two-day meal package",
       spectatorFullMealDetails: body.spectatorFullMealDetails || "2 breakfasts, 2 lunches and 1 dinner",
       spectatorFullMealFee: Number.isInteger(body.spectatorFullMealFee) && body.spectatorFullMealFee >= 0 ? body.spectatorFullMealFee : 1999,

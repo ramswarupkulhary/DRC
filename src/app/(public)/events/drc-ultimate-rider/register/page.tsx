@@ -71,9 +71,9 @@ export default function UltimateRiderRegisterPage() {
     const [stay, setStay] = useState<StayOption | null>(null);
     const [membershipDiscountPercent, setMembershipDiscountPercent] = useState(0);
     const [spectatorFees, setSpectatorFees] = useState<SpectatorFees>({
-        saturdayFee: 499,
-        sundayFee: 499,
-        weekendFee: 999,
+        saturdayFee: 0,
+        sundayFee: 0,
+        weekendFee: 0,
         fullMeal: { name: "Two-day meal package", details: "2 breakfasts, 2 lunches and 1 dinner", fee: 1999 },
         dayMeal: { name: "Day meal package", details: "1 breakfast and 1 lunch", fee: 599 },
     });
@@ -426,7 +426,7 @@ export default function UltimateRiderRegisterPage() {
                             <legend className="flex items-center gap-3 mb-6">
                                 <span className="font-heading text-lg font-bold uppercase tracking-tight">Select spectator pass</span>
                             </legend>
-                            <p className="font-mono text-[10px] uppercase tracking-widest text-orange mb-3">Early Bird</p>
+                            <p className="font-mono text-[10px] uppercase tracking-widest text-orange mb-3">Spectator admission</p>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {([
                                     { days: "saturday", label: "Saturday only", fee: spectatorFees.saturdayFee },
@@ -436,8 +436,8 @@ export default function UltimateRiderRegisterPage() {
                                     <label key={option.days} className={`border p-5 cursor-pointer ${attendanceDays === option.days ? "border-orange bg-orange/5" : "border-border"}`}>
                                         <input type="radio" name="attendanceDays" value={option.days} checked={attendanceDays === option.days} onChange={() => setAttendanceDays(option.days)} className="sr-only" />
                                         <span className="block font-heading text-base font-bold uppercase">{option.label}</span>
-                                        <span className="block font-heading text-2xl font-bold text-orange mt-3">₹{option.fee.toLocaleString("en-IN")}</span>
-                                        <span className="block font-mono text-[10px] uppercase tracking-widest text-muted mt-1">Early Bird</span>
+                                        <span className="block font-heading text-2xl font-bold text-orange mt-3">{option.fee === 0 ? "Free" : `₹${option.fee.toLocaleString("en-IN")}`}</span>
+                                        {option.fee > 0 && <span className="block font-mono text-[10px] uppercase tracking-widest text-muted mt-1">Admission</span>}
                                     </label>
                                 ))}
                             </div>
@@ -582,7 +582,7 @@ export default function UltimateRiderRegisterPage() {
 
                         <div className="mt-6 pt-6 border-t border-border space-y-4">
                             <Row k={registrationType === "rider" ? (selectedList.length > 1 ? "Categories" : "Category") : "Spectator pass"} v={registrationType === "rider" ? (selectedCategoryNames || "—") : attendanceLabel} />
-                            <Row k={registrationType === "rider" ? "Entry fee" : "Early Bird pass"} v={`₹${entryFee.toLocaleString("en-IN")}`} highlight />
+                            <Row k={registrationType === "rider" ? "Entry fee" : "Spectator admission"} v={entryFee === 0 ? "Free" : `₹${entryFee.toLocaleString("en-IN")}`} highlight />
                             {membershipDiscountPercent > 0 && memberSavings > 0 && <Row k={`Member discount (${membershipDiscountPercent}%)`} v={`−₹${memberSavings.toLocaleString("en-IN")}`} />}
                             {selectedFood && <Row k={selectedFood.name} v={`₹${foodAmount.toLocaleString("en-IN")}`} />}
                             {bookStay && stay && <Row k="Tent stay" v={`₹${stay.price.toLocaleString("en-IN")}`} />}

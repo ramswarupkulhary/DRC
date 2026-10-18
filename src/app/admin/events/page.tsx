@@ -67,9 +67,9 @@ export default function AdminEventsPage() {
   const [stayEnabled, setStayEnabled] = useState(false);
   const [stayPrice, setStayPrice] = useState("1599");
   const [stayTotalTents, setStayTotalTents] = useState("50");
-  const [spectatorSaturdayFee, setSpectatorSaturdayFee] = useState("499");
-  const [spectatorSundayFee, setSpectatorSundayFee] = useState("499");
-  const [spectatorWeekendFee, setSpectatorWeekendFee] = useState("999");
+  const [spectatorSaturdayFee, setSpectatorSaturdayFee] = useState("0");
+  const [spectatorSundayFee, setSpectatorSundayFee] = useState("0");
+  const [spectatorWeekendFee, setSpectatorWeekendFee] = useState("0");
   const [spectatorFullMealName, setSpectatorFullMealName] = useState("Two-day meal package");
   const [spectatorFullMealDetails, setSpectatorFullMealDetails] = useState("2 breakfasts, 2 lunches and 1 dinner");
   const [spectatorFullMealFee, setSpectatorFullMealFee] = useState("1999");
@@ -90,7 +90,7 @@ export default function AdminEventsPage() {
     setDate(""); setEndDate(""); setLocation(""); setCoverImage(null); setRegistrationUrl(""); setPrice("0"); setTotalSlots("50");
     setStatus("upcoming"); setFeatured(false); setPrizes(""); setRules("");
     setStayEnabled(false); setStayPrice("1599"); setStayTotalTents("50");
-    setSpectatorSaturdayFee("499"); setSpectatorSundayFee("499"); setSpectatorWeekendFee("999");
+    setSpectatorSaturdayFee("0"); setSpectatorSundayFee("0"); setSpectatorWeekendFee("0");
     setSpectatorFullMealName("Two-day meal package"); setSpectatorFullMealDetails("2 breakfasts, 2 lunches and 1 dinner"); setSpectatorFullMealFee("1999");
     setSpectatorDayMealName("Day meal package"); setSpectatorDayMealDetails("1 breakfast and 1 lunch"); setSpectatorDayMealFee("599");
     setEditing(null); setShowForm(false);
@@ -196,11 +196,11 @@ export default function AdminEventsPage() {
           {(editing?.slug === "drc-ultimate-rider" || slug === "drc-ultimate-rider") && (
             <div className="border-t border-border pt-5 space-y-4">
               <h4 className="font-heading text-sm font-bold uppercase">Spectator passes</h4>
-              <p className="text-xs text-muted">Early Bird rates. These prices can be changed here at any time.</p>
+              <p className="text-xs text-muted">Set admission to ₹0 for free entry. Optional food and tent prices are separate.</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Input label="Saturday pass (₹)" type="number" min="0" value={spectatorSaturdayFee} onChange={(e) => setSpectatorSaturdayFee(e.target.value)} />
-                <Input label="Sunday pass (₹)" type="number" min="0" value={spectatorSundayFee} onChange={(e) => setSpectatorSundayFee(e.target.value)} />
-                <Input label="Both days pass (₹)" type="number" min="0" value={spectatorWeekendFee} onChange={(e) => setSpectatorWeekendFee(e.target.value)} />
+                <Input label="Saturday admission (₹)" type="number" min="0" value={spectatorSaturdayFee} onChange={(e) => setSpectatorSaturdayFee(e.target.value)} />
+                <Input label="Sunday admission (₹)" type="number" min="0" value={spectatorSundayFee} onChange={(e) => setSpectatorSundayFee(e.target.value)} />
+                <Input label="Both days admission (₹)" type="number" min="0" value={spectatorWeekendFee} onChange={(e) => setSpectatorWeekendFee(e.target.value)} />
               </div>
               <h4 className="font-heading text-sm font-bold uppercase pt-2">Spectator food packages</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
