@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Crown, Save, IndianRupee, QrCode, CreditCard } from "lucide-react";
+import { Crown, Save, IndianRupee, QrCode, CreditCard, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 interface PlanData {
@@ -37,6 +37,12 @@ export default function AdminSettingsPage() {
   const [savingRazorpay, setSavingRazorpay] = useState(false);
   const [razorpaySaved, setRazorpaySaved] = useState(false);
 
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactInstagram, setContactInstagram] = useState("");
+  const [whatsappGroupLink, setWhatsappGroupLink] = useState("");
+  const [savingContact, setSavingContact] = useState(false);
+  const [contactSaved, setContactSaved] = useState(false);
+
   useEffect(() => {
     fetch("/api/admin/membership-plan")
       .then((r) => r.json())
@@ -63,8 +69,11 @@ export default function AdminSettingsPage() {
         setPayUpiName(d.upi_name || "");
         setRazorpayKeyId(d.razorpay_key_id || "");
         setRazorpayKeySecret(d.razorpay_key_secret || "");
+        setContactPhone(d.contact_phone || "");
+        setContactInstagram(d.contact_instagram || "");
+        setWhatsappGroupLink(d.whatsapp_group_link || "");
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const savePlan = useCallback(async () => {
@@ -136,6 +145,30 @@ export default function AdminSettingsPage() {
       setSavingRazorpay(false);
     }
   }, [razorpayKeyId, razorpayKeySecret]);
+
+  const saveContactSettings = useCallback(async () => {
+    setSavingContact(true);
+    setContactSaved(false);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contact_phone: contactPhone,
+          contact_instagram: contactInstagram.replace(/^@/, ""),
+          whatsapp_group_link: whatsappGroupLink,
+        }),
+      });
+      if (res.ok) {
+        setContactSaved(true);
+        setTimeout(() => setContactSaved(false), 3000);
+      }
+    } catch {
+      alert("Failed to save contact settings.");
+    } finally {
+      setSavingContact(false);
+    }
+  }, [contactPhone, contactInstagram, whatsappGroupLink]);
 
   return (
     <div className="space-y-6">
@@ -268,13 +301,36 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
-      <div className="bg-surface border border-border rounded-sm p-6 space-y-4">
-        <h3 className="font-heading text-lg font-semibold text-tan">Contact Info</h3>
-        <p className="text-sm text-muted">
-          WhatsApp: +91 94148 70102<br />
-          Instagram: @dirtridecamp<br />
-          Email: info@dirtridecamp.com
-        </p>
+      <div className="bg-surface border border-orange/30 rounded-sm overflow-hidden">
+        <div className="bg-gradient-to-br from-orange/10 to-transparent px-6 py-4 border-b border-border flex items-center gap-3">
+          <Phone className="w-5 h-5 text-orange" />
+          <h3 className="font-heading text-lg font-semibold">Contact Info</h3>
+        </div>
+        <div className="p-6 space-y-5">
+          <p className="text-sm text-muted">These appear across the public site (footer, contact page). Email is managed separately.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Mobile Number</label>
+              <input type="text" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} placeholder="+91 94148 70102" className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none font-mono" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground block mb-1.5">Instagram Handle</label>
+              <input type="text" value={contactInstagram} onChange={(e) => setContactInstagram(e.target.value)} placeholder="dirtridecamp" className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none" />
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-foreground block mb-1.5">WhatsApp Group Link</label>
+            <input type="url" value={whatsappGroupLink} onChange={(e) => setWhatsappGroupLink(e.target.value)} placeholder="https://chat.whatsapp.com/xxxxxxxxxxxxxxx" className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none font-mono" />
+            <p className="text-xs text-muted mt-1.5">Common community group — not tied to any specific ride.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button onClick={saveContactSettings} loading={savingContact} disabled={savingContact}>
+              <Save className="w-4 h-4 mr-2" />
+              Save Contact Info
+            </Button>
+            {contactSaved && <span className="text-sm text-success">Saved!</span>}
+          </div>
+        </div>
       </div>
     </div>
   );

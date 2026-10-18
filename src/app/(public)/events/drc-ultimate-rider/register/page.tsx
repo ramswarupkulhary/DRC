@@ -68,7 +68,7 @@ export default function UltimateRiderRegisterPage() {
         fullMeal: { name: "Two-day meal package", details: "2 breakfasts, 2 lunches and 1 dinner", fee: 1999 },
         dayMeal: { name: "Day meal package", details: "1 breakfast and 1 lunch", fee: 599 },
     });
-    const [category, setCategory] = useState<string>("");
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [registrationType, setRegistrationType] = useState<RegistrationType>("rider");
     const [attendanceDays, setAttendanceDays] = useState<AttendanceDays>("both");
     const [foodSelection, setFoodSelection] = useState<FoodSelection>("none");
@@ -83,7 +83,14 @@ export default function UltimateRiderRegisterPage() {
         experience: "",
         notes: "",
         agree: false,
+        acknowledgeOrganiser: false,
     });
+
+    function toggleCategory(slug: string) {
+        setSelectedCategories((prev) =>
+            prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
+        );
+    }
     const [status, setStatus] = useState<Status>("idle");
     const [errorMessage, setErrorMessage] = useState<string>("");
 
@@ -117,11 +124,14 @@ export default function UltimateRiderRegisterPage() {
         }
     }, [session]);
 
-    const selected = categories.find((c) => c.slug === category);
+    const selectedList = categories.filter((c) => selectedCategories.includes(c.slug));
+    const selectedCategoryNames = selectedList.map((c) => c.name).join(", ");
     const spectatorFee = attendanceDays === "saturday"
         ? spectatorFees.saturdayFee
         : attendanceDays === "sunday" ? spectatorFees.sundayFee : spectatorFees.weekendFee;
-    const entryFee = registrationType === "rider" ? selected?.fee ?? 0 : spectatorFee;
+    const entryFee = registrationType === "rider"
+        ? selectedList.reduce((sum, c) => sum + c.fee, 0)
+        : spectatorFee;
     const selectedFood = foodSelection === "full"
         ? spectatorFees.fullMeal
         : foodSelection === "day" ? spectatorFees.dayMeal : null;
@@ -131,12 +141,13 @@ export default function UltimateRiderRegisterPage() {
     const attendanceLabel = attendanceDays === "both" ? "Saturday + Sunday" : attendanceDays === "saturday" ? "Saturday only" : "Sunday only";
 
     function validate(): string | null {
-        if (registrationType === "rider" && !category) return "Please select a race category.";
+        if (registrationType === "rider" && selectedCategories.length === 0) return "Please select at least one race category.";
         if (registrationType === "spectator" && !attendanceDays) return "Please select the day or days you will attend.";
         if (bookStay && (!stay?.enabled || stay.soldOut)) return "Tent stay is no longer available. Please refresh and try again.";
         if (!form.name || !form.email || !form.phone || !form.city) return "Please fill in all contact details.";
         if (registrationType === "rider" && (!form.bikeMake || !form.bikeModel)) return "Please add your bike make and model.";
         if (registrationType === "rider" && !form.experience) return "Please select your experience level.";
+        if (registrationType === "rider" && !form.acknowledgeOrganiser) return "Please acknowledge the Organiser's right to determine category of participation.";
         if (!form.agree) return "Please acknowledge the entry terms to continue.";
         return null;
     }
@@ -151,7 +162,7 @@ export default function UltimateRiderRegisterPage() {
             setErrorMessage(err);
             return;
         }
-        if (registrationType === "rider" && !selected) return;
+        if (registrationType === "rider" && selectedCategories.length === 0) return;
         setStatus("paying");
         setErrorMessage("");
 
@@ -164,7 +175,7 @@ export default function UltimateRiderRegisterPage() {
                     registrationType,
                     attendanceDays: registrationType === "spectator" ? attendanceDays : null,
                     foodPackage: registrationType === "spectator" ? foodSelection : "none",
-                    category: registrationType === "rider" ? category : null,
+                    categories: registrationType === "rider" ? selectedCategories : null,
                     stayBooked: bookStay,
                 }),
             });
@@ -197,7 +208,7 @@ export default function UltimateRiderRegisterPage() {
                 },
                 notes: {
                     event: "drc-ultimate-rider",
-                    category: registrationType === "rider" ? category : "spectator",
+                    category: registrationType === "rider" ? selectedCategories.join(",") : "spectator",
                     registrationType,
                     attendanceDays: registrationType === "spectator" ? attendanceDays : null,
                     stayBooked: String(bookStay),
@@ -214,7 +225,7 @@ export default function UltimateRiderRegisterPage() {
                             body: JSON.stringify({
                                 ...response,
                                 ...form,
-                                category: registrationType === "rider" ? category : "spectator",
+                                categories: registrationType === "rider" ? selectedCategories : null,
                                 registrationType,
                                 attendanceDays: registrationType === "spectator" ? attendanceDays : null,
                                 foodPackage: registrationType === "spectator" ? foodSelection : "none",
@@ -250,7 +261,7 @@ export default function UltimateRiderRegisterPage() {
         const paid = status === "success-paid";
         const confirmation = registrationType === "spectator"
             ? `Spectator pass for ${attendanceLabel}`
-            : `race entry in ${selected?.name ?? "your selected category"}`;
+            : `race entry in ${selectedCategoryNames || "your selected categories"}`;
         return (
             <div className="max-w-3xl mx-auto px-6 lg:px-10 py-20 text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange/10 mb-6">
@@ -325,12 +336,13 @@ export default function UltimateRiderRegisterPage() {
                     {registrationType === "rider" ? (
                         <fieldset>
                             <legend className="flex items-center gap-3 mb-6">
-                                <span className="font-heading text-lg font-bold uppercase tracking-tight">Select category</span>
+                                <span className="font-heading text-lg font-bold uppercase tracking-tight">Select categories</span>
+                                <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Choose one or more</span>
                             </legend>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {categories.map((c) => {
-                                    const isSelected = category === c.slug;
+                                    const isSelected = selectedCategories.includes(c.slug);
                                     return (
                                         <label
                                             key={c.slug}
@@ -340,11 +352,11 @@ export default function UltimateRiderRegisterPage() {
                                                 }`}
                                         >
                                             <input
-                                                type="radio"
+                                                type="checkbox"
                                                 name="category"
                                                 value={c.slug}
                                                 checked={isSelected}
-                                                onChange={() => setCategory(c.slug)}
+                                                onChange={() => toggleCategory(c.slug)}
                                                 className="sr-only"
                                             />
                                             <div className="flex items-start justify-between gap-4">
@@ -352,11 +364,9 @@ export default function UltimateRiderRegisterPage() {
                                                     <h3 className="font-heading text-xl font-bold uppercase leading-tight">{c.name}</h3>
                                                     <p className="text-sm text-muted mt-2 leading-relaxed">{c.description}</p>
                                                 </div>
-                                                {isSelected && (
-                                                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange text-white shrink-0">
-                                                        <Check className="w-3.5 h-3.5" strokeWidth={3} />
-                                                    </span>
-                                                )}
+                                                <span className={`inline-flex items-center justify-center w-6 h-6 rounded-sm shrink-0 border ${isSelected ? "bg-orange text-white border-orange" : "border-border"}`}>
+                                                    {isSelected && <Check className="w-3.5 h-3.5" strokeWidth={3} />}
+                                                </span>
                                             </div>
                                             <div className="mt-5 pt-5 border-t border-border flex items-baseline justify-between">
                                                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Entry fee</span>
@@ -368,6 +378,18 @@ export default function UltimateRiderRegisterPage() {
                                     );
                                 })}
                             </div>
+
+                            <label className={`flex items-start gap-3 mt-6 p-5 border cursor-pointer ${form.acknowledgeOrganiser ? "border-orange bg-orange/5" : "border-border"}`}>
+                                <input
+                                    type="checkbox"
+                                    checked={form.acknowledgeOrganiser}
+                                    onChange={(e) => setForm({ ...form, acknowledgeOrganiser: e.target.checked })}
+                                    className="mt-1 accent-orange w-4 h-4 shrink-0"
+                                />
+                                <span className="text-sm text-muted leading-relaxed">
+                                    The Organiser reserves the sole right to determine a competitor&rsquo;s category of participation. Such decisions shall be made fairly and impartially, and in the event of any unfairness, the Organiser&rsquo;s decision may be Final.
+                                </span>
+                            </label>
                         </fieldset>
                     ) : (
                         <fieldset>
@@ -529,7 +551,7 @@ export default function UltimateRiderRegisterPage() {
                         ))}
 
                         <div className="mt-6 pt-6 border-t border-border space-y-4">
-                            <Row k={registrationType === "rider" ? "Category" : "Spectator pass"} v={registrationType === "rider" ? selected?.name ?? "—" : attendanceLabel} />
+                            <Row k={registrationType === "rider" ? (selectedList.length > 1 ? "Categories" : "Category") : "Spectator pass"} v={registrationType === "rider" ? (selectedCategoryNames || "—") : attendanceLabel} />
                             <Row k={registrationType === "rider" ? "Entry fee" : "Early Bird pass"} v={`₹${entryFee.toLocaleString("en-IN")}`} highlight />
                             {membershipDiscountPercent > 0 && memberSavings > 0 && <Row k={`Member discount (${membershipDiscountPercent}%)`} v={`−₹${memberSavings.toLocaleString("en-IN")}`} />}
                             {selectedFood && <Row k={selectedFood.name} v={`₹${foodAmount.toLocaleString("en-IN")}`} />}

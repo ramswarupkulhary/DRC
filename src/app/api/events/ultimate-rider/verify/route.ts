@@ -25,6 +25,7 @@ export async function POST(req: Request) {
             razorpay_payment_id,
             razorpay_signature,
             category,
+            categories,
             name,
             email,
             phone,
@@ -38,6 +39,15 @@ export async function POST(req: Request) {
             attendanceDays,
             foodPackage,
         } = body ?? {};
+
+        // Rebuild the same normalised category key used when the order was created.
+        const categoryKey = Array.from(
+            new Set(
+                (Array.isArray(categories) ? categories : category ? [category] : [])
+                    .map((c: unknown) => String(c).trim())
+                    .filter(Boolean),
+            ),
+        ).sort().join(",");
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return NextResponse.json({ error: "Missing payment identifiers." }, { status: 400 });
@@ -64,7 +74,7 @@ export async function POST(req: Request) {
         if (registration.paymentStatus === "paid") return NextResponse.json({ ok: true });
         if (
             registration.registrationType !== registrationType ||
-            (registrationType === "rider" && registration.category !== String(category)) ||
+            (registrationType === "rider" && registration.category !== categoryKey) ||
             (registrationType === "spectator" && registration.attendanceDays !== String(attendanceDays)) ||
             registration.stayBooked !== (stayBooked === true)
         ) {

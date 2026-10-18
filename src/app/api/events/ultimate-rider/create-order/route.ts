@@ -33,6 +33,7 @@ export async function POST(req: Request) {
         const body = await req.json();
         const {
             category,
+            categories,
             name,
             email,
             phone,
@@ -42,10 +43,20 @@ export async function POST(req: Request) {
             experience,
             notes,
             stayBooked,
+            acknowledgeOrganiser,
             registrationType = "rider",
             attendanceDays,
             foodPackage = "none",
         } = body ?? {};
+
+        // Normalise category input into a de-duplicated, sorted list of slugs.
+        const categorySlugs: string[] = Array.from(
+            new Set(
+                (Array.isArray(categories) ? categories : category ? [category] : [])
+                    .map((c: unknown) => String(c).trim())
+                    .filter(Boolean),
+            ),
+        ).sort();
 
         if (!name || !email || !phone || !city) {
             return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
@@ -53,8 +64,11 @@ export async function POST(req: Request) {
         if (registrationType !== "rider" && registrationType !== "spectator") {
             return NextResponse.json({ error: "Invalid registration type." }, { status: 400 });
         }
-        if (registrationType === "rider" && (!category || !bikeMake || !bikeModel || !experience)) {
+        if (registrationType === "rider" && (categorySlugs.length === 0 || !bikeMake || !bikeModel || !experience)) {
             return NextResponse.json({ error: "Race category and rider details are required." }, { status: 400 });
+        }
+        if (registrationType === "rider" && acknowledgeOrganiser !== true) {
+            return NextResponse.json({ error: "Please acknowledge the Organiser's right to determine category of participation." }, { status: 400 });
         }
 
         let event;
@@ -62,12 +76,16 @@ export async function POST(req: Request) {
         let categoryName: string;
         let entryAmount: number;
         if (registrationType === "rider") {
-            const resolved = await resolveEventCategory("drc-ultimate-rider", String(category));
-            if (!resolved) return NextResponse.json({ error: "Invalid or inactive category." }, { status: 400 });
-            event = resolved.event;
-            categorySlug = resolved.category.slug;
-            categoryName = resolved.category.name;
-            entryAmount = resolved.category.fee;
+            const resolvedList = [];
+            for (const slug of categorySlugs) {
+                const resolved = await resolveEventCategory("drc-ultimate-rider", slug);
+                if (!resolved) return NextResponse.json({ error: "Invalid or inactive category." }, { status: 400 });
+                resolvedList.push(resolved);
+            }
+            event = resolvedList[0].event;
+            categorySlug = resolvedList.map((r) => r.category.slug).join(",");
+            categoryName = resolvedList.map((r) => r.category.name).join(", ");
+            entryAmount = resolvedList.reduce((sum, r) => sum + r.category.fee, 0);
         } else {
             if (!["saturday", "sunday", "both"].includes(attendanceDays)) {
                 return NextResponse.json({ error: "Please select a spectator pass." }, { status: 400 });
@@ -115,7 +133,7 @@ export async function POST(req: Request) {
             ? await rz.instance.orders.create({
                 amount: amount * 100,
                 currency: "INR",
-                receipt: `ur_${categorySlug}_${Date.now()}`,
+                receipt: `ur_${registrationType === "rider" ? "rider" : categorySlug}_${Date.now()}`,
                 ...(reservationExpiresAt ? { expire_by: Math.floor(reservationExpiresAt.getTime() / 1000) } : {}),
                 notes: {
                     event: "drc-ultimate-rider",
