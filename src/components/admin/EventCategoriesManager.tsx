@@ -8,6 +8,7 @@ import { Trash2, Plus, X, Check } from "lucide-react";
 
 interface Category {
     id: string;
+    classLabel: string | null;
     slug: string;
     name: string;
     description: string | null;
@@ -31,6 +32,7 @@ export function EventCategoriesManager({
     const [error, setError] = useState("");
     const [draft, setDraft] = useState({
         name: "",
+        classLabel: "",
         slug: "",
         description: "",
         fee: "",
@@ -54,6 +56,7 @@ export function EventCategoriesManager({
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 name: draft.name,
+                classLabel: draft.classLabel,
                 slug: draft.slug || undefined,
                 description: draft.description || undefined,
                 fee: parseInt(draft.fee || "0", 10),
@@ -66,7 +69,7 @@ export function EventCategoriesManager({
             setError(data?.error || "Could not create category.");
             return;
         }
-        setDraft({ name: "", slug: "", description: "", fee: "", totalSlots: "", sortOrder: "0" });
+        setDraft({ name: "", classLabel: "", slug: "", description: "", fee: "", totalSlots: "", sortOrder: "0" });
         load();
     }
 
@@ -119,11 +122,12 @@ export function EventCategoriesManager({
                         <p className="text-muted text-sm">No categories yet. Add the first one below.</p>
                     ) : (
                         <div className="border border-border overflow-x-auto">
-                            <table className="w-full text-sm">
+                            <table className="w-full min-w-[1050px] text-sm">
                                 <thead className="bg-surface border-b border-border">
                                     <tr className="text-left">
                                         <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted">Order</th>
                                         <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted">Name</th>
+                                        <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted">Class</th>
                                         <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted">Slug</th>
                                         <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted">Fee (₹)</th>
                                         <th className="px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted">Slots</th>
@@ -140,6 +144,9 @@ export function EventCategoriesManager({
                                             </td>
                                             <td className="px-2 py-2">
                                                 <input defaultValue={c.name} onBlur={(e) => e.target.value !== c.name && update(c, { name: e.target.value })} className="w-full bg-background border border-border px-2 py-1 text-sm" />
+                                            </td>
+                                            <td className="px-2 py-2">
+                                                <input aria-label={`${c.name} class`} defaultValue={c.classLabel ?? ""} onBlur={(e) => update(c, { classLabel: e.target.value.trim() || null })} placeholder="Class 1" className="w-24 bg-background border border-border px-2 py-1 text-sm" />
                                             </td>
                                             <td className="px-2 py-2">
                                                 <input defaultValue={c.slug} onBlur={(e) => e.target.value !== c.slug && update(c, { slug: e.target.value })} className="w-full bg-background border border-border px-2 py-1 text-sm font-mono text-xs" />
@@ -175,6 +182,7 @@ export function EventCategoriesManager({
                         <h3 className="font-heading text-sm font-bold uppercase tracking-tight mb-3">Add category</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                             <Input label="Name *" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="e.g. Pro Enduro" />
+                            <Input label="Class" value={draft.classLabel} onChange={(e) => setDraft({ ...draft, classLabel: e.target.value })} placeholder="e.g. Class 1" />
                             <Input label="Slug" value={draft.slug} onChange={(e) => setDraft({ ...draft, slug: e.target.value })} placeholder="auto from name if blank" />
                             <Input label="Fee (₹) *" type="number" value={draft.fee} onChange={(e) => setDraft({ ...draft, fee: e.target.value })} placeholder="4999" />
                             <Input label="Total slots" type="number" value={draft.totalSlots} onChange={(e) => setDraft({ ...draft, totalSlots: e.target.value })} placeholder="unlimited" />

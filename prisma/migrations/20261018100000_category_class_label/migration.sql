@@ -1,0 +1,1 @@
+ALTER TABLE "EventCategory" ADD COLUMN "classLabel" TEXT;

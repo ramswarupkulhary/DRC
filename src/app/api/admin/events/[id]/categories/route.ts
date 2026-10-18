@@ -50,6 +50,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
                 eventId: id,
                 slug,
                 name,
+                classLabel: typeof body.classLabel === "string" ? body.classLabel.trim() || null : null,
                 description: body.description ? String(body.description) : null,
                 fee,
                 totalSlots: body.totalSlots ? parseInt(String(body.totalSlots), 10) : null,

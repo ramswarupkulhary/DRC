@@ -627,6 +627,7 @@ model Event {
 model EventCategory {
   id          String   @id @default(cuid())
   eventId     String
+  classLabel  String?
   slug        String
   name        String
   description String?

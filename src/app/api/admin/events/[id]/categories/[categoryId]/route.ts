@@ -19,6 +19,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const data: Record<string, unknown> = {};
     if (typeof body.name === "string") data.name = body.name.trim();
     if (typeof body.slug === "string") data.slug = body.slug.trim();
+    if (typeof body.classLabel === "string") data.classLabel = body.classLabel.trim() || null;
+    if (body.classLabel === null) data.classLabel = null;
     if (typeof body.description === "string") data.description = body.description;
     if (body.description === null) data.description = null;
     if (body.fee !== undefined) {
