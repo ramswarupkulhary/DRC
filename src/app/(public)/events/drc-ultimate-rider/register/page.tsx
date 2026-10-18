@@ -33,6 +33,15 @@ type Status = "idle" | "paying" | "success-paid" | "success-registered" | "error
 type RegistrationType = "rider" | "spectator";
 type AttendanceDays = "saturday" | "sunday" | "both";
 type FoodSelection = "none" | "full" | "day";
+type RaceClass = "amateur" | "professional" | null;
+
+function getRaceClass(category: Category): RaceClass {
+    const slug = category.slug.toLowerCase();
+    const name = category.name.toLowerCase();
+    if (slug.startsWith("amateurs-") || name.includes("amateur")) return "amateur";
+    if (slug.startsWith("pro-") || name.includes("professional")) return "professional";
+    return null;
+}
 
 declare global {
     interface Window {
@@ -87,8 +96,17 @@ export default function UltimateRiderRegisterPage() {
     });
 
     function toggleCategory(slug: string) {
+        const targetCategory = categories.find((category) => category.slug === slug);
         setSelectedCategories((prev) =>
-            prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug],
+            prev.includes(slug)
+                ? prev.filter((selectedSlug) => selectedSlug !== slug)
+                : targetCategory && getRaceClass(targetCategory) && prev.some((selectedSlug) => {
+                    const selected = categories.find((category) => category.slug === selectedSlug);
+                    const selectedClass = selected ? getRaceClass(selected) : null;
+                    return selectedClass !== null && selectedClass !== getRaceClass(targetCategory);
+                })
+                    ? prev
+                    : [...prev, slug],
         );
     }
     const [status, setStatus] = useState<Status>("idle");
@@ -126,6 +144,8 @@ export default function UltimateRiderRegisterPage() {
 
     const selectedList = categories.filter((c) => selectedCategories.includes(c.slug));
     const selectedCategoryNames = selectedList.map((c) => c.name).join(", ");
+    const hasSelectedAmateur = selectedList.some((category) => getRaceClass(category) === "amateur");
+    const hasSelectedProfessional = selectedList.some((category) => getRaceClass(category) === "professional");
     const spectatorFee = attendanceDays === "saturday"
         ? spectatorFees.saturdayFee
         : attendanceDays === "sunday" ? spectatorFees.sundayFee : spectatorFees.weekendFee;
@@ -339,14 +359,23 @@ export default function UltimateRiderRegisterPage() {
                                 <span className="font-heading text-lg font-bold uppercase tracking-tight">Select categories</span>
                                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Choose one or more</span>
                             </legend>
+                            <p className="text-xs text-muted -mt-3 mb-4">Amateur and Professional categories cannot be combined.</p>
+                            {hasSelectedProfessional && <p role="status" className="text-xs text-orange mb-4">Professional selected. Amateur categories are unavailable.</p>}
+                            {hasSelectedAmateur && <p role="status" className="text-xs text-orange mb-4">Amateur selected. Professional categories are unavailable.</p>}
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {categories.map((c) => {
                                     const isSelected = selectedCategories.includes(c.slug);
+                                    const categoryClass = getRaceClass(c);
+                                    const isBlocked = !isSelected && (
+                                        (hasSelectedProfessional && categoryClass === "amateur") ||
+                                        (hasSelectedAmateur && categoryClass === "professional")
+                                    );
                                     return (
                                         <label
                                             key={c.slug}
-                                            className={`block p-6 border cursor-pointer transition-colors ${isSelected
+                                            aria-disabled={isBlocked}
+                                            className={`block p-6 border transition-colors ${isBlocked ? "cursor-not-allowed opacity-50" : "cursor-pointer"} ${isSelected
                                                 ? "border-orange bg-orange/5"
                                                 : "border-border bg-background hover:border-tan-dark"
                                                 }`}
@@ -355,6 +384,7 @@ export default function UltimateRiderRegisterPage() {
                                                 type="checkbox"
                                                 name="category"
                                                 value={c.slug}
+                                                disabled={isBlocked}
                                                 checked={isSelected}
                                                 onChange={() => toggleCategory(c.slug)}
                                                 className="sr-only"

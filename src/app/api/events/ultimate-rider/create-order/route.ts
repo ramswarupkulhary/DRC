@@ -82,6 +82,11 @@ export async function POST(req: Request) {
                 if (!resolved) return NextResponse.json({ error: "Invalid or inactive category." }, { status: 400 });
                 resolvedList.push(resolved);
             }
+            const hasAmateur = resolvedList.some(({ category }) => category.slug.startsWith("amateurs-") || category.name.toLowerCase().includes("amateur"));
+            const hasProfessional = resolvedList.some(({ category }) => category.slug.startsWith("pro-") || category.name.toLowerCase().includes("professional"));
+            if (hasAmateur && hasProfessional) {
+                return NextResponse.json({ error: "Amateur and Professional categories cannot be selected together." }, { status: 400 });
+            }
             event = resolvedList[0].event;
             categorySlug = resolvedList.map((r) => r.category.slug).join(",");
             categoryName = resolvedList.map((r) => r.category.name).join(", ");
