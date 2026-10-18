@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import sharp from "sharp";
+import { ImageResponse } from "next/og";
+import { createElement } from "react";
 
 export function spectatorPassSignature(registrationId: string): string {
     const secret = process.env.NEXTAUTH_SECRET;
@@ -23,23 +24,30 @@ export function escapePassText(value: string): string {
 }
 
 export async function renderSpectatorPass(registration: { id: string; name: string }): Promise<Buffer> {
-    const nameWidth = Array.from(registration.name).length > 36 ? ' textLength="1040" lengthAdjust="spacingAndGlyphs"' : "";
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720">
-        <rect width="1200" height="720" fill="#111111"/>
-        <rect width="18" height="720" fill="#E8622C"/>
-        <g font-family="DejaVu Sans, sans-serif" fill="#FFFFFF">
-            <text x="72" y="88" font-size="26" font-weight="bold">DRC MOTORSPORTS</text>
-            <text x="72" y="170" font-size="54" font-weight="bold">DRC ULTIMATE RIDER</text>
-            <text x="72" y="228" font-size="30" fill="#E8622C">SPECTATOR PASS</text>
-            <path d="M72 270H1128" stroke="#555555"/>
-            <text x="72" y="332" font-size="20" fill="#BBBBBB">PASS HOLDER</text>
-            <text x="72" y="393" font-size="44" font-weight="bold"${nameWidth}>${escapePassText(registration.name)}</text>
-            <text x="72" y="466" font-size="28">12-13 December 2026 | Bengaluru</text>
-            <text x="72" y="512" font-size="26">Free general admission</text>
-            <path d="M72 554H1128" stroke="#555555"/>
-            <text x="72" y="608" font-size="20">Registration: ${escapePassText(registration.id)}</text>
-            <text x="72" y="655" font-size="18" fill="#BBBBBB">Spectator admission only. No race entry, meals or tent stay included.</text>
-        </g>
-    </svg>`;
-    return sharp(Buffer.from(svg)).png().toBuffer();
+    const text = (value: string, top: number, fontSize: number, color = "#FFFFFF") => createElement("div", {
+        style: { position: "absolute", display: "flex", left: 72, top, width: 1056, fontSize, color, lineHeight: 1.2 },
+    }, value);
+    const divider = (top: number) => createElement("div", {
+        style: { position: "absolute", left: 72, top, width: 1056, height: 1, backgroundColor: "#555555" },
+    });
+    const nameSize = Math.max(16, Math.min(44, Math.floor(1584 / Math.max(Array.from(registration.name).length, 1))));
+    const image = new ImageResponse(createElement("div", {
+        style: { position: "relative", display: "flex", width: 1200, height: 720, backgroundColor: "#111111", fontFamily: "sans-serif" },
+    },
+    createElement("div", { style: { position: "absolute", left: 0, top: 0, width: 18, height: 720, backgroundColor: "#E8622C" } }),
+    text("DRC MOTORSPORTS", 56, 26),
+    text("DRC ULTIMATE RIDER", 112, 54),
+    text("SPECTATOR PASS", 190, 30, "#E8622C"),
+    divider(270),
+    text("PASS HOLDER", 306, 20, "#BBBBBB"),
+    text(registration.name, 348, nameSize),
+    text("12-13 December 2026 | Bengaluru", 434, 28),
+    text("Free general admission", 482, 26),
+    divider(554),
+    text(`Registration: ${registration.id}`, 582, 20),
+    text("Spectator admission only. No race entry, meals or tent stay included.", 632, 18, "#BBBBBB")), {
+        width: 1200,
+        height: 720,
+    });
+    return Buffer.from(await image.arrayBuffer());
 }

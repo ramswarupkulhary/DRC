@@ -30,8 +30,22 @@ test("spectator pass escapes names and renders a nonblank downloadable PNG", asy
     assert.equal(metadata.height, 720);
     const stats = await sharp(image).stats();
     assert.ok(stats.channels.some((channel) => channel.stdev > 10));
-    const nameStats = await sharp(image).extract({ left: 72, top: 345, width: 1000, height: 60 }).stats();
-    assert.ok(nameStats.channels.some((channel) => channel.stdev > 10));
+    for (const region of [
+        { label: "brand", top: 50, height: 45 },
+        { label: "event title", top: 105, height: 75 },
+        { label: "pass holder name", top: 345, height: 65 },
+        { label: "event date", top: 430, height: 45 },
+        { label: "admission", top: 480, height: 40 },
+        { label: "registration reference", top: 580, height: 40 },
+    ]) {
+        const { data, info } = await sharp(image).extract({ left: 72, top: region.top, width: 1000, height: region.height })
+            .flatten({ background: "#111111" }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+        let visibleTextPixels = 0;
+        for (let offset = 0; offset < data.length; offset += info.channels) {
+            if (data[offset] > 180 && data[offset + 1] > 180 && data[offset + 2] > 180) visibleTextPixels++;
+        }
+        assert.ok(visibleTextPixels > 100, `${region.label} must contain visible light text, not only background or borders`);
+    }
 });
 
 test("download endpoint serves only signed, confirmed spectator passes", async (context) => {
