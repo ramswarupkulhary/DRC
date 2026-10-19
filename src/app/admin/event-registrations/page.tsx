@@ -39,8 +39,7 @@ interface EventRegistrationRow {
 
 const PAYMENT_VARIANTS: Record<string, "success" | "warning" | "error"> = {
     paid: "success",
-    pending: "warning",
-    cancelled: "error",
+    refund_pending: "warning",
 };
 
 export default function AdminEventRegistrationsPage() {
@@ -137,7 +136,7 @@ export default function AdminEventRegistrationsPage() {
     const totals = {
         all: rows.length,
         paid: rows.filter((r) => r.paymentStatus === "paid").length,
-        pending: rows.filter((r) => r.paymentStatus === "pending").length,
+        cancelled: rows.filter((r) => r.status === "cancelled").length,
         revenue: rows.filter((r) => r.paymentStatus === "paid").reduce((s, r) => s + r.amount, 0),
     };
 
@@ -178,8 +177,8 @@ export default function AdminEventRegistrationsPage() {
                     >
                         <option value="">All statuses</option>
                         <option value="paid">Paid</option>
-                        <option value="pending">Pending</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="refunded">Refunded</option>
+                        <option value="refund_pending">Refund pending</option>
                     </select>
                     <select aria-label="Booking status" disabled={!eventSlug} value={bookingStatusFilter} onChange={(e) => changeFilter(() => setBookingStatusFilter(e.target.value))} className="bg-background border border-border px-3 py-2 text-sm"><option value="">All bookings</option><option value="active">Active</option><option value="cancelled">Cancelled</option></select>
                     <Button onClick={() => exportExcel()} disabled={!eventSlug || loading || exporting} loading={exporting}><Download className="h-4 w-4" />Export Excel</Button>
@@ -191,7 +190,7 @@ export default function AdminEventRegistrationsPage() {
             {eventSlug && <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                 <SummaryTile label="Total" value={String(totals.all)} />
                 <SummaryTile label="Paid" value={String(totals.paid)} accent />
-                <SummaryTile label="Pending" value={String(totals.pending)} />
+                <SummaryTile label="Cancelled" value={String(totals.cancelled)} />
                 <SummaryTile label="Revenue (paid)" value={formatPrice(totals.revenue)} accent />
             </div>}
 

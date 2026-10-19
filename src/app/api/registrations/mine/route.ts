@@ -21,7 +21,7 @@ export async function GET() {
       training: { select: { title: true, slug: true, location: true } },
     },
   }), prisma.eventRegistration.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, paymentStatus: { in: ["paid", "refunded", "refund_pending"] } },
     orderBy: { createdAt: "desc" },
   }), prisma.programBooking.findMany({
     where: { userId: user.id },

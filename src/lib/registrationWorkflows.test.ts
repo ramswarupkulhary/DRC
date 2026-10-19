@@ -48,7 +48,7 @@ test("registration, admin and document workflows stay scoped and never refund im
                 return [{ ...base, id: "ride", ride: { title: "Ride", slug: "ride" }, training: null }, { ...base, id: "training", ride: null, training: { title: "Training", slug: "training" } }];
             });
             stub(prisma.eventRegistration, "findMany", async (args) => {
-                assert.deepEqual((args as { where: unknown }).where, { userId: "account-one" });
+                assert.deepEqual((args as { where: unknown }).where, { userId: "account-one", paymentStatus: { in: ["paid", "refunded", "refund_pending"] } });
                 return [{ ...base, id: "race", eventSlug: "drc-ultimate-rider", categoryName: "Class 1", registrationType: "rider", status: "active" }, { ...base, id: "spectator", eventSlug: "drc-ultimate-rider", categoryName: "Spectator pass", registrationType: "spectator", status: "active" }];
             });
             stub(prisma.programBooking, "findMany", async (args) => {
@@ -132,13 +132,16 @@ test("registration, admin and document workflows stay scoped and never refund im
             let queries = 0;
             stub(prisma.eventRegistration, "findMany", async (args) => {
                 queries++;
-                const where = (args as { where: { eventSlug: string; registrationType: string; OR: unknown[] } }).where;
+                const where = (args as { where: { eventSlug: string; registrationType: string; OR: unknown[]; paymentStatus: unknown } }).where;
                 assert.equal(where.eventSlug, "event-one");
                 assert.equal(where.registrationType, "rider");
                 assert.equal(where.OR.length, 4);
+                assert.deepEqual(where.paymentStatus, { in: ["paid", "refunded", "refund_pending"] });
                 return [{ id: "row-one", category: "class-one,class-two", registrationType: "rider", name: "Test Rider", email: "rider@example.com", phone: "001234", createdAt: new Date(), amount: 5000, status: "active", paymentStatus: "paid" }];
             });
             assert.equal((await adminList.GET(new Request("https://example.com/api/admin/event-registrations"))).status, 400);
+            assert.equal(queries, 0);
+            assert.equal((await adminList.GET(new Request("https://example.com/api/admin/event-registrations?eventSlug=event-one&paymentStatus=pending&format=xlsx"))).status, 400);
             assert.equal(queries, 0);
             stub(prisma.event, "findUnique", async () => ({ id: "event-one", title: "Event One" }));
             stub(prisma.eventCategory, "findMany", async () => [{ slug: "class-one", name: "One", classLabel: "Class 1" }]);

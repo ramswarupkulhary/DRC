@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     const format = url.searchParams.get("format") || undefined;
     if (!eventSlug) return NextResponse.json({ error: "Select an event first." }, { status: 400 });
     if (registrationType && !["rider", "spectator"].includes(registrationType)) return NextResponse.json({ error: "Invalid registration type." }, { status: 400 });
-    if (paymentStatus && !["paid", "pending", "cancelled", "refunded"].includes(paymentStatus)) return NextResponse.json({ error: "Invalid payment status." }, { status: 400 });
+    if (paymentStatus && !["paid", "refunded", "refund_pending"].includes(paymentStatus)) return NextResponse.json({ error: "Only completed-payment registrations can be listed." }, { status: 400 });
     if (status && !["active", "cancelled"].includes(status)) return NextResponse.json({ error: "Invalid booking status." }, { status: 400 });
     if (format && !["xlsx", "category-zip"].includes(format)) return NextResponse.json({ error: "Unsupported export format." }, { status: 400 });
     const event = await prisma.event.findUnique({ where: { slug: eventSlug }, select: { id: true, title: true } });
@@ -35,7 +35,7 @@ export async function GET(req: Request) {
             ...(status ? { status } : {}),
             ...(registrationType ? { registrationType } : {}),
             ...(category ? { OR: [{ category }, { category: { startsWith: `${category},` } }, { category: { endsWith: `,${category}` } }, { category: { contains: `,${category},` } }] } : {}),
-            ...(paymentStatus ? { paymentStatus } : {}),
+            paymentStatus: paymentStatus || { in: ["paid", "refunded", "refund_pending"] },
         },
         orderBy: { createdAt: "desc" },
         include: {
