@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
 import crypto from "crypto";
+import { getContactInfo, whatsappContactUrl } from "@/lib/contact";
 
 const ADMIN_INBOX = "info@dirtridecamp.com";
 
@@ -69,6 +70,7 @@ export async function POST(req: Request) {
             where: { razorpayOrderId: razorpay_order_id, userId, eventSlug: "drc-ultimate-rider" },
         });
         if (!registration) return NextResponse.json({ error: "Payment order reservation not found." }, { status: 404 });
+        if (registration.status === "cancelled") return NextResponse.json({ error: "This registration has been cancelled. Please contact the event team." }, { status: 409 });
         if (registration.paymentStatus === "paid") return NextResponse.json({ ok: true });
         if (
             registration.registrationType !== registrationType ||
@@ -78,8 +80,8 @@ export async function POST(req: Request) {
         ) {
             return NextResponse.json({ error: "Order details do not match this registration." }, { status: 400 });
         }
-        const paidRegistration = await prisma.eventRegistration.update({
-            where: { id: registration.id },
+        const paymentUpdate = await prisma.eventRegistration.updateMany({
+            where: { id: registration.id, status: "active", paymentStatus: { not: "paid" } },
             data: {
                 paymentStatus: "paid",
                 razorpayPaymentId: razorpay_payment_id,
@@ -87,6 +89,8 @@ export async function POST(req: Request) {
                 reservationExpiresAt: null,
             },
         });
+        if (!paymentUpdate.count) return NextResponse.json({ error: "Registration status changed. Please contact the event team." }, { status: 409 });
+        const paidRegistration = await prisma.eventRegistration.findUniqueOrThrow({ where: { id: registration.id } });
         const totalAmount = registration.amount;
         const stayAmount = registration.stayAmount;
         const foodAmount = registration.foodAmount;
@@ -131,6 +135,7 @@ export async function POST(req: Request) {
         });
 
         if (email) {
+            const contact = await getContactInfo();
             await sendEmail({
                 to: email,
                 subject: `DRC Ultimate Rider — slot confirmed (${registration.categoryName})`,
@@ -141,7 +146,7 @@ export async function POST(req: Request) {
             <p style="color:#B9A886;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-top:24px;">Your entry &amp; receipt</p>
             <table style="width:100%;border-collapse:collapse;margin-top:8px;">${rowsHtml}</table>
             <p style="color:#F1E9DD;font-size:14px;line-height:1.7;margin-top:24px;"><strong>Event:</strong> 12&ndash;13 December 2026 &middot; Bengaluru<br/><strong>Overall prize pool:</strong> ₹5,00,000</p>
-            <p style="color:#F1E9DD;font-size:14px;line-height:1.7;margin-top:16px;">We'll be in touch with race-week details, gear checklist and venue instructions. Questions? Reply to this email or WhatsApp us at <a href="https://wa.me/919414870102" style="color:#E8622C;">+91 94148 70102</a>.</p>
+            <p style="color:#F1E9DD;font-size:14px;line-height:1.7;margin-top:16px;">We'll be in touch with race-week details, gear checklist and venue instructions. Questions? Reply to this email or WhatsApp us at <a href="${whatsappContactUrl(contact.phone)}" style="color:#E8622C;">${escapeHtml(contact.phone)}</a>.</p>
           `,
                     ctaText: "Race brief",
                     ctaUrl: "https://www.dirtridecamp.com/events/drc-ultimate-rider",

@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Badge } from "@/components/ui/Badge";
-import { Plus, Pencil, Trash2, Tag } from "lucide-react";
+import { Plus, Pencil, Trash2, Tag, FileText, Send } from "lucide-react";
 import { EventCategoriesManager } from "@/components/admin/EventCategoriesManager";
+import { EventDocumentsManager } from "@/components/admin/EventDocumentsManager";
+import { NotifyRidersModal } from "@/components/admin/NotifyRidersModal";
 import ImageUpload from "@/components/admin/ImageUpload";
 
 interface EventData {
@@ -39,6 +41,8 @@ export default function AdminEventsPage() {
   const [editing, setEditing] = useState<EventData | null>(null);
   const [loading, setLoading] = useState(true);
   const [categoriesFor, setCategoriesFor] = useState<EventData | null>(null);
+  const [documentsFor, setDocumentsFor] = useState<EventData | null>(null);
+  const [notifyFor, setNotifyFor] = useState<EventData | null>(null);
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -199,7 +203,7 @@ export default function AdminEventsPage() {
 
       <div className="space-y-3">
         {events.map((e) => (
-          <div key={e.id} className="bg-surface border border-border rounded-sm p-4 flex items-center justify-between">
+          <div key={e.id} className="bg-surface border border-border rounded-sm p-4 flex flex-wrap gap-4 items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <h4 className="font-semibold">{e.title}</h4>
@@ -208,7 +212,9 @@ export default function AdminEventsPage() {
               </div>
               <p className="text-xs text-muted">{new Date(e.date).toLocaleDateString("en-IN")} · {e.location} · ₹{e.price}{e.stayEnabled ? ` · Tents: ${e.stayAvailableTents}/${e.stayTotalTents} available at ₹${e.stayPrice}` : ""}</p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <button onClick={() => setDocumentsFor(e)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-border" title="Manage full race brief PDFs"><FileText className="h-4 w-4" />PDFs</button>
+              <button onClick={() => setNotifyFor(e)} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs border border-border" title="Notify riders about this event"><Send className="h-4 w-4" />Notify riders</button>
               <button
                 onClick={() => setCategoriesFor(e)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border border-orange text-orange hover:bg-orange hover:text-white transition-colors"
@@ -231,6 +237,8 @@ export default function AdminEventsPage() {
           onClose={() => setCategoriesFor(null)}
         />
       )}
+      {documentsFor && <EventDocumentsManager eventId={documentsFor.id} eventTitle={documentsFor.title} onClose={() => setDocumentsFor(null)} />}
+      {notifyFor && <NotifyRidersModal eventId={notifyFor.id} rideTitle={notifyFor.title} onClose={() => setNotifyFor(null)} />}
     </div>
   );
 }

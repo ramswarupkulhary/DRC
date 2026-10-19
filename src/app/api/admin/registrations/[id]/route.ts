@@ -3,11 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
 import { refundPayment } from "@/lib/razorpay";
 import { promoteWaitlist } from "@/lib/waitlist";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const session = await getServerSession(authOptions);
+  const role = (session?.user as { role?: string } | undefined)?.role;
+  if (!session?.user || !["admin", "coordinator"].includes(role || "")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const body = await req.json();
 
@@ -26,9 +31,7 @@ export async function PATCH(
     },
   });
 
-  // Auto-refund only when an admin rejects a paid registration.
-  // Rider-initiated cancellations are non-refundable.
-  if (body.status === "rejected" && registration.paymentStatus === "paid" && registration.paymentId) {
+  if (body.refund === true && ["rejected", "cancelled"].includes(body.status) && registration.paymentStatus === "paid" && registration.paymentId) {
     const refunded = await refundPayment(registration.paymentId, registration.amount);
     if (refunded) {
       await prisma.registration.update({ where: { id }, data: { paymentStatus: "refunded" } });

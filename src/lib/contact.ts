@@ -40,3 +40,8 @@ export async function getContactInfo(): Promise<ContactInfo> {
 export function phoneDigits(phone: string): string {
     return phone.replace(/\D/g, "");
 }
+
+export function whatsappContactUrl(phone: string): string {
+    const digits = phoneDigits(phone);
+    return `https://wa.me/${digits.length === 10 ? `91${digits}` : digits}`;
+}

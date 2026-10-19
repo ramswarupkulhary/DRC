@@ -7,11 +7,19 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { formatPrice, formatDate } from "@/lib/utils";
 import Link from "next/link";
-import { MapPin, Calendar, MessageCircle, Image as ImageIcon, Star } from "lucide-react";
+import { MapPin, Calendar, MessageCircle, Image as ImageIcon, Star, Download } from "lucide-react";
 import { IndemnityWaiverModal } from "@/components/waiver/IndemnityWaiverModal";
 
 interface Registration {
   id: string;
+  kind?: "ride" | "training" | "event" | "spectator" | "program";
+  title?: string;
+  href?: string;
+  location?: string | null;
+  date?: string;
+  categoryName?: string;
+  passUrl?: string | null;
+  program?: { persons: number; kids: number; rejectionNote: string | null };
   status: string;
   paymentStatus: string;
   amount: number;
@@ -36,6 +44,9 @@ const statusVariant: Record<string, "success" | "warning" | "error" | "muted" | 
   cancelled: "error",
   waitlist: "muted",
   checked_in: "success",
+  approved: "success",
+  awaiting_approval: "warning",
+  rejected: "error",
 };
 
 const statusLabel: Record<string, string> = {
@@ -44,6 +55,9 @@ const statusLabel: Record<string, string> = {
   cancelled: "Cancelled",
   waitlist: "Waitlisted",
   checked_in: "Checked In",
+  approved: "Approved",
+  awaiting_approval: "Awaiting Approval",
+  rejected: "Not Approved",
 };
 
 const paymentVariant: Record<string, "success" | "warning" | "error" | "muted"> = {
@@ -57,12 +71,13 @@ export default function MyRegistrationsPage() {
   const router = useRouter();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [reviewingRide, setReviewingRide] = useState<string | null>(null);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccess, setReviewSuccess] = useState<string | null>(null);
-  const [signingWaiver, setSigningWaiver] = useState<{ id: string; context: string } | null>(null);
+  const [signingWaiver, setSigningWaiver] = useState<{ id: string; context: string; kind?: "program" } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -73,11 +88,12 @@ export default function MyRegistrationsPage() {
   useEffect(() => {
     if (status === "authenticated") {
       fetch("/api/registrations/mine")
-        .then((r) => r.json())
+        .then((r) => { if (!r.ok) throw new Error("Could not load your registrations. Please refresh and try again."); return r.json(); })
         .then((data) => {
           setRegistrations(data.registrations || []);
-          setLoading(false);
-        });
+        })
+        .catch((error) => setLoadError(error instanceof Error ? error.message : "Could not load registrations."))
+        .finally(() => setLoading(false));
     }
   }, [status]);
 
@@ -109,7 +125,7 @@ export default function MyRegistrationsPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <SectionHeader accent="Your bookings" title="My Registrations" align="left" />
 
-      {registrations.length === 0 ? (
+      {loadError ? <p role="alert" className="mt-8 text-error">{loadError}</p> : registrations.length === 0 ? (
         <div className="mt-12 text-center py-16 bg-surface border border-border rounded-sm">
           <p className="text-muted text-lg">No registrations yet.</p>
           <p className="text-muted text-sm mt-2">
@@ -120,26 +136,28 @@ export default function MyRegistrationsPage() {
         <div className="mt-8 space-y-4">
           {registrations.map((reg) => {
             const item = reg.ride || reg.training;
-            const href = reg.ride ? `/rides/${reg.ride.slug}` : `/trainings/${reg.training?.slug}`;
-            const isConfirmedPaid = (reg.status === "confirmed" || reg.status === "checked_in") && reg.paymentStatus === "paid";
+            const href = reg.href || (reg.ride ? `/rides/${reg.ride.slug}` : `/trainings/${reg.training?.slug}`);
+            const isConfirmedPaid = !!(reg.ride || reg.training) && (reg.status === "confirmed" || reg.status === "checked_in") && reg.paymentStatus === "paid";
             const isConfirmed = reg.status === "confirmed" || reg.status === "checked_in";
             return (
-              <div key={reg.id} className="bg-surface border border-border rounded-sm p-5 hover:border-orange/30 transition-colors">
+              <div key={`${reg.kind || "registration"}-${reg.id}`} id={`registration-${reg.id}`} className="bg-surface border border-border rounded-sm p-5 hover:border-orange/30 transition-colors">
                 <Link href={href} className="block group">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="space-y-1">
                       <h3 className="font-heading text-lg font-semibold group-hover:text-orange transition-colors">
-                        {item?.title}
+                        {reg.title || item?.title}
                       </h3>
+                      {reg.kind && <p className="text-xs text-orange capitalize">{reg.kind === "event" ? "Race entry" : reg.kind === "spectator" ? "Spectator pass" : reg.kind}</p>}
+                      {reg.categoryName && <p className="text-sm text-muted">{reg.categoryName}</p>}
                       <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
-                        {item && "location" in item && item.location && (
+                        {(reg.location || (item && "location" in item && item.location)) && (
                           <span className="flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5 text-orange" /> {item.location}
+                            <MapPin className="w-3.5 h-3.5 text-orange" /> {reg.location || item?.location}
                           </span>
                         )}
-                        {reg.ride?.startDate && (
+                        {(reg.date || reg.ride?.startDate) && (
                           <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5 text-orange" /> {formatDate(reg.ride.startDate)}
+                            <Calendar className="w-3.5 h-3.5 text-orange" /> {formatDate(reg.date || reg.ride!.startDate)}
                           </span>
                         )}
                       </div>
@@ -153,6 +171,17 @@ export default function MyRegistrationsPage() {
                     </div>
                   </div>
                 </Link>
+
+                {reg.passUrl && <a href={reg.passUrl} download className="mt-3 inline-flex items-center gap-2 text-sm text-orange"><Download className="h-4 w-4" />Download spectator pass</a>}
+                {reg.program && (
+                  <div className="mt-3 border-t border-border pt-3 space-y-3">
+                    <p className="text-sm text-muted">{reg.program.persons} adults · {reg.program.kids} children</p>
+                    {reg.program.rejectionNote && <p className="text-sm text-error">{reg.program.rejectionNote}</p>}
+                    <Link href={`/my-programs#booking-${reg.id}`} className="text-sm text-orange hover:underline">Manage companions and program details</Link>
+                    {reg.status !== "rejected" && !reg.waiverSigned && <button onClick={() => setSigningWaiver({ id: reg.id, context: `Program: ${reg.title}`, kind: "program" })} className="block text-sm text-orange hover:underline">Sign Indemnity Waiver</button>}
+                    {reg.waiverSigned && <p className="text-xs text-success">Indemnity waiver signed</p>}
+                  </div>
+                )}
 
                 {isConfirmed && (reg.ride?.whatsappGroupLink || (reg.ride?.photosLink && reg.ride?.photosPublished)) && (
                   <div className="mt-3 pt-3 border-t border-border flex flex-wrap gap-3">
@@ -250,7 +279,8 @@ export default function MyRegistrationsPage() {
       {signingWaiver && (
         <IndemnityWaiverModal
           context={signingWaiver.context}
-          registrationId={signingWaiver.id}
+          registrationId={signingWaiver.kind === "program" ? undefined : signingWaiver.id}
+          programBookingId={signingWaiver.kind === "program" ? signingWaiver.id : undefined}
           onClose={() => setSigningWaiver(null)}
           onSigned={() => {
             setRegistrations((prev) => prev.map((r) => (r.id === signingWaiver.id ? { ...r, waiverSigned: true } : r)));

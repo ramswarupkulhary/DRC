@@ -6,6 +6,7 @@ import { SportsEventJsonLd } from "@/components/seo/SportsEventJsonLd";
 import { ArrowRight, Calendar, MapPin, Trophy, Flag, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
+import { EventDocuments } from "@/components/events/EventDocuments";
 
 // Always SSR fresh so admin edits to categories, fees and copy show up instantly.
 export const dynamic = "force-dynamic";
@@ -321,6 +322,8 @@ export default async function UltimateRiderPage() {
                     </p>
                 </div>
             </section>
+
+            <EventDocuments eventSlug="drc-ultimate-rider" />
 
             {/* Partnership */}
             <section className="border-b border-border">

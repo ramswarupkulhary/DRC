@@ -27,7 +27,7 @@ const navLinks = [
 
 const userMenuLinks = [
   { href: "/profile", label: "My Profile", icon: User },
-  { href: "/my-programs", label: "My Programs", icon: MapPinned },
+  { href: "/my-registrations", label: "My Registrations", icon: MapPinned },
   { href: "/rewards", label: "Rewards", icon: Gift },
   { href: "/write-review", label: "Write a Review", icon: Star },
 ];
@@ -350,12 +350,12 @@ export function Navbar({ hasUpcomingRides = false }: { hasUpcomingRides?: boolea
                     </Link>
 
                     <Link
-                      href="/my-programs"
+                      href="/my-registrations"
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center gap-3 px-3 py-2.5 text-sm text-foreground/80 hover:text-orange hover:bg-surface-light rounded-sm transition-colors"
                     >
                       <MapPinned className="w-4 h-4" />
-                      My Programs
+                      My Registrations
                     </Link>
 
                     <Link

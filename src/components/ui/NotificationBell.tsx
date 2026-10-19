@@ -3,6 +3,7 @@
 import { Bell } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 interface Notification {
   id: string;
@@ -10,6 +11,7 @@ interface Notification {
   message: string;
   read: boolean;
   createdAt: string;
+  link?: string | null;
 }
 
 export function NotificationBell() {
@@ -40,7 +42,7 @@ export function NotificationBell() {
         const data = await res.json();
         setUnreadCount(data.unreadCount);
       }
-    } catch {}
+    } catch { }
   }
 
   async function fetchNotifications() {
@@ -118,16 +120,18 @@ export function NotificationBell() {
                 <div className="p-6 text-center text-muted text-sm">No notifications yet</div>
               )}
               {!loading && notifications.map((n) => (
-                <div
+                <Link
                   key={n.id}
-                  className={`px-4 py-3 border-b border-border last:border-0 ${!n.read ? "bg-orange/5" : ""}`}
+                  href={n.link?.startsWith("/") && !n.link.startsWith("//") ? n.link : "/notifications"}
+                  onClick={() => setOpen(false)}
+                  className={`block px-4 py-3 border-b border-border last:border-0 hover:bg-orange/10 ${!n.read ? "bg-orange/5" : ""}`}
                 >
                   <p className="text-sm font-medium text-foreground">{n.title}</p>
                   <p className="text-xs text-muted mt-0.5 line-clamp-2">{n.message}</p>
                   <p className="text-[10px] text-muted mt-1">
                     {new Date(n.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                   </p>
-                </div>
+                </Link>
               ))}
             </div>
           </motion.div>

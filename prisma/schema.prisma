@@ -622,6 +622,7 @@ model Event {
   spectatorDayMealFee      Int    @default(599)
 
   categories EventCategory[]
+  documents  EventDocument[]
 }
 
 model EventCategory {
@@ -644,6 +645,38 @@ model EventCategory {
   @@index([eventId])
 }
 
+model EventDocument {
+  id          String   @id @default(cuid())
+  eventId     String
+  displayText String
+  filename    String
+  content     Bytes
+  size        Int
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  downloads   EventDocumentDownload[]
+
+  @@index([eventId, active])
+}
+
+model EventDocumentDownload {
+  id                 String   @id @default(cuid())
+  documentId         String
+  downloadedAt       DateTime @default(now())
+  userId             String?
+  name               String?
+  email              String?
+  phone              String?
+  ip                 String?
+  userAgent          String?
+  referrer           String?
+  notificationStatus String   @default("pending")
+  document           EventDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, downloadedAt])
+}
+
 model EventRegistration {
   id                 String   @id @default(cuid())
   userId             String?
@@ -654,6 +687,10 @@ model EventRegistration {
   membershipDiscount Int      @default(0)
   currency           String   @default("INR")
   paymentStatus      String   @default("pending") // pending | paid | cancelled
+  status             String   @default("active")
+  cancelledAt        DateTime?
+  cancelledById      String?
+  cancellationReason String?
   razorpayOrderId    String?
   razorpayPaymentId  String?
   razorpaySignature  String?

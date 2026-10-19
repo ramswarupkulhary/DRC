@@ -122,7 +122,7 @@ export default function MyProgramsPage() {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-            <SectionHeader accent="Your adventures" title="My Program Bookings" align="center" />
+            <SectionHeader accent="Program details" title="My Registrations" align="center" />
 
             {loading ? (
                 <p className="text-center text-muted mt-10">Loading…</p>
@@ -140,7 +140,7 @@ export default function MyProgramsPage() {
                             b.kids > 0 ? `${b.kids} kid${b.kids > 1 ? "s" : ""}` : null,
                         ].filter(Boolean).join(" · ");
                         return (
-                            <div key={b.id} className="bg-surface border border-border rounded-sm p-6">
+                            <div key={b.id} id={`booking-${b.id}`} className="bg-surface border border-border rounded-sm p-6 scroll-mt-24">
                                 <div className="flex items-start justify-between gap-4">
                                     <div>
                                         <h3 className="font-heading text-xl font-bold">{b.programName}</h3>

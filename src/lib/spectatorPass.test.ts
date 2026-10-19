@@ -57,12 +57,13 @@ test("download endpoint serves only signed, confirmed spectator passes", async (
     try {
         const { prisma } = await import("./prisma");
         const { GET } = await import("../app/api/events/ultimate-rider/passes/[id]/route");
-        let registration: { id: string; name: string; eventSlug: string; registrationType: string; paymentStatus: string } | null = {
+        let registration: { id: string; name: string; eventSlug: string; registrationType: string; paymentStatus: string; status: string } | null = {
             id: "registration-one",
             name: "Test Spectator",
             eventSlug: "drc-ultimate-rider",
             registrationType: "spectator",
             paymentStatus: "paid",
+            status: "active",
         };
         const originalLookup = prisma.eventRegistration.findUnique;
         const lookup = context.mock.fn(async () => registration);
@@ -80,6 +81,9 @@ test("download endpoint serves only signed, confirmed spectator passes", async (
         registration.paymentStatus = "pending";
         assert.equal((await download()).status, 404);
         registration.paymentStatus = "paid";
+        registration.status = "cancelled";
+        assert.equal((await download()).status, 404);
+        registration.status = "active";
         registration.registrationType = "rider";
         assert.equal((await download()).status, 404);
         registration.registrationType = "spectator";

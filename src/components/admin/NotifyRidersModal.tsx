@@ -12,12 +12,13 @@ interface Rider {
 }
 
 interface Props {
-  rideId: string;
+  rideId?: string;
+  eventId?: string;
   rideTitle: string;
   onClose: () => void;
 }
 
-export function NotifyRidersModal({ rideId, rideTitle, onClose }: Props) {
+export function NotifyRidersModal({ rideId, eventId, rideTitle, onClose }: Props) {
   const [riders, setRiders] = useState<Rider[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -70,6 +71,7 @@ export function NotifyRidersModal({ rideId, rideTitle, onClose }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         rideId,
+        eventId,
         riderIds: Array.from(selected),
         message: message || undefined,
       }),
@@ -120,7 +122,7 @@ export function NotifyRidersModal({ rideId, rideTitle, onClose }: Props) {
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Leave empty for default notification about this ride..."
+                placeholder="Leave empty for the default notification..."
                 className="w-full px-3 py-2 bg-background border border-border rounded-sm text-sm text-foreground focus:border-orange focus:outline-none resize-none h-16"
               />
             </div>

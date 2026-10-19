@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -57,6 +57,7 @@ export default function UltimateRiderRegisterPage() {
     const { data: session, status: authStatus } = useSession();
     const router = useRouter();
     const callbackUrl = "/events/drc-ultimate-rider/register";
+    const formRef = useRef<HTMLFormElement>(null);
 
     const [categories, setCategories] = useState<Category[]>([]);
     const [stay, setStay] = useState<StayOption | null>(null);
@@ -136,14 +137,17 @@ export default function UltimateRiderRegisterPage() {
     const wantsStay = registrationType === "rider" && bookStay;
     const total = entryFee - memberSavings + (wantsStay && stay ? stay.price : 0);
 
-    function validate(): string | null {
-        if (registrationType === "rider" && selectedCategories.length === 0) return "Please select at least one race category.";
-        if (wantsStay && (!stay?.enabled || stay.soldOut)) return "Tent stay is no longer available. Please refresh and try again.";
-        if (!form.name || !form.email || !form.phone || !form.city) return "Please fill in all contact details.";
-        if (registrationType === "rider" && (!form.bikeMake || !form.bikeModel)) return "Please add your bike make and model.";
-        if (registrationType === "rider" && !form.experience) return "Please select your experience level.";
-        if (registrationType === "rider" && !form.acknowledgeOrganiser) return "Please acknowledge the Organiser's right to determine category of participation.";
-        if (!form.agree) return "Please acknowledge the entry terms to continue.";
+    function validate(): { message: string; selector: string } | null {
+        if (registrationType === "rider" && selectedCategories.length === 0) return { message: "Please select at least one race category.", selector: "#race-categories" };
+        if (wantsStay && (!stay?.enabled || stay.soldOut)) return { message: "Tent stay is no longer available. Please refresh and try again.", selector: "#booking-summary" };
+        for (const [value, label] of [[form.name, "Full name"], [form.email, "Email"], [form.phone, "Phone (WhatsApp)"], [form.city, "City"], ...(registrationType === "rider" ? [[form.bikeMake, "Bike make"], [form.bikeModel, "Bike model"]] : [])]) {
+            if (!value.trim()) return { message: `Please fill in ${label.toLowerCase()}.`, selector: `[data-field="${label}"]` };
+        }
+        if (registrationType === "rider" && !form.experience) return { message: "Please select your experience level.", selector: '[name="experience"]' };
+        if (registrationType === "rider" && !form.acknowledgeOrganiser) return { message: "Please acknowledge the Organiser's right to determine category of participation.", selector: '[name="acknowledgeOrganiser"]' };
+        if (!form.agree) return { message: "Please acknowledge the entry terms to continue.", selector: '[name="agree"]' };
+        const invalid = formRef.current?.querySelector<HTMLInputElement>('input[type="email"]:invalid');
+        if (invalid) return { message: invalid.validationMessage, selector: 'input[type="email"]' };
         return null;
     }
 
@@ -154,7 +158,10 @@ export default function UltimateRiderRegisterPage() {
         }
         const err = validate();
         if (err) {
-            setErrorMessage(err);
+            setErrorMessage(err.message);
+            const target = formRef.current?.querySelector<HTMLElement>(err.selector);
+            target?.scrollIntoView({ behavior: "smooth", block: "center" });
+            target?.focus({ preventScroll: true });
             return;
         }
         if (registrationType === "rider" && selectedCategories.length === 0) return;
@@ -319,7 +326,7 @@ export default function UltimateRiderRegisterPage() {
                 </div>
             </section>
 
-            <form onSubmit={(e) => { e.preventDefault(); handlePayNow(); }} className="max-w-7xl mx-auto px-6 lg:px-10 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <form ref={formRef} noValidate onSubmit={(e) => { e.preventDefault(); handlePayNow(); }} className="max-w-7xl mx-auto px-6 lg:px-10 py-16 grid grid-cols-1 lg:grid-cols-12 gap-12">
                 {/* Booking type and pass selection */}
                 <div className="lg:col-span-7 space-y-10">
                     <fieldset>
@@ -338,7 +345,7 @@ export default function UltimateRiderRegisterPage() {
                     </fieldset>
 
                     {registrationType === "rider" ? (
-                        <fieldset>
+                        <fieldset id="race-categories" tabIndex={-1}>
                             <legend className="flex items-center gap-3 mb-6">
                                 <span className="font-heading text-lg font-bold uppercase tracking-tight">Select categories</span>
                                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted">Choose one or more</span>
@@ -397,6 +404,7 @@ export default function UltimateRiderRegisterPage() {
                             <label className={`flex items-start gap-3 mt-6 p-5 border cursor-pointer ${form.acknowledgeOrganiser ? "border-orange bg-orange/5" : "border-border"}`}>
                                 <input
                                     type="checkbox"
+                                    name="acknowledgeOrganiser"
                                     checked={form.acknowledgeOrganiser}
                                     onChange={(e) => setForm({ ...form, acknowledgeOrganiser: e.target.checked })}
                                     className="mt-1 accent-orange w-4 h-4 shrink-0"
@@ -476,6 +484,7 @@ export default function UltimateRiderRegisterPage() {
                                 Riding experience
                             </label>
                             <select
+                                name="experience"
                                 value={form.experience}
                                 onChange={(e) => setForm({ ...form, experience: e.target.value })}
                                 required
@@ -505,7 +514,7 @@ export default function UltimateRiderRegisterPage() {
                 </div>
 
                 {/* Summary sidebar */}
-                <aside className="lg:col-span-5">
+                <aside id="booking-summary" tabIndex={-1} className="lg:col-span-5">
                     <div className="lg:sticky lg:top-24 p-8 border border-border bg-surface">
                         <div className="font-mono text-[10px] uppercase tracking-widest text-orange">Order summary</div>
                         <h3 className="font-heading text-2xl font-bold uppercase mt-3">DRC Ultimate Rider</h3>
@@ -538,6 +547,7 @@ export default function UltimateRiderRegisterPage() {
                         <label className="flex items-start gap-3 mt-8 cursor-pointer">
                             <input
                                 type="checkbox"
+                                name="agree"
                                 checked={form.agree}
                                 onChange={(e) => setForm({ ...form, agree: e.target.checked })}
                                 className="mt-1 accent-orange w-4 h-4"
@@ -550,7 +560,7 @@ export default function UltimateRiderRegisterPage() {
                         </label>
 
                         {errorMessage && (
-                            <p className="mt-4 text-sm text-error font-medium">{errorMessage}</p>
+                            <p role="alert" className="mt-4 text-sm text-error font-medium">{errorMessage}</p>
                         )}
 
                         <Button
@@ -601,6 +611,7 @@ function Field({
             </span>
             <input
                 type={type}
+                data-field={label}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resolveEventCategory } from "@/lib/eventCategories";
 import { sendEmail, drcEmailTemplate } from "@/lib/email";
+import { getContactInfo, whatsappContactUrl } from "@/lib/contact";
 
 const ADMIN_INBOX = "info@dirtridecamp.com";
 
@@ -82,6 +83,7 @@ export async function POST(req: Request) {
             }),
         });
 
+        const contact = await getContactInfo();
         // Confirmation to rider
         await sendEmail({
             to: email,
@@ -93,7 +95,7 @@ export async function POST(req: Request) {
           <p style="color:#B9A886;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-top:24px;">Your entry summary</p>
           <table style="width:100%;border-collapse:collapse;margin-top:8px;">${rowsHtml}</table>
           <p style="color:#F1E9DD;font-size:14px;line-height:1.7;margin-top:24px;"><strong>Event:</strong> 12&ndash;13 December 2026 &middot; Bengaluru<br/><strong>Overall prize pool:</strong> ₹5,00,000</p>
-          <p style="color:#F1E9DD;font-size:14px;line-height:1.7;margin-top:16px;">Questions? Reply to this email or WhatsApp us at <a href="https://wa.me/919414870102" style="color:#E8622C;">+91 94148 70102</a>.</p>
+          <p style="color:#F1E9DD;font-size:14px;line-height:1.7;margin-top:16px;">Questions? Reply to this email or WhatsApp us at <a href="${whatsappContactUrl(contact.phone)}" style="color:#E8622C;">${escapeHtml(contact.phone)}</a>.</p>
         `,
                 ctaText: "Race brief",
                 ctaUrl: "https://www.dirtridecamp.com/events/drc-ultimate-rider",

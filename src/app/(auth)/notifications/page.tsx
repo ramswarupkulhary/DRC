@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { EnablePushButton } from "@/components/EnablePushButton";
+import Link from "next/link";
 
 interface Notification {
   id: string;
@@ -61,9 +62,10 @@ export default function NotificationsPage() {
           </div>
         ) : (
           notifications.map((notification) => (
-            <div
+            <Link
               key={notification.id}
-              className={`bg-surface border border-border rounded-sm p-4 transition-colors ${!notification.read ? "border-orange/50 bg-orange/5" : ""
+              href={notification.link?.startsWith("/") && !notification.link.startsWith("//") ? notification.link : "/notifications"}
+              className={`block bg-surface border border-border rounded-sm p-4 transition-colors hover:border-orange ${!notification.read ? "border-orange/50 bg-orange/5" : ""
                 }`}
             >
               <div className="flex items-start justify-between gap-4">
@@ -90,12 +92,12 @@ export default function NotificationsPage() {
                   </p>
                 </div>
                 {notification.link && (
-                  <a href={notification.link} className="text-orange hover:underline text-sm font-medium whitespace-nowrap">
+                  <span className="text-orange text-sm font-medium whitespace-nowrap">
                     View
-                  </a>
+                  </span>
                 )}
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>

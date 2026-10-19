@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { EventDocuments } from "@/components/events/EventDocuments";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -109,6 +110,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
           </ul>
         </div>
       )}
+
+      <EventDocuments eventSlug={event.slug} />
 
       <div className="mt-10 flex gap-4">
         <Link href={event.registrationUrl || "/contact"}>
