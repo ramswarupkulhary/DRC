@@ -55,6 +55,8 @@ export async function GET() {
         categoryName: registration.categoryName,
         status: registration.status === "cancelled" || registration.paymentStatus === "cancelled" ? "cancelled" : registration.paymentStatus === "paid" ? "confirmed" : "pending",
         paymentStatus: registration.paymentStatus,
+        refundId: registration.refundId,
+        refundStatus: registration.refundStatus,
         amount: registration.amount,
         createdAt: registration.createdAt,
         passUrl: registration.status === "active" && registration.registrationType === "spectator" && registration.paymentStatus === "paid" && registration.eventSlug === "drc-ultimate-rider"

@@ -19,6 +19,8 @@ interface Registration {
   date?: string;
   categoryName?: string;
   passUrl?: string | null;
+  refundId?: string | null;
+  refundStatus?: string | null;
   program?: { persons: number; kids: number; rejectionNote: string | null };
   status: string;
   paymentStatus: string;
@@ -64,6 +66,7 @@ const paymentVariant: Record<string, "success" | "warning" | "error" | "muted"> 
   paid: "success",
   unpaid: "warning",
   refunded: "muted",
+  refund_pending: "warning",
 };
 
 export default function MyRegistrationsPage() {
@@ -166,11 +169,13 @@ export default function MyRegistrationsPage() {
                       <Badge variant={statusVariant[reg.status] || "muted"}>
                         {statusLabel[reg.status] || reg.status}
                       </Badge>
-                      <Badge variant={paymentVariant[reg.paymentStatus] || "muted"}>{reg.paymentStatus}</Badge>
+                      <Badge variant={paymentVariant[reg.paymentStatus] || "muted"}>{reg.paymentStatus.replace(/_/g, " ")}</Badge>
                       <span className="font-heading text-lg font-bold text-orange">{formatPrice(reg.amount)}</span>
                     </div>
                   </div>
                 </Link>
+
+                {reg.refundId && <p className="mt-2 text-xs text-muted break-all">Refund {reg.refundStatus || "requested"} · Reference: {reg.refundId}</p>}
 
                 {reg.passUrl && <a href={reg.passUrl} download className="mt-3 inline-flex items-center gap-2 text-sm text-orange"><Download className="h-4 w-4" />Download spectator pass</a>}
                 {reg.program && (

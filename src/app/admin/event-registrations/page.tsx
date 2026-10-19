@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { Download, Files, Ban } from "lucide-react";
+import { Download, Files, Ban, RotateCcw, RefreshCw } from "lucide-react";
 
 interface EventRegistrationRow {
     id: string;
@@ -17,6 +17,8 @@ interface EventRegistrationRow {
     paymentStatus: string;
     status: string;
     cancellationReason: string | null;
+    refundId: string | null;
+    refundStatus: string | null;
     razorpayOrderId: string | null;
     razorpayPaymentId: string | null;
     name: string;
@@ -54,6 +56,8 @@ export default function AdminEventRegistrationsPage() {
     const [bookingStatusFilter, setBookingStatusFilter] = useState("");
     const [cancelling, setCancelling] = useState<EventRegistrationRow | null>(null);
     const [cancelReason, setCancelReason] = useState("");
+    const [requestRefund, setRequestRefund] = useState(false);
+    const [confirmRefund, setConfirmRefund] = useState(false);
     const [savingCancellation, setSavingCancellation] = useState(false);
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [categoryFilter, setCategoryFilter] = useState<string>("");
@@ -119,15 +123,38 @@ export default function AdminEventRegistrationsPage() {
         finally { setExporting(false); }
     }
 
+    function canRefund(row: EventRegistrationRow) {
+        return row.paymentStatus === "paid" && row.amount > 0 && !!row.razorpayPaymentId && !row.refundId && !["processing", "unknown", "pending", "processed"].includes(row.refundStatus || "");
+    }
+
+    function openCancellation(row: EventRegistrationRow, refund = false) {
+        setCancelling(row); setCancelReason(""); setRequestRefund(refund); setConfirmRefund(false); setError("");
+    }
+
+    function updateRow(registration: EventRegistrationRow) {
+        setRows((current) => current.map((row) => row.id === registration.id ? { ...row, ...registration } : row).filter((row) => (!bookingStatusFilter || row.status === bookingStatusFilter) && (!statusFilter || row.paymentStatus === statusFilter)));
+    }
+
+    async function refreshRefund(row: EventRegistrationRow) {
+        setError("");
+        try {
+            const response = await fetch(`/api/admin/event-registrations/${row.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "refresh_refund", eventSlug }) });
+            const data = await response.json();
+            if (data.registration) updateRow(data.registration);
+            if (!response.ok) throw new Error(data.error || "Could not refresh refund.");
+        } catch (failure) { setError(failure instanceof Error ? failure.message : "Could not refresh refund."); }
+    }
+
     async function cancelRegistration() {
         if (!cancelling) return;
+        if (requestRefund && !confirmRefund) return;
         setSavingCancellation(true);
         try {
-            const response = await fetch(`/api/admin/event-registrations/${cancelling.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "cancel", eventSlug, reason: cancelReason }) });
+            const response = await fetch(`/api/admin/event-registrations/${cancelling.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "cancel", eventSlug, reason: cancelReason, refund: requestRefund, confirmRefund: requestRefund && confirmRefund }) });
             const data = await response.json();
+            if (data.registration) { updateRow(data.registration); setCancelling(data.registration); }
             if (!response.ok) throw new Error(data.error || "Could not cancel registration.");
-            setRows((current) => current.map((row) => row.id === cancelling.id ? { ...row, ...data.registration } : row).filter((row) => !bookingStatusFilter || row.status === bookingStatusFilter));
-            if (data.notificationSent === false) setError("Registration cancelled without refund, but its email notification failed.");
+            if (data.notificationSent === false) setError("Registration updated, but its email notification failed.");
             setCancelling(null);
         } catch (failure) { setError(failure instanceof Error ? failure.message : "Cancellation failed."); }
         finally { setSavingCancellation(false); }
@@ -279,6 +306,8 @@ export default function AdminEventRegistrationsPage() {
                                         <Badge variant={PAYMENT_VARIANTS[r.paymentStatus] ?? "muted"}>
                                             {r.paymentStatus}
                                         </Badge>
+                                        {r.refundStatus && <p className="mt-1 text-xs text-muted">Refund: {r.refundStatus}</p>}
+                                        {r.refundId && <p className="text-[10px] font-mono break-all text-muted">{r.refundId}</p>}
                                     </Td>
                                     <Td>
                                         <div className="text-xs">{r.bikeMake ?? "—"}</div>
@@ -289,14 +318,27 @@ export default function AdminEventRegistrationsPage() {
                                             {r.razorpayPaymentId ?? "—"}
                                         </span>
                                     </Td>
-                                    <Td>{r.status === "cancelled" ? <span className="text-xs text-muted">Cancelled{r.cancellationReason ? `: ${r.cancellationReason}` : ""}</span> : <button title="Cancel registration without refund" onClick={() => { setCancelling(r); setCancelReason(""); setError(""); }} className="inline-flex items-center gap-1 text-error text-xs"><Ban className="h-4 w-4" />Cancel</button>}</Td>
+                                    <Td><div className="space-y-2 min-w-40">{r.status === "cancelled" ? <span className="block text-xs text-muted">Cancelled{r.cancellationReason ? `: ${r.cancellationReason}` : ""}</span> : <button onClick={() => openCancellation(r)} className="flex items-center gap-1 text-error text-xs"><Ban className="h-4 w-4" />Cancel registration</button>}{canRefund(r) && <button onClick={() => openCancellation(r, true)} className="flex items-center gap-1 text-orange text-xs"><RotateCcw className="h-4 w-4" />{r.status === "cancelled" ? "Refund payment" : "Cancel with refund"}</button>}{r.refundId && <button onClick={() => refreshRefund(r)} className="flex items-center gap-1 text-orange text-xs"><RefreshCw className="h-4 w-4" />Refresh refund status</button>}{["processing", "unknown"].includes(r.refundStatus || "") && <p className="text-xs text-warning">Check Razorpay before retrying.</p>}</div></Td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             )}
-            {cancelling && <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"><div role="dialog" aria-modal="true" aria-labelledby="cancel-registration-title" className="w-full max-w-lg border border-border bg-background p-6 space-y-4"><h2 id="cancel-registration-title" className="font-heading text-xl">Cancel registration?</h2><p>{cancelling.name} · {cancelling.categoryName}</p><p className="text-sm text-warning">This cancels the booking only. No refund will be issued and the payment record will remain unchanged.</p><label className="block text-sm">Reason (optional)<textarea value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} maxLength={2000} className="mt-2 w-full border border-border bg-background p-3" rows={3} /></label><div className="flex flex-wrap gap-3"><Button onClick={cancelRegistration} loading={savingCancellation}><Ban className="h-4 w-4" />Cancel without refund</Button><Button variant="outline" onClick={() => setCancelling(null)} disabled={savingCancellation}>Keep registration</Button></div></div></div>}
+            {cancelling && <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto"><div role="dialog" aria-modal="true" aria-labelledby="cancel-registration-title" className="w-full max-w-lg border border-border bg-background p-6 space-y-4">
+                <h2 id="cancel-registration-title" className="font-heading text-xl">{requestRefund ? "Cancel and refund payment?" : "Cancel registration?"}</h2>
+                <p className="break-words">{cancelling.name} · {cancelling.categoryName}</p>
+                <fieldset disabled={savingCancellation} className="space-y-3"><legend className="text-sm font-semibold mb-2">Payment action</legend>
+                    <label className="flex items-center gap-2 text-sm"><input type="radio" name="refund-mode" checked={!requestRefund} onChange={() => { setRequestRefund(false); setConfirmRefund(false); }} />Cancel without refund</label>
+                    <label className={`flex items-center gap-2 text-sm ${!canRefund(cancelling) ? "text-muted" : ""}`}><input type="radio" name="refund-mode" checked={requestRefund} disabled={!canRefund(cancelling)} onChange={() => { setRequestRefund(true); setConfirmRefund(false); }} />Cancel and refund {formatPrice(cancelling.amount)}</label>
+                </fieldset>
+                <p className="text-sm text-warning">{requestRefund ? "This requests a full refund to the original payment method. Bank processing is not instant." : "No refund will be issued. The payment record remains unchanged."}</p>
+                {!canRefund(cancelling) && !requestRefund && <p className="text-xs text-muted">Refunds require a paid Razorpay registration with a recorded payment ID and no existing refund request.</p>}
+                <label className="block text-sm">Reason (optional)<textarea value={cancelReason} onChange={(e) => setCancelReason(e.target.value)} maxLength={2000} className="mt-2 w-full border border-border bg-background p-3" rows={3} /></label>
+                {requestRefund && <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={confirmRefund} onChange={(e) => setConfirmRefund(e.target.checked)} className="mt-1" />I explicitly authorize refunding {formatPrice(cancelling.amount)} to the original payment method.</label>}
+                {error && <p role="alert" className="text-sm text-error">{error}</p>}
+                <div className="flex flex-wrap gap-3"><Button onClick={cancelRegistration} loading={savingCancellation} disabled={requestRefund && (!confirmRefund || !canRefund(cancelling))}>{requestRefund ? <RotateCcw className="h-4 w-4" /> : <Ban className="h-4 w-4" />}{requestRefund ? "Confirm cancellation and refund" : "Cancel without refund"}</Button><Button variant="outline" onClick={() => setCancelling(null)} disabled={savingCancellation}>Close</Button></div>
+            </div></div>}
         </div>
     );
 }

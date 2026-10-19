@@ -18,6 +18,7 @@ export async function buildRegistrationWorkbook(eventTitle: string, registration
         ["Order ID", "razorpayOrderId", 28], ["Tent booked", "tent", 14], ["Tent amount", "stayAmount", 14],
         ["Bike make", "bikeMake", 20], ["Bike model", "bikeModel", 20], ["Experience", "experience", 22],
         ["Cancellation reason", "cancellationReason", 35], ["Notes", "notes", 45],
+        ["Refund ID", "refundId", 28], ["Refund status", "refundStatus", 18], ["Refund amount", "refundAmount", 16],
     ].map(([header, key, width]) => ({ header: String(header), key: String(key), width: Number(width) }));
     for (const registration of registrations) {
         sheet.addRow({ ...registration, event: eventTitle, date: registration.createdAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }), tent: registration.stayBooked ? "Yes" : "No", classes: registration.category.split(",").map((slug) => classBySlug.get(slug)).filter(Boolean).join(", ") });

@@ -691,6 +691,11 @@ model EventRegistration {
   cancelledAt        DateTime?
   cancelledById      String?
   cancellationReason String?
+  refundId           String?  @unique
+  refundStatus       String?
+  refundAmount       Int      @default(0)
+  refundRequestedAt  DateTime?
+  refundRequestedById String?
   razorpayOrderId    String?
   razorpayPaymentId  String?
   razorpaySignature  String?
