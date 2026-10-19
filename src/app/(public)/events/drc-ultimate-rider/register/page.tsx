@@ -11,6 +11,7 @@ interface Category {
     id: string;
     slug: string;
     name: string;
+    classLabel: string | null;
     fee: number;
     description: string | null;
 }
@@ -106,7 +107,7 @@ export default function UltimateRiderRegisterPage() {
         fetch("/api/events/drc-ultimate-rider/categories", { cache: "no-store" })
             .then((r) => (r.ok ? r.json() : Promise.reject()))
             .then((data) => {
-                setCategories((data?.categories ?? []).map((c: { id: string; slug: string; name: string; fee: number; description: string | null }) => c));
+                setCategories((data?.categories ?? []).map((c: Category) => c));
                 setStay(data?.stay ?? null);
                 setMembershipDiscountPercent(data?.memberDiscountPercent ?? 0);
             })
@@ -373,7 +374,8 @@ export default function UltimateRiderRegisterPage() {
                                                 className="sr-only"
                                             />
                                             <div className="flex items-start justify-between gap-4">
-                                                <div>
+                                                <div className="min-w-0">
+                                                    {c.classLabel?.trim() && <p className="font-mono text-xs uppercase text-orange mb-2 break-words">{c.classLabel}</p>}
                                                     <h3 className="font-heading text-xl font-bold uppercase leading-tight">{c.name}</h3>
                                                     <p className="text-sm text-muted mt-2 leading-relaxed">{c.description}</p>
                                                 </div>

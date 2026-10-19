@@ -45,7 +45,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     const categories = await prisma.eventCategory.findMany({
         where: { eventId: event.id, active: true },
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-        select: { id: true, slug: true, name: true, description: true, fee: true, totalSlots: true },
+        select: { id: true, slug: true, name: true, classLabel: true, description: true, fee: true, totalSlots: true },
     });
     const session = await getServerSession(authOptions);
     const member = session?.user ? await isActiveMember((session.user as { id: string }).id) : false;
