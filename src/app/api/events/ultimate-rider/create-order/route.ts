@@ -124,7 +124,6 @@ export async function POST(req: Request) {
                 amount: amount * 100,
                 currency: "INR",
                 receipt: `ur_${registrationType === "rider" ? "rider" : categorySlug}_${Date.now()}`,
-                ...(reservationExpiresAt ? { expire_by: Math.floor(reservationExpiresAt.getTime() / 1000) } : {}),
                 notes: {
                     event: "drc-ultimate-rider",
                     registrationType,

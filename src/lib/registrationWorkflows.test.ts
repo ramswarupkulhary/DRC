@@ -82,6 +82,51 @@ test("registration, admin and document workflows stay scoped and never refund im
             assert.equal((await eventOrder.POST(request("https://example.com", body))).status, 200);
         });
 
+        await context.test("rider tent checkout uses supported Razorpay fields and retains the database hold", async () => {
+            currentSession = member;
+            const event = { id: "event-one", slug: "drc-ultimate-rider", stayEnabled: true, stayTotalTents: 50, stayPrice: 1599 };
+            stub(prisma.event, "findUnique", async () => event);
+            stub(prisma.eventCategory, "findUnique", async () => ({ id: "category-one", slug: "foreign-bikes", name: "Foreign Bikes", fee: 5999, active: true }));
+            stub(prisma.user, "findUnique", async () => ({ id: "account-one", membership: null }));
+            stub(prisma.siteSetting, "findMany", async () => [{ key: "razorpay_key_id", value: "rzp_test_fake" }, { key: "razorpay_key_secret", value: "fake-secret" }]);
+            const api = loadModule("razorpay/dist/api") as { prototype: { post: (...args: unknown[]) => Promise<unknown> } };
+            const orderRequest = context.mock.method(api.prototype, "post", async (args: unknown) => {
+                const payload = args as { url: string; data: Record<string, unknown> };
+                assert.equal(payload.url, "/orders");
+                assert.equal(Object.hasOwn(payload.data, "expire_by"), false);
+                assert.equal(payload.data.amount, 759800);
+                assert.equal(payload.data.currency, "INR");
+                return { id: "order-with-tent", amount: payload.data.amount, currency: "INR" };
+            });
+            let saved = false;
+            stub(prisma, "$transaction", async (callback, options) => {
+                assert.deepEqual(options, { isolationLevel: "Serializable" });
+                const execute = callback as (transaction: object) => Promise<string>;
+                return execute({ eventRegistration: {
+                    count: async () => 0,
+                    create: async ({ data }: { data: { userId: string; amount: number; stayBooked: boolean; stayAmount: number; reservationExpiresAt: Date } }) => {
+                        assert.equal(data.userId, "account-one");
+                        assert.equal(data.amount, 7598);
+                        assert.equal(data.stayBooked, true);
+                        assert.equal(data.stayAmount, 1599);
+                        assert.ok(data.reservationExpiresAt.getTime() > Date.now() + 14 * 60 * 1000);
+                        assert.ok(data.reservationExpiresAt.getTime() <= Date.now() + 15 * 60 * 1000);
+                        saved = true;
+                        return { id: "rider-with-tent" };
+                    },
+                } });
+            });
+            const response = await eventOrder.POST(request("https://example.com", { registrationType: "rider", categories: ["foreign-bikes"], name: "Test Rider", email: "rider@example.com", phone: "001234", city: "Bengaluru", bikeMake: "Test", bikeModel: "Bike", experience: "advanced", acknowledgeOrganiser: true, stayBooked: true }));
+            const data = await response.json();
+            assert.equal(response.status, 200);
+            assert.equal(data.orderId, "order-with-tent");
+            assert.equal(data.stayAmount, 1599);
+            assert.equal(data.amount, 7598);
+            assert.equal(saved, true);
+            assert.equal(orderRequest.mock.callCount(), 1);
+            orderRequest.mock.restore();
+        });
+
         await context.test("admin table requires an event and export applies that event and rider/category filters", async () => {
             currentSession = admin;
             let queries = 0;
