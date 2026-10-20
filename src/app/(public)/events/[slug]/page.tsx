@@ -77,6 +77,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
         <p className="text-xl font-heading font-bold text-success mt-4">Free Entry</p>
       )}
 
+      <EventDocuments eventSlug={event.slug} />
+
       <div className="mt-8 prose prose-invert max-w-none text-foreground/80 leading-relaxed whitespace-pre-line">
         {event.description}
       </div>
@@ -110,8 +112,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
           </ul>
         </div>
       )}
-
-      <EventDocuments eventSlug={event.slug} />
 
       <div className="mt-10 flex gap-4">
         <Link href={event.registrationUrl || "/contact"}>

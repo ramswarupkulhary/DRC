@@ -154,6 +154,8 @@ export default async function UltimateRiderPage() {
                 </div>
             </section>
 
+            <EventDocuments eventSlug="drc-ultimate-rider" />
+
             {/* Data ledger */}
             <section className="border-b border-border bg-background">
                 <div className="max-w-7xl mx-auto px-6 lg:px-10 grid grid-cols-2 md:grid-cols-4 divide-x divide-border">
@@ -322,8 +324,6 @@ export default async function UltimateRiderPage() {
                     </p>
                 </div>
             </section>
-
-            <EventDocuments eventSlug="drc-ultimate-rider" />
 
             {/* Partnership */}
             <section className="border-b border-border">
