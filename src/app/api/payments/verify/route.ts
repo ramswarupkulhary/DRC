@@ -38,6 +38,12 @@ export async function POST(req: Request) {
 
   try {
     if (type === "ride" || type === "training") {
+      if (typeof razorpay_payment_id !== "string" || !razorpay_payment_id) return NextResponse.json({ error: "Missing payment ID." }, { status: 400 });
+      const existing = await prisma.registration.findFirst({ where: { paymentId: razorpay_payment_id } });
+      if (existing) {
+        if (existing.deletedAt || existing.userId !== userId || (type === "ride" ? existing.rideId !== itemId : existing.trainingId !== itemId)) return NextResponse.json({ error: "This payment is already associated with another or removed registration." }, { status: 409 });
+        return NextResponse.json({ success: true, paymentId: razorpay_payment_id, registrationId: existing.id });
+      }
       const quote = await computeQuote(type as PurchaseType, itemId, userId, couponCode);
       const reg = await prisma.registration.create({
         data: {

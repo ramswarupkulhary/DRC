@@ -119,6 +119,7 @@ export async function GET() {
         eventSlug: event.slug,
         stayBooked: true,
         status: "active",
+        deletedAt: null,
         OR: [
           { paymentStatus: "paid" },
           { paymentStatus: "pending", reservationExpiresAt: { gt: new Date() } },

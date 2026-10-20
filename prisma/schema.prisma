@@ -238,6 +238,8 @@ model Registration {
   trainingId    String?
   status        String   @default("pending")
   paymentStatus String   @default("unpaid")
+  deletedAt     DateTime?
+  deletedById   String?
   paymentId     String?
   orderId       String?
   amount        Int
@@ -688,6 +690,8 @@ model EventRegistration {
   currency           String   @default("INR")
   paymentStatus      String   @default("pending") // pending | paid | cancelled
   status             String   @default("active")
+  deletedAt          DateTime?
+  deletedById        String?
   cancelledAt        DateTime?
   cancelledById      String?
   cancellationReason String?
@@ -794,6 +798,8 @@ model ProgramBooking {
   waiverSigned  Boolean  @default(false)
   amount        Int
   status        String   @default("awaiting_approval")
+  deletedAt     DateTime?
+  deletedById   String?
   paymentId     String?
   paymentStatus String   @default("paid")
   note          String?

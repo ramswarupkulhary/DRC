@@ -11,9 +11,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         }
         const registration = await prisma.eventRegistration.findUnique({
             where: { id },
-            select: { id: true, name: true, eventSlug: true, registrationType: true, paymentStatus: true, status: true },
+            select: { id: true, name: true, eventSlug: true, registrationType: true, paymentStatus: true, status: true, deletedAt: true },
         });
-        if (!registration || registration.status !== "active" || registration.eventSlug !== "drc-ultimate-rider" || registration.registrationType !== "spectator" || registration.paymentStatus !== "paid") {
+        if (!registration || registration.deletedAt || registration.status !== "active" || registration.eventSlug !== "drc-ultimate-rider" || registration.registrationType !== "spectator" || registration.paymentStatus !== "paid") {
             return NextResponse.json({ error: "Pass not found." }, { status: 404 });
         }
         const image = await renderSpectatorPass(registration);

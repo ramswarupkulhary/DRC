@@ -23,17 +23,22 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
     if (!await isAdmin()) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    if (Number(req.headers.get("content-length")) > MAX_EVENT_PDF_BYTES + 1024 * 1024) return NextResponse.json({ error: "PDF files must be 10 MB or smaller." }, { status: 413 });
-    const { id } = await params;
-    if (!await prisma.event.findUnique({ where: { id }, select: { id: true } })) return NextResponse.json({ error: "Event not found." }, { status: 404 });
-    const form = await req.formData();
-    const displayText = String(form.get("displayText") || "").trim();
-    const file = form.get("file");
-    if (!displayText || displayText.length > 150 || !(file instanceof File)) return NextResponse.json({ error: "Enter display text (up to 150 characters) and select a PDF." }, { status: 400 });
-    if (file.size > MAX_EVENT_PDF_BYTES) return NextResponse.json({ error: "PDF files must be 10 MB or smaller." }, { status: 413 });
-    const content = new Uint8Array(await file.arrayBuffer());
-    const error = validateEventPdf(file.name, content);
-    if (error) return NextResponse.json({ error }, { status: 400 });
-    const document = await prisma.eventDocument.create({ data: { eventId: id, displayText, filename: file.name.slice(0, 200), content, size: file.size }, select: { id: true, displayText: true, filename: true, size: true } });
-    return NextResponse.json(document, { status: 201 });
+    if (Number(req.headers.get("content-length")) > MAX_EVENT_PDF_BYTES + 1024 * 1024) return NextResponse.json({ error: "PDF files must be 25 MB or smaller." }, { status: 413 });
+    try {
+        const { id } = await params;
+        if (!await prisma.event.findUnique({ where: { id }, select: { id: true } })) return NextResponse.json({ error: "Event not found." }, { status: 404 });
+        const form = await req.formData();
+        const displayText = String(form.get("displayText") || "").trim();
+        const file = form.get("file");
+        if (!displayText || displayText.length > 150 || !file || typeof file === "string") return NextResponse.json({ error: "Enter display text (up to 150 characters) and select a PDF." }, { status: 400 });
+        if (file.size > MAX_EVENT_PDF_BYTES) return NextResponse.json({ error: "PDF files must be 25 MB or smaller." }, { status: 413 });
+        const content = new Uint8Array(await file.arrayBuffer());
+        const error = validateEventPdf(file.name, content);
+        if (error) return NextResponse.json({ error }, { status: 400 });
+        const document = await prisma.eventDocument.create({ data: { eventId: id, displayText, filename: file.name.slice(0, 200), content, size: file.size }, select: { id: true, displayText: true, filename: true, size: true } });
+        return NextResponse.json(document, { status: 201 });
+    } catch (error) {
+        console.error("[event PDF upload]", error);
+        return NextResponse.json({ error: "The PDF could not be uploaded. Please try again, or select a smaller PDF if the connection is slow." }, { status: 500 });
+    }
 }

@@ -6,6 +6,11 @@ import { sendEmail, drcEmailTemplate } from "@/lib/email";
 import { escapePassText } from "@/lib/spectatorPass";
 import { getRazorpay } from "@/lib/razorpay";
 import { EventRefundError, requestEventRefund } from "@/lib/eventRefunds";
+import { deleteAdminEntry } from "@/lib/adminEntryDeletion";
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    return deleteAdminEntry(req, (await params).id, "event");
+}
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
@@ -17,7 +22,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         return NextResponse.json({ error: "Invalid cancellation request." }, { status: 400 });
     }
     if (body.refund === true && body.confirmRefund !== true) return NextResponse.json({ error: "Explicitly confirm the payment refund before continuing." }, { status: 400 });
-    const registration = await prisma.eventRegistration.findFirst({ where: { id, eventSlug: body.eventSlug } });
+    const registration = await prisma.eventRegistration.findFirst({ where: { id, eventSlug: body.eventSlug, deletedAt: null } });
     if (!registration) return NextResponse.json({ error: "Registration not found for this event." }, { status: 404 });
     const reason = typeof body.reason === "string" ? body.reason.trim().slice(0, 2000) : "";
     const cancellationData = { status: "cancelled", cancelledAt: registration.cancelledAt || new Date(), cancelledById: registration.cancelledById || admin.id, cancellationReason: reason || registration.cancellationReason || null, reservationExpiresAt: null };
@@ -31,7 +36,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
                 return NextResponse.json({ error: "Refund details do not match this registration." }, { status: 409 });
             }
             await prisma.eventRegistration.updateMany({
-                where: { id, refundId: registration.refundId, refundStatus: { not: "processed" } },
+                where: { id, deletedAt: null, refundId: registration.refundId, refundStatus: { not: "processed" } },
                 data: { ...cancellationData, refundStatus: refund.status, paymentStatus: refund.status === "processed" ? "refunded" : refund.status === "failed" ? "paid" : "refund_pending" },
             });
             return NextResponse.json({ registration: await prisma.eventRegistration.findUniqueOrThrow({ where: { id } }), refundIssued: refund.status === "processed", refundInitiated: refund.status === "pending" });
@@ -48,7 +53,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         const gateway = await getRazorpay();
         if (!gateway) return NextResponse.json({ error: "Razorpay is not configured." }, { status: 503 });
         const claim = await prisma.eventRegistration.updateMany({
-            where: { id, eventSlug: body.eventSlug, paymentStatus: "paid", refundId: null, OR: [{ refundStatus: null }, { refundStatus: "failed" }] },
+            where: { id, eventSlug: body.eventSlug, deletedAt: null, paymentStatus: "paid", refundId: null, OR: [{ refundStatus: null }, { refundStatus: "failed" }] },
             data: { refundStatus: "processing", refundRequestedAt: new Date(), refundRequestedById: admin.id, refundAmount: registration.amount },
         });
         if (!claim.count) return NextResponse.json({ error: "Another refund request is already in progress. Refresh this registration." }, { status: 409 });
@@ -74,7 +79,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         if (registration.status === "cancelled") return NextResponse.json({ registration, refundIssued: registration.refundStatus === "processed", refundInitiated: registration.refundStatus === "pending" });
         if (["processing", "unknown"].includes(registration.refundStatus || "")) return NextResponse.json({ error: "The refund outcome must be checked before changing this registration.", registration }, { status: 409 });
         const updated = await prisma.eventRegistration.updateMany({
-            where: { id, eventSlug: body.eventSlug, status: "active", OR: [{ refundStatus: null }, { refundStatus: "failed" }] },
+            where: { id, eventSlug: body.eventSlug, deletedAt: null, status: "active", OR: [{ refundStatus: null }, { refundStatus: "failed" }] },
             data: cancellationData,
         });
         changed = updated.count > 0;

@@ -44,15 +44,15 @@ test("registration, admin and document workflows stay scoped and never refund im
             const createdAt = new Date("2026-10-19T00:00:00Z");
             const base = { amount: 5000, paymentStatus: "paid", status: "confirmed", createdAt };
             stub(prisma.registration, "findMany", async (args) => {
-                assert.deepEqual((args as { where: unknown }).where, { userId: "account-one" });
+                assert.deepEqual((args as { where: unknown }).where, { userId: "account-one", deletedAt: null });
                 return [{ ...base, id: "ride", ride: { title: "Ride", slug: "ride" }, training: null }, { ...base, id: "training", ride: null, training: { title: "Training", slug: "training" } }];
             });
             stub(prisma.eventRegistration, "findMany", async (args) => {
-                assert.deepEqual((args as { where: unknown }).where, { userId: "account-one", paymentStatus: { in: ["paid", "refunded", "refund_pending"] } });
+                assert.deepEqual((args as { where: unknown }).where, { userId: "account-one", deletedAt: null, paymentStatus: { in: ["paid", "refunded", "refund_pending"] } });
                 return [{ ...base, id: "race", eventSlug: "drc-ultimate-rider", categoryName: "Class 1", registrationType: "rider", status: "active" }, { ...base, id: "spectator", eventSlug: "drc-ultimate-rider", categoryName: "Spectator pass", registrationType: "spectator", status: "active" }];
             });
             stub(prisma.programBooking, "findMany", async (args) => {
-                assert.deepEqual((args as { where: unknown }).where, { userId: "account-one" });
+                assert.deepEqual((args as { where: unknown }).where, { userId: "account-one", deletedAt: null });
                 return [{ ...base, id: "program", programName: "Family Program", programSlug: "family", companions: [] }];
             });
             stub(prisma.event, "findMany", async () => [{ slug: "drc-ultimate-rider", title: "Ultimate Rider", location: "Bengaluru", date: createdAt }]);
@@ -134,6 +134,7 @@ test("registration, admin and document workflows stay scoped and never refund im
                 queries++;
                 const where = (args as { where: { eventSlug: string; registrationType: string; OR: unknown[]; paymentStatus: unknown } }).where;
                 assert.equal(where.eventSlug, "event-one");
+                assert.equal((args as { where: { deletedAt: unknown } }).where.deletedAt, null);
                 assert.equal(where.registrationType, "rider");
                 assert.equal(where.OR.length, 4);
                 assert.deepEqual(where.paymentStatus, { in: ["paid", "refunded", "refund_pending"] });

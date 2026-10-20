@@ -67,7 +67,7 @@ export async function POST(req: Request) {
 
         const userId = (session.user as { id: string }).id;
         const registration = await prisma.eventRegistration.findFirst({
-            where: { razorpayOrderId: razorpay_order_id, userId, eventSlug: "drc-ultimate-rider" },
+            where: { razorpayOrderId: razorpay_order_id, userId, eventSlug: "drc-ultimate-rider", deletedAt: null },
         });
         if (!registration) return NextResponse.json({ error: "Payment order reservation not found." }, { status: 404 });
         if (registration.status === "cancelled") return NextResponse.json({ error: "This registration has been cancelled. Please contact the event team." }, { status: 409 });
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Order details do not match this registration." }, { status: 400 });
         }
         const paymentUpdate = await prisma.eventRegistration.updateMany({
-            where: { id: registration.id, status: "active", paymentStatus: { not: "paid" } },
+            where: { id: registration.id, deletedAt: null, status: "active", paymentStatus: { not: "paid" } },
             data: {
                 paymentStatus: "paid",
                 razorpayPaymentId: razorpay_payment_id,

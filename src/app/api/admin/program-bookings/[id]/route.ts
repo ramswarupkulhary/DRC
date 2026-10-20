@@ -4,6 +4,11 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { refundPayment } from "@/lib/razorpay";
 import { notifyRider } from "@/lib/notify";
+import { deleteAdminEntry } from "@/lib/adminEntryDeletion";
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+    return deleteAdminEntry(req, (await params).id, "program");
+}
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
@@ -14,7 +19,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const { id } = await params;
     const { action, rejectionNote } = await req.json();
 
-    const booking = await prisma.programBooking.findUnique({ where: { id } });
+    const booking = await prisma.programBooking.findFirst({ where: { id, deletedAt: null } });
     if (!booking) {
         return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }

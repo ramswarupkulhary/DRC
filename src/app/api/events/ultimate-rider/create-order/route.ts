@@ -173,6 +173,7 @@ export async function POST(req: Request) {
                         eventSlug: event.slug,
                         stayBooked: true,
                         status: "active",
+                        deletedAt: null,
                         OR: [
                             { paymentStatus: "paid" },
                             { paymentStatus: "pending", reservationExpiresAt: { gt: now } },

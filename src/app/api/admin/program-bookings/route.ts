@@ -10,6 +10,7 @@ export async function GET() {
     }
 
     const bookings = await prisma.programBooking.findMany({
+        where: { deletedAt: null },
         orderBy: { createdAt: "desc" },
         include: {
             companions: true,

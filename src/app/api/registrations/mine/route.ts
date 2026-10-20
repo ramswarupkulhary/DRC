@@ -14,17 +14,17 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
   const [registrations, eventRegistrations, programs] = await Promise.all([prisma.registration.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: {
       ride: { select: { id: true, title: true, slug: true, location: true, startDate: true, whatsappGroupLink: true, photosLink: true, photosPublished: true } },
       training: { select: { title: true, slug: true, location: true } },
     },
   }), prisma.eventRegistration.findMany({
-    where: { userId: user.id, paymentStatus: { in: ["paid", "refunded", "refund_pending"] } },
+    where: { userId: user.id, deletedAt: null, paymentStatus: { in: ["paid", "refunded", "refund_pending"] } },
     orderBy: { createdAt: "desc" },
   }), prisma.programBooking.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, deletedAt: null },
     orderBy: { createdAt: "desc" },
     include: { companions: true },
   })]);

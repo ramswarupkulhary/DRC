@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Download, Files, Ban, RotateCcw, RefreshCw } from "lucide-react";
+import { DeleteEntryButton } from "@/components/admin/DeleteEntryButton";
 
 interface EventRegistrationRow {
     id: string;
@@ -318,7 +319,7 @@ export default function AdminEventRegistrationsPage() {
                                             {r.razorpayPaymentId ?? "—"}
                                         </span>
                                     </Td>
-                                    <Td><div className="space-y-2 min-w-40">{r.status === "cancelled" ? <span className="block text-xs text-muted">Cancelled{r.cancellationReason ? `: ${r.cancellationReason}` : ""}</span> : <button onClick={() => openCancellation(r)} className="flex items-center gap-1 text-error text-xs"><Ban className="h-4 w-4" />Cancel registration</button>}{canRefund(r) && <button onClick={() => openCancellation(r, true)} className="flex items-center gap-1 text-orange text-xs"><RotateCcw className="h-4 w-4" />{r.status === "cancelled" ? "Refund payment" : "Cancel with refund"}</button>}{r.refundId && <button onClick={() => refreshRefund(r)} className="flex items-center gap-1 text-orange text-xs"><RefreshCw className="h-4 w-4" />Refresh refund status</button>}{["processing", "unknown"].includes(r.refundStatus || "") && <p className="text-xs text-warning">Check Razorpay before retrying.</p>}</div></Td>
+                                    <Td><div className="space-y-2 min-w-40">{r.status === "cancelled" ? <span className="block text-xs text-muted">Cancelled{r.cancellationReason ? `: ${r.cancellationReason}` : ""}</span> : <button onClick={() => openCancellation(r)} className="flex items-center gap-1 text-error text-xs"><Ban className="h-4 w-4" />Cancel registration</button>}{canRefund(r) && <button onClick={() => openCancellation(r, true)} className="flex items-center gap-1 text-orange text-xs"><RotateCcw className="h-4 w-4" />{r.status === "cancelled" ? "Refund payment" : "Cancel with refund"}</button>}{r.refundId && <button onClick={() => refreshRefund(r)} className="flex items-center gap-1 text-orange text-xs"><RefreshCw className="h-4 w-4" />Refresh refund status</button>}{["processing", "unknown"].includes(r.refundStatus || "") && <p className="text-xs text-warning">Check Razorpay before retrying.</p>}<DeleteEntryButton endpoint={`/api/admin/event-registrations/${r.id}`} label={`${r.name}'s ${r.registrationType} registration`} eventSlug={eventSlug} disabled={["processing", "unknown", "pending"].includes(r.refundStatus || "")} onDeleted={() => setRows((current) => current.filter((row) => row.id !== r.id))} /></div></Td>
                                 </tr>
                             ))}
                         </tbody>

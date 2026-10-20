@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Clock3, CheckCircle2, XCircle, User, Phone, Mail } from "lucide-react";
+import { DeleteEntryButton } from "@/components/admin/DeleteEntryButton";
 
 interface Companion {
     id: string;
@@ -146,6 +147,7 @@ export default function AdminProgramBookingsPage() {
                             {b.status === "rejected" && b.rejectionNote && (
                                 <p className="mt-3 text-sm text-error">Reason: {b.rejectionNote}</p>
                             )}
+                            <div className="mt-4 pt-3 border-t border-border"><DeleteEntryButton endpoint={`/api/admin/program-bookings/${b.id}`} label={`${b.user.name || b.user.email}'s ${b.programName} booking`} onDeleted={() => setBookings((current) => current.filter((booking) => booking.id !== b.id))} /></div>
                         </div>
                     ))}
                 </div>

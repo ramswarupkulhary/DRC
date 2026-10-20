@@ -42,12 +42,19 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Invalid payment signature" }, { status: 400 });
     }
 
+    const userId = (session.user as { id: string }).id;
+    if (typeof razorpay_payment_id !== "string" || !razorpay_payment_id) return NextResponse.json({ error: "Missing payment ID." }, { status: 400 });
+    const existing = await prisma.programBooking.findFirst({ where: { paymentId: razorpay_payment_id } });
+    if (existing) {
+        if (existing.deletedAt || existing.userId !== userId || existing.programSlug !== programSlug) return NextResponse.json({ error: "This payment is already associated with another or removed booking." }, { status: 409 });
+        return NextResponse.json({ success: true, bookingId: existing.id });
+    }
+
     const program = await getProgramBySlug(programSlug);
     if (!program) {
         return NextResponse.json({ error: "Invalid program" }, { status: 400 });
     }
 
-    const userId = (session.user as { id: string }).id;
     const supports = !!program.supportsCompanions;
     const normalizedPersons = supports ? Math.max(0, Math.floor(Number(persons) || 0)) : 0;
     const normalizedKids = supports ? Math.max(0, Math.floor(Number(kids) || 0)) : 0;

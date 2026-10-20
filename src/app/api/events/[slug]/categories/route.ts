@@ -55,6 +55,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
                 eventSlug: event.slug,
                 stayBooked: true,
                 status: "active",
+                deletedAt: null,
                 OR: [
                     { paymentStatus: "paid" },
                     { paymentStatus: "pending", reservationExpiresAt: { gt: new Date() } },

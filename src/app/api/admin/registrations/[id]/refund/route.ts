@@ -38,7 +38,7 @@ export async function POST(_req: Request, { params }: Props) {
     },
   });
 
-  if (!registration) {
+  if (!registration || registration.deletedAt) {
     return NextResponse.json({ error: "Registration not found" }, { status: 404 });
   }
 

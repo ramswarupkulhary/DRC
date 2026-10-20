@@ -5,6 +5,11 @@ import { refundPayment } from "@/lib/razorpay";
 import { promoteWaitlist } from "@/lib/waitlist";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { deleteAdminEntry } from "@/lib/adminEntryDeletion";
+
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  return deleteAdminEntry(req, (await params).id, "registration");
+}
 
 export async function PATCH(
   req: Request,
@@ -14,6 +19,7 @@ export async function PATCH(
   const role = (session?.user as { role?: string } | undefined)?.role;
   if (!session?.user || !["admin", "coordinator"].includes(role || "")) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
+  if (!await prisma.registration.findFirst({ where: { id, deletedAt: null }, select: { id: true } })) return NextResponse.json({ error: "Registration not found." }, { status: 404 });
   const body = await req.json();
 
   const data: Record<string, unknown> = {};

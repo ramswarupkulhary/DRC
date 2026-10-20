@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { ChevronLeft, Eye, Check, X, Edit, ChevronDown, ChevronUp, MessageCircle, Image as ImageIcon, Link as LinkIcon, Trash2, Copy, ClipboardList, Award, Send } from "lucide-react";
 import Link from "next/link";
 import { NotifyRidersModal } from "@/components/admin/NotifyRidersModal";
+import { DeleteEntryButton } from "@/components/admin/DeleteEntryButton";
 
 interface Registration {
   id: string;
@@ -367,6 +368,7 @@ export default function AdminRideDetailPage() {
                             Mark Paid
                           </Button>
                         )}
+                        <DeleteEntryButton endpoint={`/api/admin/registrations/${reg.id}`} label={`${reg.user.name || reg.user.email}'s ride registration`} onDeleted={() => { setRegistrations((current) => current.filter((row) => row.id !== reg.id)); setRiderHistory((current) => { const next = { ...current }; delete next[reg.user.id]; return next; }); }} />
                       </div>
 
                       {rejectId === reg.id && (

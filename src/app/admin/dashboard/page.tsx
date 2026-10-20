@@ -18,6 +18,7 @@ export default async function AdminDashboard() {
       prisma.programBooking.findMany({ where: { paymentStatus: "paid", paymentId: { not: null } }, select: { amount: true, createdAt: true } }),
       prisma.eventRegistration.findMany({ where: { paymentStatus: "paid", razorpayPaymentId: { not: null } }, select: { amount: true, createdAt: true } }),
       prisma.registration.findMany({
+        where: { deletedAt: null },
         orderBy: { createdAt: "desc" },
         take: 10,
         include: {

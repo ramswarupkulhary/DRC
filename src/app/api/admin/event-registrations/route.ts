@@ -32,6 +32,7 @@ export async function GET(req: Request) {
     const registrations = await prisma.eventRegistration.findMany({
         where: {
             eventSlug,
+            deletedAt: null,
             ...(status ? { status } : {}),
             ...(registrationType ? { registrationType } : {}),
             ...(category ? { OR: [{ category }, { category: { startsWith: `${category},` } }, { category: { endsWith: `,${category}` } }, { category: { contains: `,${category},` } }] } : {}),

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { X, UserPlus } from "lucide-react";
+import { DeleteEntryButton } from "@/components/admin/DeleteEntryButton";
 
 interface Registration {
   id: string;
@@ -177,7 +178,7 @@ export default function AdminRegistrationsPage() {
                   </td>
                   <td className="px-5 py-3 text-muted text-xs">{new Date(reg.createdAt).toLocaleDateString()}</td>
                   <td className="px-5 py-3">
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {reg.status === "pending" && (
                         <Button size="sm" variant="primary" onClick={() => updateStatus(reg.id, "status", "confirmed")}>
                           Confirm
@@ -193,6 +194,7 @@ export default function AdminRegistrationsPage() {
                           Mark Paid
                         </Button>
                       )}
+                      <DeleteEntryButton endpoint={`/api/admin/registrations/${reg.id}`} label={`${reg.user.name || reg.user.email}'s registration`} onDeleted={() => setRegistrations((current) => current.filter((row) => row.id !== reg.id))} />
                     </div>
                   </td>
                 </tr>

@@ -11,7 +11,7 @@ export async function GET() {
 
     const userId = (session.user as { id: string }).id;
     const bookings = await prisma.programBooking.findMany({
-        where: { userId },
+        where: { userId, deletedAt: null },
         orderBy: { createdAt: "desc" },
         include: { companions: true },
     });
