@@ -7,6 +7,21 @@ import { escapePassText } from "@/lib/spectatorPass";
 
 export const dynamic = "force-dynamic";
 
+function pdfResponse(document: { content: Uint8Array; filename: string; size: number }, inline = false) {
+    return new NextResponse(new Uint8Array(document.content), {
+        headers: {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="event-document.pdf"; filename*=UTF-8''${encodeURIComponent(document.filename)}`,
+            "Content-Length": String(document.size),
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+            "X-Robots-Tag": "noindex",
+            "Referrer-Policy": "no-referrer",
+            "X-Frame-Options": "SAMEORIGIN",
+        },
+    });
+}
+
 export async function HEAD(_req: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const document = await prisma.eventDocument.findFirst({ where: { id, active: true }, select: { size: true } });
@@ -17,6 +32,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     const document = await prisma.eventDocument.findFirst({ where: { id, active: true }, include: { event: { select: { title: true, slug: true } } } });
     if (!document) return NextResponse.json({ error: "Document not found." }, { status: 404 });
+    if (new URL(req.url).searchParams.get("view") === "inline") return pdfResponse(document, true);
     const ip = (req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown").slice(0, 200);
     const recent = await prisma.eventDocumentDownload.count({ where: { documentId: id, ip, downloadedAt: { gte: new Date(Date.now() - 60000) } } });
     if (recent >= 10) return NextResponse.json({ error: "Too many downloads. Please try again in a minute." }, { status: 429, headers: { "Retry-After": "60" } });
@@ -48,15 +64,5 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         console.error("[event PDF download notification]", error);
         await prisma.eventDocumentDownload.update({ where: { id: download.id }, data: { notificationStatus: "failed" } });
     }
-    return new NextResponse(new Uint8Array(document.content), {
-        headers: {
-            "Content-Type": "application/pdf",
-            "Content-Disposition": `attachment; filename="event-document.pdf"; filename*=UTF-8''${encodeURIComponent(document.filename)}`,
-            "Content-Length": String(document.size),
-            "Cache-Control": "private, no-store",
-            "X-Content-Type-Options": "nosniff",
-            "X-Robots-Tag": "noindex",
-            "Referrer-Policy": "no-referrer",
-        }
-    });
+    return pdfResponse(document);
 }

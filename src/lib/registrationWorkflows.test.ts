@@ -209,6 +209,13 @@ test("registration, admin and document workflows stay scoped and never refund im
             stub(prisma.eventDocumentDownload, "update", async () => ({}));
             const params = { params: Promise.resolve({ id: "document-one" }) };
             const req = new Request("https://example.com/api/event-documents/document-one", { headers: { "x-forwarded-for": "203.0.113.10", "user-agent": "Test browser" } });
+            const mailCount = messages.length;
+            const preview = await download.GET(new Request("https://example.com/api/event-documents/document-one?view=inline"), params);
+            assert.equal(await preview.text(), pdf.toString());
+            assert.match(preview.headers.get("Content-Disposition") || "", /^inline;/);
+            assert.equal(preview.headers.get("X-Frame-Options"), "SAMEORIGIN");
+            assert.equal(logs, 0);
+            assert.equal(messages.length, mailCount);
             const response = await download.GET(req, params);
             assert.equal(await response.text(), pdf.toString());
             assert.match(response.headers.get("Content-Disposition") || "", /^attachment;/);
