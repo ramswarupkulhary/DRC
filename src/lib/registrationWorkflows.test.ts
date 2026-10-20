@@ -64,22 +64,17 @@ test("registration, admin and document workflows stay scoped and never refund im
             assert.equal((await history.GET()).status, 401);
         });
 
-        await context.test("spectator bookings link to the signed-in account but guest bookings do not create an account", async () => {
-            stub(prisma.event, "findUnique", async () => ({ id: "event-one", slug: "drc-ultimate-rider" }));
-            let expectedUserId: string | null = "account-one";
-            stub(prisma.eventRegistration, "create", async (args) => {
-                const data = (args as { data: { userId: string | null; stayBooked: boolean; amount: number } }).data;
-                assert.equal(data.userId, expectedUserId);
-                assert.equal(data.stayBooked, false);
-                assert.equal(data.amount, 0);
-                return { id: "spectator-test" };
-            });
+        await context.test("spectator registration is temporarily closed for accounts and guests without creating records or emails", async () => {
+            let created = 0;
+            stub(prisma.eventRegistration, "create", async () => { created++; return { id: "must-not-be-created" }; });
             const body = { registrationType: "spectator", name: "Test Spectator", email: "spectator@example.com", phone: "001234", city: "Bengaluru" };
+            const emailCount = messages.length;
             currentSession = member;
-            assert.equal((await eventOrder.POST(request("https://example.com", body))).status, 200);
+            assert.equal((await eventOrder.POST(request("https://example.com", body))).status, 403);
             currentSession = null;
-            expectedUserId = null;
-            assert.equal((await eventOrder.POST(request("https://example.com", body))).status, 200);
+            assert.equal((await eventOrder.POST(request("https://example.com", body))).status, 403);
+            assert.equal(created, 0);
+            assert.equal(messages.length, emailCount);
         });
 
         await context.test("rider tent checkout uses supported Razorpay fields and retains the database hold", async () => {

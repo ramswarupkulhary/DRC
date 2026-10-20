@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { ArrowRight, Check, Download } from "lucide-react";
+import { SPECTATOR_REGISTRATION_ENABLED } from "@/lib/eventRegistrationConfig";
 
 interface Category {
     id: string;
@@ -98,7 +99,7 @@ export default function UltimateRiderRegisterPage() {
     const [errorMessage, setErrorMessage] = useState<string>("");
 
     useEffect(() => {
-        if (new URLSearchParams(window.location.search).get("type") === "spectator") {
+        if (SPECTATOR_REGISTRATION_ENABLED && new URLSearchParams(window.location.search).get("type") === "spectator") {
             setRegistrationType("spectator");
         }
     }, []);
@@ -321,7 +322,7 @@ export default function UltimateRiderRegisterPage() {
                         <span className="text-orange">Event</span> registration.
                     </h1>
                     <p className="mt-6 max-w-2xl text-lg text-muted">
-                        Choose a race entry or spectator pass, then confirm your booking.
+                        {SPECTATOR_REGISTRATION_ENABLED ? "Choose a race entry or spectator pass, then confirm your booking." : "Choose a race entry, then confirm your booking."}
                     </p>
                 </div>
             </section>
@@ -333,8 +334,8 @@ export default function UltimateRiderRegisterPage() {
                         <legend className="flex items-center gap-3 mb-6">
                             <span className="font-heading text-lg font-bold uppercase tracking-tight">Choose your booking</span>
                         </legend>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {(["rider", "spectator"] as const).map((type) => (
+                        <div className={`grid grid-cols-1 ${SPECTATOR_REGISTRATION_ENABLED ? "sm:grid-cols-2" : ""} gap-4`}>
+                            {(["rider", "spectator"] as const).filter((type) => type === "rider" || SPECTATOR_REGISTRATION_ENABLED).map((type) => (
                                 <label key={type} className={`border p-5 cursor-pointer ${registrationType === type ? "border-orange bg-orange/5" : "border-border"}`}>
                                     <input type="radio" name="registrationType" value={type} checked={registrationType === type} onChange={() => setRegistrationType(type)} className="sr-only" />
                                     <span className="font-heading text-lg font-bold uppercase">{type === "rider" ? "Race rider" : "Spectator"}</span>

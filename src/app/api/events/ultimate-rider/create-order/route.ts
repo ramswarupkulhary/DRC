@@ -7,6 +7,7 @@ import { isActiveMember } from "@/lib/pricing";
 import { drcEmailTemplate, sendEmail } from "@/lib/email";
 import { escapePassText, renderSpectatorPass, spectatorPassDownloadUrl } from "@/lib/spectatorPass";
 import Razorpay from "razorpay";
+import { SPECTATOR_REGISTRATION_ENABLED } from "@/lib/eventRegistrationConfig";
 
 async function getRazorpayInstance() {
     const settings = await prisma.siteSetting.findMany({
@@ -43,6 +44,10 @@ export async function POST(req: Request) {
             acknowledgeOrganiser,
             registrationType = "rider",
         } = body ?? {};
+
+        if (registrationType === "spectator" && !SPECTATOR_REGISTRATION_ENABLED) {
+            return NextResponse.json({ error: "Spectator registration is currently unavailable." }, { status: 403 });
+        }
 
         const session = await getServerSession(authOptions);
         const userId = (session?.user as { id?: string } | undefined)?.id || null;

@@ -1,0 +1,1 @@
+export const SPECTATOR_REGISTRATION_ENABLED = false;

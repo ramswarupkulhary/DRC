@@ -6,6 +6,7 @@ import { Calendar, MapPin, Trophy, ArrowRight } from "lucide-react";
 import { AnimatedPageHeader, AnimatedGrid, AnimatedGridItem, AnimatedSection, HoverCard } from "@/components/ui/AnimatedPage";
 import { Button } from "@/components/ui/Button";
 import type { Metadata } from "next";
+import { SPECTATOR_REGISTRATION_ENABLED } from "@/lib/eventRegistrationConfig";
 
 export const metadata: Metadata = {
   title: "DRC Racing — Off-Road Races & Motorsport Events Across India",
@@ -75,9 +76,9 @@ export default async function EventsPage() {
                 <Link href="/events/drc-ultimate-rider/register">
                   <Button size="lg" variant="outline" className="uppercase tracking-wider">Register for race</Button>
                 </Link>
-                <Link href="/events/drc-ultimate-rider/register?type=spectator">
+                {SPECTATOR_REGISTRATION_ENABLED && <Link href="/events/drc-ultimate-rider/register?type=spectator">
                   <Button size="lg" variant="outline" className="uppercase tracking-wider">Spectator passes</Button>
-                </Link>
+                </Link>}
                 <a href="/magazine/DRC-Ultimate-Rider.pdf" target="_blank" rel="noopener noreferrer" className="font-heading uppercase tracking-widest text-sm text-foreground/70 hover:text-orange transition-colors border-b border-transparent hover:border-orange pb-1 self-center">
                   Sponsor / Partner Deck →
                 </a>
